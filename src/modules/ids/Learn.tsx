@@ -44,7 +44,7 @@ export default function IDSLearn() {
         </p>
       </section>
       
-      <Callout variant="info">
+      <Callout variant="default">
         <strong>The Problem with IPS:</strong> Because Anomaly-based detection has high false positives, putting it in an IPS mode is risky. If the AI makes a mistake, it might accidentally block a legitimate customer from accessing your website!
       </Callout>
     </div>

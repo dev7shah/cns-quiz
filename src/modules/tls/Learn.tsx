@@ -45,7 +45,7 @@ export default function TLSLearn() {
         </p>
       </section>
       
-      <Callout variant="info">
+      <Callout variant="default">
         <strong>Perfect Forward Secrecy (PFS):</strong> Modern TLS uses Diffie-Hellman (ECDHE) for key exchange instead of just RSA. With PFS, a unique session key is generated for every single connection. If a hacker steals the server&apos;s Private Key in the future, they STILL cannot decrypt past recorded traffic!
       </Callout>
     </div>
