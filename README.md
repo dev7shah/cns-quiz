@@ -1,36 +1,57 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# CNS Security Lab
+
+An interactive learning and quiz web application for Computer Network Security (CNS), built as an Innovative Exam project.
+
+## Features
+
+- **8 Comprehensive Modules:**
+  - Cryptography (Caesar, Vigenere, RSA, Hashing)
+  - Authentication (TOTP, Passwords, Salting)
+  - Firewalls (Stateless Packet Filter Simulator)
+  - Cloud Security (CSPM Configuration Checker)
+  - Attacks (SQLi, XSS, DDoS)
+  - Intrusion Detection Systems (IDS Analyzer)
+  - SSL/TLS (Handshake Simulator)
+  - AI Security (Prompt Injection Simulator)
+- **Interactive Playgrounds:** Every module has a live, interactive simulator written purely in TypeScript (no real network or database required).
+- **Quiz Engine:** Built-in quiz platform with Rapid-Fire and Scenario-based rounds, scored in real-time.
+- **Revision Hub:** Flip-to-reveal Flashcards, Master Complexity Tables, and Top 10 Viva Questions.
+- **100% Client-Side:** Static Next.js App Router application. Runs anywhere, works offline, and requires zero environment variables or backend.
 
 ## Getting Started
 
-First, run the development server:
+### Local Development
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+1. Install dependencies:
+   ```bash
+   npm install
+   ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+2. Start the development server:
+   ```bash
+   npm run dev
+   ```
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+3. Open [http://localhost:3000](http://localhost:3000) in your browser.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+### Deployment
 
-## Learn More
+This project is optimized for [Vercel](https://vercel.com). Simply push the repository to GitHub and connect it to a new Vercel project. No environment variables are required.
 
-To learn more about Next.js, take a look at the following resources:
+## Tech Stack
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+- **Framework:** Next.js 16 (App Router)
+- **Language:** TypeScript
+- **Styling:** Tailwind CSS + custom tokens
+- **Animations:** Framer Motion
+- **State Management:** Zustand
+- **Icons:** Lucide React
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## Project Structure
 
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- `/src/app`: Next.js pages and routing
+- `/src/components`: Reusable UI components (Cards, Buttons, Callouts, Tabs)
+- `/src/modules`: The 8 core security modules (Learn, Playground, Complexity, Quiz, Cheat Sheet)
+- `/src/lib`: Core logic and simulators (e.g., `lib/crypto`, `lib/auth`, `lib/firewall`)
+- `/src/data`: Question banks for the Quiz Engine
+- `/docs`: Project documentation, architecture, reports, and presentation outlines.
