@@ -17,6 +17,22 @@ const CloudModule = dynamic(() => import("@/modules/cloud").then(mod => mod.defa
   loading: () => <p className="p-8 text-center text-muted-foreground">Loading Cloud Module...</p>
 })
 
+const AttacksModule = dynamic(() => import("@/modules/attacks").then(mod => mod.default), {
+  loading: () => <p className="p-8 text-center text-muted-foreground">Loading Attacks Module...</p>
+})
+
+const IDSModule = dynamic(() => import("@/modules/ids").then(mod => mod.default), {
+  loading: () => <p className="p-8 text-center text-muted-foreground">Loading IDS Module...</p>
+})
+
+const TLSModule = dynamic(() => import("@/modules/tls").then(mod => mod.default), {
+  loading: () => <p className="p-8 text-center text-muted-foreground">Loading TLS Module...</p>
+})
+
+const AIModule = dynamic(() => import("@/modules/ai").then(mod => mod.default), {
+  loading: () => <p className="p-8 text-center text-muted-foreground">Loading AI Security Module...</p>
+})
+
 export function generateStaticParams() {
   return [
     { slug: 'crypto' },
@@ -40,18 +56,10 @@ export default async function ModulePage({ params }: { params: Promise<{ slug: s
     case 'auth': return <AuthModule />
     case 'firewall': return <FirewallModule />
     case 'cloud': return <CloudModule />
-    case 'attacks':
-    case 'ids':
-    case 'tls':
-    case 'ai':
-      return (
-        <div className="container mx-auto p-4 py-8 text-center">
-          <h1 className="text-3xl font-bold mb-6 capitalize">{slug} Module</h1>
-          <p className="text-muted-foreground">
-            This module is scheduled for Phase 3 and is currently under construction.
-          </p>
-        </div>
-      )
+    case 'attacks': return <AttacksModule />
+    case 'ids': return <IDSModule />
+    case 'tls': return <TLSModule />
+    case 'ai': return <AIModule />
     default:
       notFound()
   }

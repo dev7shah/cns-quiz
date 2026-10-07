@@ -4,6 +4,9 @@ import { authQuestions } from "./auth"
 import { attacksQuestions } from "./attacks"
 import { firewallQuestions } from "./firewalls"
 import { cloudQuestions } from "./cloud"
+import { idsQuestions } from "./ids"
+import { tlsQuestions } from "./tls"
+import { aiQuestions } from "./ai"
 
 // We will aggregate all questions here.
 export const allQuestions: Question[] = [
@@ -12,4 +15,7 @@ export const allQuestions: Question[] = [
   ...attacksQuestions,
   ...firewallQuestions,
   ...cloudQuestions,
+  ...idsQuestions,
+  ...tlsQuestions,
+  ...aiQuestions,
 ]
