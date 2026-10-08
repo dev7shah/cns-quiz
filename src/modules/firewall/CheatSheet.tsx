@@ -1,46 +1,43 @@
 import { Card, CardContent } from "@/components/ui/Card"
+import { Callout } from "@/components/ui/Callout"
 
 export default function FirewallCheatSheet() {
   return (
-    <div className="space-y-6 p-2">
+    <div className="space-y-12">
       <Card>
-        <CardContent className="p-6">
-          <h2 className="text-2xl font-bold mb-6 text-primary border-b pb-2">Firewall & Networking Cheat Sheet</h2>
+        <CardContent className="p-8">
+          <h2 className="text-3xl font-serif mb-8 text-ink border-b border-rule pb-4">Firewall Recap</h2>
           
-          <div className="grid md:grid-cols-2 gap-8">
+          <div className="grid md:grid-cols-2 gap-12">
             <div>
-              <h3 className="text-xl font-bold mb-3">Key Terms</h3>
-              <ul className="space-y-3">
-                <li><strong className="text-primary">ACL (Access Control List):</strong> The ordered list of rules a firewall uses to filter traffic.</li>
-                <li><strong className="text-primary">Stateless:</strong> Evaluates packets individually (Layer 3/4).</li>
-                <li><strong className="text-primary">Stateful:</strong> Tracks active connections (Layer 4).</li>
-                <li><strong className="text-primary">WAF:</strong> Web Application Firewall. Inspects HTTP/S traffic (Layer 7) for SQLi, XSS, etc.</li>
-                <li><strong className="text-primary">DMZ:</strong> Demilitarized Zone. A subnet for external-facing servers (web, email) isolated from the internal network.</li>
+              <h3 className="font-mono text-sm uppercase tracking-wider text-ink-soft mb-6 border-b border-rule pb-2">Key Terms</h3>
+              <ul className="space-y-4">
+                <li><strong className="text-signal font-mono text-[11px] uppercase tracking-wider mr-2">ACL</strong> <span className="text-ink">Access Control List. Ordered rules.</span></li>
+                <li><strong className="text-signal font-mono text-[11px] uppercase tracking-wider mr-2">Stateless</strong> <span className="text-ink">Evaluates packets individually (L3/L4).</span></li>
+                <li><strong className="text-signal font-mono text-[11px] uppercase tracking-wider mr-2">Stateful</strong> <span className="text-ink">Tracks active connections.</span></li>
+                <li><strong className="text-signal font-mono text-[11px] uppercase tracking-wider mr-2">DMZ</strong> <span className="text-ink">Demilitarized Zone for public servers.</span></li>
               </ul>
             </div>
 
             <div>
-              <h3 className="text-xl font-bold mb-3">Common Ports</h3>
-              <ul className="space-y-1 font-mono text-sm">
-                <li>20/21 - FTP (File Transfer)</li>
-                <li>22 - SSH (Secure Shell)</li>
-                <li>23 - Telnet (Insecure, DO NOT USE)</li>
-                <li>25 - SMTP (Email Routing)</li>
-                <li>53 - DNS (Domain Name System)</li>
-                <li>80 - HTTP (Web)</li>
-                <li>443 - HTTPS (Secure Web)</li>
-                <li>3389 - RDP (Remote Desktop)</li>
+              <h3 className="font-mono text-sm uppercase tracking-wider text-ink-soft mb-6 border-b border-rule pb-2">Common Ports</h3>
+              <ul className="space-y-4 font-mono text-[11px] text-ink">
+                <li><strong className="text-signal mr-2">22</strong> SSH (Secure Shell)</li>
+                <li><strong className="text-signal mr-2">53</strong> DNS (Domain Name System)</li>
+                <li><strong className="text-signal mr-2">80</strong> HTTP (Web)</li>
+                <li><strong className="text-signal mr-2">443</strong> HTTPS (Secure Web)</li>
               </ul>
             </div>
           </div>
 
-          <div className="mt-8 bg-muted p-4 rounded-lg border-l-4 border-destructive">
-            <h3 className="text-lg font-bold mb-2">Golden Rules of Firewall Config</h3>
-            <ul className="list-disc pl-5 space-y-2 text-sm">
-              <li><strong>Default Deny:</strong> The last rule should always block everything. Only explicitly allowed traffic should pass.</li>
-              <li><strong>First Match Wins:</strong> Rules are processed top-down. Place more specific rules (e.g., blocking a single bad IP) above general rules (e.g., allowing a whole subnet).</li>
-              <li><strong>Least Privilege:</strong> Only open the specific ports required for a service, to the specific IPs that need it. Never use `ALLOW ANY ANY` unless it&apos;s a public web server on port 80/443.</li>
-            </ul>
+          <div className="mt-12">
+            <Callout variant="warning" title="Golden Rules of Firewall Config">
+              <ul className="list-disc pl-5 space-y-2 mt-2 font-sans text-sm">
+                <li><strong>Default Deny:</strong> Last rule blocks everything.</li>
+                <li><strong>First Match Wins:</strong> Rules processed top-down. Place specific rules above general ones.</li>
+                <li><strong>Least Privilege:</strong> Only open required ports to required IPs.</li>
+              </ul>
+            </Callout>
           </div>
         </CardContent>
       </Card>

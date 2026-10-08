@@ -32,34 +32,37 @@ export default function IDSPlayground() {
   }
 
   return (
-    <div className="space-y-8 p-2">
+    <div className="space-y-12">
       <Card>
         <CardHeader>
-          <div className="flex justify-between items-center">
-            <CardTitle>Network Traffic Logs</CardTitle>
+          <div className="flex justify-between items-center flex-wrap gap-4">
+            <div>
+              <CardTitle className="font-serif text-3xl">Network Traffic Logs</CardTitle>
+              <p className="text-ink-soft text-sm font-sans mt-2">Simulate real-time network traffic and pass it through the IDS.</p>
+            </div>
             <div className="flex gap-2">
               <Button variant="outline" size="sm" onClick={addNormalTraffic}>+ Normal</Button>
               <Button variant="outline" size="sm" onClick={addMaliciousTraffic}>+ Malicious</Button>
-              <Button size="sm" onClick={runSimulation}>Analyze Logs (Run IDS)</Button>
+              <Button size="sm" onClick={runSimulation} className="bg-signal text-paper hover:bg-signal/90 border border-signal shadow-sm font-mono uppercase tracking-wider text-[11px] font-bold">Analyze Logs</Button>
             </div>
           </div>
         </CardHeader>
         <CardContent>
-          <div className="border rounded-lg bg-muted/30 max-h-64 overflow-y-auto">
-            <table className="w-full text-sm">
-              <thead className="bg-muted sticky top-0">
+          <div className="border border-rule bg-card max-h-80 overflow-y-auto">
+            <table className="w-full text-sm font-mono text-left">
+              <thead className="bg-paper sticky top-0 border-b border-rule z-10 text-[10px] uppercase tracking-wider text-ink-soft font-bold">
                 <tr>
-                  <th className="p-2 text-left font-bold border-b">ID</th>
-                  <th className="p-2 text-left font-bold border-b">Source IP</th>
-                  <th className="p-2 text-left font-bold border-b">Action / Payload</th>
+                  <th className="p-3 border-r border-rule">ID</th>
+                  <th className="p-3 border-r border-rule">Source IP</th>
+                  <th className="p-3">Action / Payload</th>
                 </tr>
               </thead>
               <tbody>
                 {logs.map(log => (
-                  <tr key={log.id} className="border-b last:border-0 font-mono">
-                    <td className="p-2">{log.id}</td>
-                    <td className="p-2">{log.ip}</td>
-                    <td className="p-2 break-all">{log.action}</td>
+                  <tr key={log.id} className="border-b border-rule last:border-0 hover:bg-rule/50 transition-colors text-ink">
+                    <td className="p-3 border-r border-rule">{log.id}</td>
+                    <td className="p-3 border-r border-rule">{log.ip}</td>
+                    <td className="p-3 break-all">{log.action}</td>
                   </tr>
                 ))}
               </tbody>
@@ -69,20 +72,25 @@ export default function IDSPlayground() {
       </Card>
 
       {alerts.length > 0 && (
-        <Card className="border-destructive">
-          <CardHeader><CardTitle className="text-destructive">IDS Alerts ({alerts.length})</CardTitle></CardHeader>
+        <Card className="border-bad shadow-[0_0_15px_rgba(var(--color-bad-rgb),0.1)]">
+          <CardHeader>
+            <CardTitle className="font-serif text-3xl text-bad">IDS Alerts ({alerts.length})</CardTitle>
+            <p className="text-ink-soft text-sm font-sans mt-2">The IDS has matched signatures or anomalies against the traffic.</p>
+          </CardHeader>
           <CardContent>
-            <div className="space-y-3">
+            <div className="space-y-4 font-mono">
               {alerts.map((alert, i) => (
-                <div key={i} className={`p-4 border rounded-lg flex items-start gap-4 ${
-                  alert.severity === 'CRITICAL' ? 'bg-destructive/20 border-destructive text-destructive' :
-                  alert.severity === 'HIGH' ? 'bg-orange-500/20 border-orange-500 text-orange-600' :
-                  'bg-yellow-500/20 border-yellow-500 text-yellow-600'
+                <div key={i} className={`p-4 border bg-card flex items-start gap-4 ${
+                  alert.severity === 'CRITICAL' ? 'border-bad text-bad' :
+                  alert.severity === 'HIGH' ? 'border-orange-500 text-orange-600' :
+                  'border-signal text-signal'
                 }`}>
-                  <div className="font-bold shrink-0">[{alert.severity}]</div>
+                  <div className="font-bold shrink-0 uppercase tracking-wider text-[10px] bg-paper px-2 py-1 border border-current">
+                    {alert.severity}
+                  </div>
                   <div>
-                    <div className="font-bold">{alert.message}</div>
-                    <div className="text-sm opacity-80 mt-1">Triggered by Event ID: {alert.eventId}</div>
+                    <div className="font-bold text-sm">{alert.message}</div>
+                    <div className="text-[11px] opacity-80 mt-2 uppercase tracking-wider">Triggered by Event ID: {alert.eventId}</div>
                   </div>
                 </div>
               ))}

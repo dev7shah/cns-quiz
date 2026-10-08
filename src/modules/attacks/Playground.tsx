@@ -12,51 +12,53 @@ export default function AttacksPlayground() {
   const [xssInput, setXssInput] = useState("<script>alert('Hacked!');</script>")
   const [xssSafe, setXssSafe] = useState(false)
   const xssResult = simulateXSS(xssInput, xssSafe)
-
   return (
-    <div className="space-y-8 p-2">
+    <div className="space-y-12">
       <Card>
-        <CardHeader><CardTitle>SQL Injection Simulator</CardTitle></CardHeader>
+        <CardHeader>
+          <CardTitle className="font-serif text-3xl">SQL Injection Simulator</CardTitle>
+          <p className="text-ink-soft text-sm font-sans mt-2">See how malicious input can alter the logic of an unsanitized query.</p>
+        </CardHeader>
         <CardContent>
-          <div className="grid md:grid-cols-2 gap-8">
-            <div className="space-y-4 border p-4 rounded-lg bg-muted/50">
-              <h3 className="font-bold">Login Form</h3>
+          <div className="grid md:grid-cols-2 gap-8 font-mono text-sm">
+            <div className="space-y-4 border border-rule p-4 bg-card">
+              <h3 className="font-bold text-[10px] uppercase tracking-wider text-ink mb-2 border-b border-rule pb-2">Login Form</h3>
               <div>
-                <label className="text-xs font-bold block mb-1">Username</label>
+                <label className="font-mono text-[10px] uppercase tracking-wider font-bold mb-2 block text-ink">Username</label>
                 <input 
-                  className="w-full p-2 border rounded bg-background" 
+                  className="w-full p-2 border border-ink bg-paper text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-signal" 
                   value={sqliUser} 
                   onChange={e => setSqliUser(e.target.value)} 
                 />
               </div>
               <div>
-                <label className="text-xs font-bold block mb-1">Password</label>
+                <label className="font-mono text-[10px] uppercase tracking-wider font-bold mb-2 block text-ink">Password</label>
                 <input 
-                  className="w-full p-2 border rounded bg-background text-destructive font-mono text-sm" 
+                  className="w-full p-2 border border-ink bg-paper text-bad font-mono text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-signal" 
                   value={sqliPass} 
                   onChange={e => setSqliPass(e.target.value)} 
                 />
               </div>
-              <label className="flex items-center gap-2 cursor-pointer mt-4">
-                <input type="checkbox" checked={sqliSafe} onChange={e => setSqliSafe(e.target.checked)} className="w-4 h-4" />
+              <label className="flex items-center gap-2 cursor-pointer mt-4 text-ink-soft hover:text-ink transition-colors">
+                <input type="checkbox" checked={sqliSafe} onChange={e => setSqliSafe(e.target.checked)} className="w-4 h-4 accent-ok" />
                 Use Parameterized Query (Fix)
               </label>
             </div>
 
             <div className="space-y-4">
-              <h3 className="font-bold">Backend Execution</h3>
+              <h3 className="font-bold text-[10px] uppercase tracking-wider text-ink mb-2 border-b border-rule pb-2">Backend Execution</h3>
               <div>
-                <span className="text-xs font-bold">Generated SQL Query:</span>
-                <div className="p-3 bg-card border rounded font-mono text-xs mt-1 break-all">
+                <span className="font-mono text-[10px] uppercase tracking-wider font-bold mb-2 block text-signal">Generated SQL Query</span>
+                <div className="p-3 bg-signal/5 border border-signal text-ink font-mono text-xs break-all min-h-[64px]">
                   {sqliResult.queryExecuted}
                 </div>
               </div>
-              <div className="mt-4 flex flex-col items-center justify-center p-6 border rounded-lg bg-card">
-                <div className="text-lg font-bold mb-2">Auth Status:</div>
+              <div className={`mt-4 flex flex-col items-center justify-center p-6 border ${sqliResult.isAuthenticated ? 'border-bad bg-bad/10' : 'border-ok bg-ok/10'}`}>
+                <div className="text-[10px] uppercase tracking-wider font-bold mb-2 text-ink-soft">Auth Status</div>
                 {sqliResult.isAuthenticated ? (
-                  <div className="text-3xl font-black text-destructive">LOGGED IN (Bypassed) ✕</div>
+                  <div className="text-xl font-bold text-bad tracking-widest">LOGGED IN (Bypassed) ✕</div>
                 ) : (
-                  <div className="text-3xl font-black text-green-500">ACCESS DENIED ✓</div>
+                  <div className="text-xl font-bold text-ok tracking-widest">ACCESS DENIED ✓</div>
                 )}
               </div>
             </div>
@@ -65,31 +67,34 @@ export default function AttacksPlayground() {
       </Card>
 
       <Card>
-        <CardHeader><CardTitle>Cross-Site Scripting (XSS) Simulator</CardTitle></CardHeader>
+        <CardHeader>
+          <CardTitle className="font-serif text-3xl">Cross-Site Scripting (XSS) Simulator</CardTitle>
+          <p className="text-ink-soft text-sm font-sans mt-2">Inject a script into the comment to see how it executes if not sanitized.</p>
+        </CardHeader>
         <CardContent>
-          <div className="grid md:grid-cols-2 gap-8">
-            <div className="space-y-4 border p-4 rounded-lg bg-muted/50">
-              <h3 className="font-bold">Leave a Comment</h3>
+          <div className="grid md:grid-cols-2 gap-8 font-mono text-sm">
+            <div className="space-y-4 border border-rule p-4 bg-card">
+              <h3 className="font-bold text-[10px] uppercase tracking-wider text-ink mb-2 border-b border-rule pb-2">Leave a Comment</h3>
               <textarea 
-                className="w-full p-2 border rounded bg-background font-mono text-sm h-24" 
+                className="w-full p-2 border border-ink bg-paper font-mono text-sm h-24 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-signal" 
                 value={xssInput} 
                 onChange={e => setXssInput(e.target.value)}
               />
-              <label className="flex items-center gap-2 cursor-pointer mt-2">
-                <input type="checkbox" checked={xssSafe} onChange={e => setXssSafe(e.target.checked)} className="w-4 h-4" />
+              <label className="flex items-center gap-2 cursor-pointer mt-2 text-ink-soft hover:text-ink transition-colors">
+                <input type="checkbox" checked={xssSafe} onChange={e => setXssSafe(e.target.checked)} className="w-4 h-4 accent-ok" />
                 Sanitize Output (Fix)
               </label>
             </div>
 
             <div className="space-y-4">
-              <h3 className="font-bold">Rendered Output</h3>
-              <div className="p-4 border rounded min-h-[100px] bg-card overflow-hidden">
+              <h3 className="font-bold text-[10px] uppercase tracking-wider text-ink mb-2 border-b border-rule pb-2">Rendered Output</h3>
+              <div className="p-4 border border-ink bg-paper min-h-[100px]">
                 {xssResult.isExploited ? (
-                  <div className="animate-pulse bg-destructive/20 p-4 border border-destructive rounded text-destructive font-bold text-center">
+                  <div className="animate-pulse bg-bad/20 p-4 border border-bad text-bad font-bold text-center tracking-widest">
                     [Browser executes popup alert!]
                   </div>
                 ) : (
-                  <span className="font-mono text-sm">{xssResult.renderedOutput}</span>
+                  <span className="font-mono text-sm text-ink break-all">{xssResult.renderedOutput}</span>
                 )}
               </div>
             </div>

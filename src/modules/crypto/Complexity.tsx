@@ -3,17 +3,20 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 
 export default function CryptoComplexity() {
   const data = [
-    { algo: "Caesar Brute Force", time: "O(26)", space: "O(1)", meaning: "Try all 26 shifts, constant time.", topic: "crypto" },
-    { algo: "Vigenère Brute Force", time: "O(26^L)", space: "O(1)", meaning: "Exponential to key length L.", topic: "crypto" },
-    { algo: "RSA Encryption (Mod Exp)", time: "O(log e)", space: "O(1)", meaning: "Square and multiply makes it fast.", topic: "crypto" },
-    { algo: "RSA Breaking (Factoring)", time: "Sub-exponential", space: "Large", meaning: "General Number Field Sieve.", topic: "crypto" },
-    { algo: "SHA-256 Hashing", time: "O(n)", space: "O(1)", meaning: "Linear to the length of the message.", topic: "crypto" },
+    { algo: "Caesar Cipher Brute Force", time: "O(26) = O(1)", space: "O(1)", meaning: "Try all 26 shifts. Trivial for computers." },
+    { algo: "Vigenère Cipher (Known Key Len)", time: "O(N)", space: "O(1)", meaning: "Frequency analysis on each interleaved shift." },
+    { algo: "RSA Key Generation", time: "O(log³ N)", space: "O(log N)", meaning: "Primality testing (Miller-Rabin) is probabilistic but fast." },
+    { algo: "RSA Encryption", time: "O(log³ N)", space: "O(log N)", meaning: "Modular exponentiation (M^e mod n)." },
+    { algo: "AES-256 (Symmetric)", time: "O(1) per block", space: "O(1)", meaning: "Highly optimized in hardware (AES-NI). Blazing fast." },
   ]
 
   return (
-    <div className="space-y-8 p-2">
+    <div className="space-y-12">
       <Card>
-        <CardHeader><CardTitle>Time & Space Complexity</CardTitle></CardHeader>
+        <CardHeader>
+          <CardTitle className="font-serif text-3xl">Cryptographic Complexity</CardTitle>
+          <p className="text-ink-soft text-sm font-sans mt-2">The computational cost of breaking encryption vs using it.</p>
+        </CardHeader>
         <CardContent>
           <Table>
             <TableHeader>
@@ -27,10 +30,10 @@ export default function CryptoComplexity() {
             <TableBody>
               {data.map((row, i) => (
                 <TableRow key={i}>
-                  <TableCell className="font-medium">{row.algo}</TableCell>
-                  <TableCell className="font-mono text-primary">{row.time}</TableCell>
-                  <TableCell className="font-mono">{row.space}</TableCell>
-                  <TableCell>{row.meaning}</TableCell>
+                  <TableCell className="font-mono text-xs">{row.algo}</TableCell>
+                  <TableCell className="font-mono text-[11px] text-signal font-bold">{row.time}</TableCell>
+                  <TableCell className="font-mono text-[11px] text-signal font-bold">{row.space}</TableCell>
+                  <TableCell className="text-sm">{row.meaning}</TableCell>
                 </TableRow>
               ))}
             </TableBody>
@@ -39,13 +42,18 @@ export default function CryptoComplexity() {
       </Card>
 
       <Card>
-        <CardHeader><CardTitle>Why RSA is Secure (But Slow)</CardTitle></CardHeader>
-        <CardContent>
+        <CardHeader>
+          <CardTitle className="font-serif text-3xl">Why is RSA so slow?</CardTitle>
+        </CardHeader>
+        <CardContent className="font-sans text-lg text-ink leading-relaxed">
           <p className="mb-4">
-            RSA&apos;s security relies on the fact that multiplying two large prime numbers takes <span className="font-mono text-primary">O(log<sup>2</sup> n)</span> time, but factoring the resulting large number takes <em>Sub-exponential time</em>.
+            RSA involves math with extremely large numbers (2048-bit primes). The time complexity of modular exponentiation is <strong>O(log³ N)</strong>, making it computationally heavy.
+          </p>
+          <p className="mb-4">
+            Symmetric algorithms like AES use simple bitwise operations (XOR, shifting) and lookup tables, which are executed in a single clock cycle using hardware acceleration (AES-NI).
           </p>
           <p>
-            However, the modular exponentiation required to encrypt and decrypt data also takes significantly more CPU cycles than symmetric bit-shifting (AES). This is why RSA is primarily used to encrypt <em>keys</em>, not bulk data.
+            Because of this, we <strong className="text-signal bg-signal/10 px-1 border border-signal">never encrypt large files with RSA</strong>. We use RSA to securely exchange a tiny symmetric key, and then switch to AES for the bulk data transfer.
           </p>
         </CardContent>
       </Card>

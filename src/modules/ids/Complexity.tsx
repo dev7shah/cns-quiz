@@ -3,15 +3,18 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 
 export default function IDSComplexity() {
   const data = [
-    { algo: "Signature Matching (Regex)", time: "O(L * S)", space: "O(S)", meaning: "L = payload length, S = num signatures. Very fast.", topic: "ids" },
-    { algo: "Anomaly Detection (Statistical)", time: "O(N log N)", space: "O(N)", meaning: "N = events. Requires tracking state over time.", topic: "ids" },
-    { algo: "Anomaly Detection (Machine Learning)", time: "O(F * W)", space: "O(W)", meaning: "F = features, W = model weights. Deep learning is slow.", topic: "ids" },
+    { algo: "Signature Matching (Regex)", time: "O(L * S)", space: "O(S)", meaning: "L = payload length, S = num signatures. Very fast." },
+    { algo: "Anomaly Detection (Statistical)", time: "O(N log N)", space: "O(N)", meaning: "N = events. Requires tracking state over time." },
+    { algo: "Anomaly Detection (Machine Learning)", time: "O(F * W)", space: "O(W)", meaning: "F = features, W = model weights. Deep learning is slow." },
   ]
 
   return (
-    <div className="space-y-8 p-2">
+    <div className="space-y-12">
       <Card>
-        <CardHeader><CardTitle>Detection Complexity</CardTitle></CardHeader>
+        <CardHeader>
+          <CardTitle className="font-serif text-3xl">Detection Complexity</CardTitle>
+          <p className="text-ink-soft text-sm font-sans mt-2">The computational and memory cost of processing network traffic in real-time.</p>
+        </CardHeader>
         <CardContent>
           <Table>
             <TableHeader>
@@ -25,10 +28,10 @@ export default function IDSComplexity() {
             <TableBody>
               {data.map((row, i) => (
                 <TableRow key={i}>
-                  <TableCell className="font-medium">{row.algo}</TableCell>
-                  <TableCell className="font-mono text-primary">{row.time}</TableCell>
-                  <TableCell className="font-mono">{row.space}</TableCell>
-                  <TableCell>{row.meaning}</TableCell>
+                  <TableCell className="font-mono text-xs text-ink">{row.algo}</TableCell>
+                  <TableCell className="font-mono text-[11px] text-signal font-bold">{row.time}</TableCell>
+                  <TableCell className="font-mono text-[11px] text-signal font-bold">{row.space}</TableCell>
+                  <TableCell className="text-sm text-ink">{row.meaning}</TableCell>
                 </TableRow>
               ))}
             </TableBody>
@@ -37,13 +40,15 @@ export default function IDSComplexity() {
       </Card>
 
       <Card>
-        <CardHeader><CardTitle>The False Positive Paradox</CardTitle></CardHeader>
-        <CardContent>
+        <CardHeader>
+          <CardTitle className="font-serif text-3xl">The False Positive Paradox</CardTitle>
+        </CardHeader>
+        <CardContent className="font-sans text-lg text-ink leading-relaxed">
           <p className="mb-4">
             If you have an IDS looking at 1,000,000 packets a day, and the anomaly detection model is 99% accurate...
           </p>
           <p className="mb-4">
-            It will still generate <strong>10,000 False Positives every single day</strong>! This causes <em>Alert Fatigue</em>, where security analysts start ignoring the dashboard entirely because there are too many useless alerts.
+            It will still generate <strong className="text-bad bg-bad/10 px-1 border border-bad">10,000 False Positives every single day</strong>! This causes <em className="text-signal font-bold">Alert Fatigue</em>, where security analysts start ignoring the dashboard entirely because there are too many useless alerts.
           </p>
           <p>
             Because of this, most enterprises rely heavily on <strong>Signature-based</strong> detection (which has almost 0% false positives) for the bulk of their alerts, and only use Anomaly-based detection for highly specific, high-risk assets.

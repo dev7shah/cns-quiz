@@ -16,9 +16,23 @@ The application is built using Next.js 16 (App Router) with TypeScript. It is a 
 - **State Management:** Zustand (for Quiz Engine scoring and timer state)
 - **Data Layer:** Hardcoded TypeScript objects (`src/data/questions`) serve as the database to eliminate external dependencies.
 
-### 3.1 Module Design
+### 3.1 Design System: "The Lab Notebook"
+The application utilizes a custom design system tokenized in CSS. It mimics a physical lab notebook combined with a precise instrument panel, utilizing:
+- **Warm Themes:** Paper (`#F4F1EA`) and Ink (`#16130F`) backgrounds.
+- **Typography:** Instrument Serif for display headers, JetBrains Mono for technical labels, and Geist Sans for UI.
+- **Structural Integrity:** A strict 12-column grid and heavy use of 1px ruled lines to separate components.
+
+### 3.2 Pedagogical Framework
+Every concept across the 8 modules is taught using a strict "Three-Layer" approach implemented via the `<GuidedLesson>` component:
+1. **Picture it:** A real-world analogy.
+2. **See it work:** An interactive, animated SVG diagram.
+3. **Say it in exam words:** A strict, formal definition.
+
+Additionally, the application features a **Presenter Mode**, accessible via the `[P]` shortcut, providing a distraction-free overlay designed specifically for classroom projection.
+
+### 3.3 Module Design
 Each of the 8 modules follows a strict UI pattern for consistency:
-1. **Learn:** Theoretical foundation.
+1. **Learn:** Guided "scrollytelling" lesson and diagrams.
 2. **Playground:** Pure TypeScript simulators (e.g., `src/lib/auth/totp.ts`).
 3. **Complexity:** Analysis of algorithmic time and space complexity.
 4. **Quiz:** Topic-specific practice questions.

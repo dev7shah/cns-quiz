@@ -11,7 +11,7 @@ export function simulateSQLi(usernameInput: string, passwordInput: string, isVul
 
   let queryExecuted = ""
   let isAuthenticated = false
-  let error = null
+  const error = null
 
   if (isVulnerable) {
     // Vulnerable string concatenation

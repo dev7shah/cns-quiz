@@ -11,7 +11,7 @@ export function Stepper({
   className?: string
 }) {
   return (
-    <div className={cn("flex w-full items-center justify-between", className)}>
+    <div className={cn("flex w-full items-center justify-between font-mono", className)}>
       {steps.map((step, index) => {
         const isCompleted = index < currentStep
         const isCurrent = index === currentStep
@@ -21,21 +21,23 @@ export function Stepper({
             <div className="relative flex flex-col items-center">
               <div
                 className={cn(
-                  "flex h-8 w-8 items-center justify-center rounded-full border-2 text-sm font-semibold transition-colors",
+                  "flex h-8 w-8 items-center justify-center border border-ink text-[11px] font-bold transition-colors",
                   {
-                    "border-primary bg-primary text-primary-foreground": isCompleted || isCurrent,
-                    "border-muted bg-background text-muted-foreground": !isCompleted && !isCurrent,
+                    "bg-signal text-white": isCurrent,
+                    "bg-ink text-paper": isCompleted && !isCurrent,
+                    "bg-paper text-ink": !isCompleted && !isCurrent,
                   }
                 )}
               >
-                {index + 1}
+                {String(index + 1).padStart(2, '0')}
               </div>
               <div
                 className={cn(
-                  "absolute -bottom-6 w-max text-xs font-medium",
+                  "absolute -bottom-6 w-max text-[10px] tracking-wider uppercase transition-colors",
                   {
-                    "text-foreground": isCurrent || isCompleted,
-                    "text-muted-foreground": !isCurrent && !isCompleted,
+                    "text-signal font-bold": isCurrent,
+                    "text-ink font-semibold": isCompleted && !isCurrent,
+                    "text-ink-soft": !isCurrent && !isCompleted,
                   }
                 )}
               >
@@ -45,10 +47,10 @@ export function Stepper({
             {index < steps.length - 1 && (
               <div
                 className={cn(
-                  "mx-4 h-[2px] flex-1 transition-colors",
+                  "mx-4 h-[1px] flex-1 transition-colors",
                   {
-                    "bg-primary": isCompleted,
-                    "bg-muted": !isCompleted,
+                    "bg-ink": isCompleted || isCurrent,
+                    "bg-rule": !isCompleted && !isCurrent,
                   }
                 )}
               />

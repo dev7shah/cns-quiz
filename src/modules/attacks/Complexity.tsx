@@ -9,9 +9,12 @@ export default function AttacksComplexity() {
   ]
 
   return (
-    <div className="space-y-8 p-2">
+    <div className="space-y-12">
       <Card>
-        <CardHeader><CardTitle>Attack Mechanics & Amplification</CardTitle></CardHeader>
+        <CardHeader>
+          <CardTitle className="font-serif text-3xl">Attack Mechanics & Amplification</CardTitle>
+          <p className="text-ink-soft text-sm font-sans mt-2">The efficiency of exploits and denial of service.</p>
+        </CardHeader>
         <CardContent>
           <Table>
             <TableHeader>
@@ -25,10 +28,10 @@ export default function AttacksComplexity() {
             <TableBody>
               {data.map((row, i) => (
                 <TableRow key={i}>
-                  <TableCell className="font-medium">{row.algo}</TableCell>
-                  <TableCell className="font-mono text-primary">{row.time}</TableCell>
-                  <TableCell className="font-mono">{row.space}</TableCell>
-                  <TableCell>{row.meaning}</TableCell>
+                  <TableCell className="font-mono text-xs">{row.algo}</TableCell>
+                  <TableCell className="font-mono text-[11px] text-signal font-bold">{row.time}</TableCell>
+                  <TableCell className="font-mono text-[11px] text-signal font-bold">{row.space}</TableCell>
+                  <TableCell className="text-sm">{row.meaning}</TableCell>
                 </TableRow>
               ))}
             </TableBody>
@@ -37,10 +40,12 @@ export default function AttacksComplexity() {
       </Card>
 
       <Card>
-        <CardHeader><CardTitle>The Power of Amplification</CardTitle></CardHeader>
-        <CardContent>
+        <CardHeader>
+          <CardTitle className="font-serif text-3xl">The Power of Amplification</CardTitle>
+        </CardHeader>
+        <CardContent className="font-sans text-lg text-ink leading-relaxed">
           <p className="mb-4">
-            In a <strong>DNS Amplification Attack</strong>, the attacker spoofs the victim's IP address and sends a small 60-byte query to a vulnerable DNS server.
+            In a <strong className="text-signal bg-signal/10 px-1 border border-signal">DNS Amplification Attack</strong>, the attacker spoofs the victim&apos;s IP address and sends a small 60-byte query to a vulnerable DNS server.
           </p>
           <p className="mb-4">
             The DNS server responds with a massive 3000-byte record directly to the victim. This is an <strong>Amplification Factor of 50x</strong>.

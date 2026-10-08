@@ -1,7 +1,7 @@
 "use client"
 
 import { useState } from "react"
-import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/Card"
+import { motion, AnimatePresence } from "framer-motion"
 import { ChevronDown, ChevronUp } from "lucide-react"
 
 const vivaQuestions = [
@@ -21,33 +21,55 @@ export default function VivaQuestions() {
   const [openIndex, setOpenIndex] = useState<number | null>(null)
 
   return (
-    <div className="space-y-4 max-w-3xl mx-auto py-8">
-      <div className="text-center mb-8">
-        <h2 className="text-3xl font-bold mb-2">Top 10 Viva Questions</h2>
-        <p className="text-muted-foreground">Click a question to reveal the examiner&apos;s expected answer.</p>
+    <div className="space-y-6 max-w-4xl mx-auto py-8">
+      <div className="mb-12 border-b border-rule pb-6">
+        <h2 className="text-4xl font-serif text-ink mb-2">Examiner Q&A Bank</h2>
+        <p className="text-ink-soft font-sans">
+          The top 10 most frequently asked oral examination questions across all security modules.
+        </p>
       </div>
 
-      {vivaQuestions.map((item, i) => (
-        <Card 
-          key={i} 
-          className={`cursor-pointer transition-colors ${openIndex === i ? 'border-primary' : 'hover:border-primary/50'}`}
-          onClick={() => setOpenIndex(openIndex === i ? null : i)}
-        >
-          <CardHeader className="flex flex-row items-center justify-between p-4">
-            <CardTitle className="text-lg leading-tight">
-              <span className="text-primary mr-3 font-mono">Q{i + 1}.</span>
-              {item.q}
-            </CardTitle>
-            {openIndex === i ? <ChevronUp className="h-5 w-5 text-primary" /> : <ChevronDown className="h-5 w-5 text-muted-foreground" />}
-          </CardHeader>
-          {openIndex === i && (
-            <CardContent className="p-4 pt-0 text-muted-foreground bg-primary/5 rounded-b-lg border-t border-primary/10 mt-2">
-              <div className="font-bold text-foreground mb-1">Expected Answer:</div>
-              {item.a}
-            </CardContent>
-          )}
-        </Card>
-      ))}
+      <div className="space-y-4">
+        {vivaQuestions.map((item, i) => (
+          <div 
+            key={i} 
+            className={`border transition-colors duration-200 ${openIndex === i ? 'bg-card border-ink shadow-[4px_4px_0_var(--rule)]' : 'bg-paper border-rule hover:border-ink hover:bg-card'}`}
+          >
+            <button
+              className="w-full flex items-center justify-between p-6 text-left cursor-pointer focus:outline-none"
+              onClick={() => setOpenIndex(openIndex === i ? null : i)}
+            >
+              <div className="flex gap-6 items-start">
+                <span className="font-mono text-signal font-bold mt-1">
+                  {String(i + 1).padStart(2, '0')}
+                </span>
+                <span className="text-xl font-serif text-ink">{item.q}</span>
+              </div>
+              {openIndex === i ? (
+                <ChevronUp className="h-5 w-5 text-signal flex-shrink-0 ml-4" />
+              ) : (
+                <ChevronDown className="h-5 w-5 text-ink-soft flex-shrink-0 ml-4" />
+              )}
+            </button>
+            
+            <AnimatePresence>
+              {openIndex === i && (
+                <motion.div 
+                  initial={{ height: 0, opacity: 0 }}
+                  animate={{ height: "auto", opacity: 1 }}
+                  exit={{ height: 0, opacity: 0 }}
+                  className="overflow-hidden"
+                >
+                  <div className="p-6 pt-0 ml-[3.25rem] mr-6 pb-6 text-ink border-t border-rule mt-2">
+                    <div className="font-mono text-[10px] uppercase tracking-widest text-ink-soft mb-3 pt-4">Expected Answer</div>
+                    <p className="font-sans leading-relaxed">{item.a}</p>
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </div>
+        ))}
+      </div>
     </div>
   )
 }

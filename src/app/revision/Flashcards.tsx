@@ -1,8 +1,7 @@
 "use client"
 
 import { useState } from "react"
-import { motion, AnimatePresence } from "framer-motion"
-import { Card } from "@/components/ui/Card"
+import { motion } from "framer-motion"
 import { Button } from "@/components/ui/Button"
 import { ChevronLeft, ChevronRight, RefreshCw } from "lucide-react"
 
@@ -39,8 +38,8 @@ export default function Flashcards() {
 
   return (
     <div className="flex flex-col items-center justify-center py-12 max-w-2xl mx-auto">
-      <div className="text-muted-foreground mb-4 font-mono">
-        Card {currentIndex + 1} of {flashcards.length}
+      <div className="font-mono text-[10px] uppercase tracking-widest text-ink-soft mb-8 bg-card border border-rule px-4 py-1">
+        Index {String(currentIndex + 1).padStart(2, '0')} / {String(flashcards.length).padStart(2, '0')}
       </div>
 
       <div className="relative w-full aspect-[3/2] perspective-[1000px] cursor-pointer" onClick={() => setIsFlipped(!isFlipped)}>
@@ -51,30 +50,32 @@ export default function Flashcards() {
           style={{ transformStyle: "preserve-3d" }}
         >
           {/* Front */}
-          <Card className="absolute w-full h-full backface-hidden p-8 flex items-center justify-center text-center shadow-lg bg-card border-primary/20">
-            <h2 className="text-2xl font-bold leading-tight">{flashcards[currentIndex].q}</h2>
-          </Card>
+          <div className="absolute w-full h-full backface-hidden p-8 md:p-12 flex flex-col items-center justify-center text-center bg-card border border-ink shadow-[4px_4px_0_var(--rule)]">
+            <div className="absolute top-4 left-4 font-mono text-xs text-signal font-bold uppercase tracking-widest">Question</div>
+            <h2 className="text-3xl md:text-4xl font-serif leading-tight text-ink">{flashcards[currentIndex].q}</h2>
+          </div>
 
           {/* Back */}
-          <Card className="absolute w-full h-full backface-hidden p-8 flex items-center justify-center text-center shadow-lg bg-primary/10 border-primary" style={{ transform: "rotateX(180deg)" }}>
-            <p className="text-xl leading-relaxed">{flashcards[currentIndex].a}</p>
-          </Card>
+          <div className="absolute w-full h-full backface-hidden p-8 md:p-12 flex flex-col items-center justify-center text-center bg-paper border border-ok shadow-[4px_4px_0_var(--ok)]" style={{ transform: "rotateX(180deg)" }}>
+            <div className="absolute top-4 right-4 font-mono text-xs text-ok font-bold uppercase tracking-widest">Answer</div>
+            <p className="text-xl md:text-2xl font-sans leading-relaxed text-ink">{flashcards[currentIndex].a}</p>
+          </div>
         </motion.div>
       </div>
 
-      <div className="flex items-center gap-6 mt-8">
-        <Button variant="outline" size="icon" onClick={handlePrev} className="h-12 w-12 rounded-full">
+      <div className="flex items-center gap-6 mt-12">
+        <Button variant="outline" onClick={handlePrev} className="h-12 w-12 rounded-none border border-ink text-ink hover:bg-card hover:text-signal transition-colors p-0 flex items-center justify-center">
           <ChevronLeft className="h-6 w-6" />
         </Button>
-        <Button variant="ghost" onClick={() => setIsFlipped(!isFlipped)} className="gap-2">
+        <Button variant="ghost" onClick={() => setIsFlipped(!isFlipped)} className="gap-2 font-mono uppercase tracking-wider text-xs border border-transparent hover:border-ink rounded-none">
           <RefreshCw className="h-4 w-4" />
           Flip
         </Button>
-        <Button variant="outline" size="icon" onClick={handleNext} className="h-12 w-12 rounded-full">
+        <Button variant="outline" onClick={handleNext} className="h-12 w-12 rounded-none border border-ink text-ink hover:bg-card hover:text-signal transition-colors p-0 flex items-center justify-center">
           <ChevronRight className="h-6 w-6" />
         </Button>
       </div>
-      <p className="text-sm text-muted-foreground mt-4">Click the card or press Flip to see the answer</p>
+      <p className="text-[10px] uppercase tracking-widest font-mono text-ink-soft mt-8">Click the card to reveal the answer</p>
 
       {/* Required CSS for 3D flip effect */}
       <style dangerouslySetInnerHTML={{__html: `

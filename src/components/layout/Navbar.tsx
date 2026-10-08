@@ -3,46 +3,39 @@ import { Shield } from "lucide-react"
 
 export function Navbar() {
   return (
-    <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-      <div className="container mx-auto flex h-14 items-center px-4">
-        <div className="mr-4 hidden md:flex">
-          <Link href="/" className="mr-6 flex items-center space-x-2">
-            <Shield className="h-6 w-6 text-primary" />
-            <span className="hidden font-bold sm:inline-block">
-              CNS Security Lab
+    <header className="sticky top-0 z-50 w-full border-b border-rule bg-paper">
+      <div className="container mx-auto flex h-14 items-center px-4 max-w-[1180px]">
+        <div className="flex w-full justify-between items-center">
+          <Link href="/" className="flex items-center space-x-3 group">
+            {/* Simple SVG icon instead of Lucide to match spec "one consistent inline SVG set" */}
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="square" className="text-signal group-hover:-translate-y-[1px] transition-transform">
+              <rect x="3" y="3" width="18" height="18" />
+              <path d="M3 9h18M9 21V9" />
+            </svg>
+            <span className="font-serif text-xl tracking-wide pt-1">
+              CNS Lab
             </span>
           </Link>
-          <nav className="flex items-center space-x-6 text-sm font-medium">
+          <nav className="flex items-center space-x-8 text-sm font-sans font-medium">
             <Link
               href="/"
-              className="transition-colors hover:text-foreground/80 text-foreground"
+              className="transition-colors hover:text-signal text-ink"
             >
-              Dashboard
+              Modules
             </Link>
             <Link
               href="/quiz"
-              className="transition-colors hover:text-foreground/80 text-foreground/60"
+              className="transition-colors hover:text-signal text-ink"
             >
               Quiz Challenge
             </Link>
             <Link
               href="/revision"
-              className="transition-colors hover:text-foreground/80 text-foreground/60"
+              className="transition-colors hover:text-signal text-ink"
             >
               Revision
             </Link>
-            <Link
-              href="/about"
-              className="transition-colors hover:text-foreground/80 text-foreground/60"
-            >
-              About
-            </Link>
           </nav>
-        </div>
-        <div className="flex flex-1 items-center justify-between space-x-2 md:justify-end">
-          <div className="w-full flex-1 md:w-auto md:flex-none">
-            {/* Theme toggle could go here */}
-          </div>
         </div>
       </div>
     </header>

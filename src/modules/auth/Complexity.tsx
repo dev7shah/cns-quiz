@@ -9,11 +9,13 @@ export default function AuthComplexity() {
     { algo: "Bcrypt Hashing", time: "O(2^C)", space: "O(1)", meaning: "C is the cost factor. Intentionally slow.", topic: "auth" },
     { algo: "TOTP Generation", time: "O(1)", space: "O(1)", meaning: "Fast HMAC calculation.", topic: "auth" },
   ]
-
   return (
-    <div className="space-y-8 p-2">
+    <div className="space-y-12">
       <Card>
-        <CardHeader><CardTitle>Authentication Attack Complexity</CardTitle></CardHeader>
+        <CardHeader>
+          <CardTitle className="font-serif text-3xl">Authentication Attack Complexity</CardTitle>
+          <p className="text-ink-soft text-sm font-sans mt-2">The computational cost of breaking passwords vs defending them.</p>
+        </CardHeader>
         <CardContent>
           <Table>
             <TableHeader>
@@ -27,10 +29,10 @@ export default function AuthComplexity() {
             <TableBody>
               {data.map((row, i) => (
                 <TableRow key={i}>
-                  <TableCell className="font-medium">{row.algo}</TableCell>
-                  <TableCell className="font-mono text-primary">{row.time}</TableCell>
-                  <TableCell className="font-mono">{row.space}</TableCell>
-                  <TableCell>{row.meaning}</TableCell>
+                  <TableCell className="font-mono text-xs">{row.algo}</TableCell>
+                  <TableCell className="font-mono text-[11px] text-signal font-bold">{row.time}</TableCell>
+                  <TableCell className="font-mono text-[11px] text-signal font-bold">{row.space}</TableCell>
+                  <TableCell className="text-sm">{row.meaning}</TableCell>
                 </TableRow>
               ))}
             </TableBody>
@@ -39,15 +41,17 @@ export default function AuthComplexity() {
       </Card>
 
       <Card>
-        <CardHeader><CardTitle>The Physics of Password Cracking</CardTitle></CardHeader>
-        <CardContent>
+        <CardHeader>
+          <CardTitle className="font-serif text-3xl">The Physics of Password Cracking</CardTitle>
+        </CardHeader>
+        <CardContent className="font-sans text-lg text-ink leading-relaxed">
           <p className="mb-4">
-            A password with 40 bits of entropy has <span className="font-mono">2<sup>40</sup> ≈ 1 trillion</span> possibilities. 
+            A password with 40 bits of entropy has <span className="font-mono bg-paper px-1 border border-ink">2<sup>40</sup> ≈ 1 trillion</span> possibilities. 
             A modern GPU cluster can compute billions of fast hashes (like MD5) per second, cracking this in minutes.
           </p>
           <p>
-            By using a slow hashing algorithm like <strong>bcrypt</strong> with a high cost factor, you force the GPU to take 0.1 seconds per hash. 
-            Suddenly, cracking those 1 trillion possibilities takes 3,170 years.
+            By using a slow hashing algorithm like <strong className="text-signal">bcrypt</strong> with a high cost factor, you force the GPU to take 0.1 seconds per hash. 
+            Suddenly, cracking those 1 trillion possibilities takes <strong className="text-ok bg-ok/10 px-1 border border-ok">3,170 years</strong>.
           </p>
         </CardContent>
       </Card>

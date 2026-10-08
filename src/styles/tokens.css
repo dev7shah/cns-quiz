@@ -1,70 +1,50 @@
 @layer base {
   :root {
-    --background: hsl(210, 40%, 98%);
-    --foreground: hsl(222.2, 84%, 4.9%);
+    --paper: #F4F1EA;
+    --card: #FBF9F4;
+    --ink: #16130F;
+    --ink-soft: #5D574C;
+    --rule: #D9D3C5;
+    --signal: #E5390F;
+    --ok: #1F7A4D;
+    --warn: #B7791F;
+    --bad: #B3261E;
+    --info: #1F4FD8;
 
-    --card: hsl(0, 0%, 100%);
-    --card-foreground: hsl(222.2, 84%, 4.9%);
-
-    --popover: hsl(0, 0%, 100%);
-    --popover-foreground: hsl(222.2, 84%, 4.9%);
-
-    --primary: hsl(173, 58%, 39%);
-    --primary-foreground: hsl(210, 40%, 98%);
-
-    --secondary: hsl(210, 40%, 96.1%);
-    --secondary-foreground: hsl(222.2, 47.4%, 11.2%);
-
-    --muted: hsl(210, 40%, 96.1%);
-    --muted-foreground: hsl(215.4, 16.3%, 46.9%);
-
-    --accent: hsl(173, 58%, 39%);
-    --accent-foreground: hsl(210, 40%, 98%);
-
-    --destructive: hsl(0, 84.2%, 60.2%);
-    --destructive-foreground: hsl(210, 40%, 98%);
-
-    --warning: hsl(38, 92%, 50%);
-    --warning-foreground: hsl(48, 96%, 89%);
-
-    --border: hsl(214.3, 31.8%, 91.4%);
-    --input: hsl(214.3, 31.8%, 91.4%);
-    --ring: hsl(173, 58%, 39%);
-
-    --radius: 0.5rem;
+    /* Semantic mappings for standard Tailwind/Next UI components */
+    --background: var(--paper);
+    --foreground: var(--ink);
+    --muted: var(--card);
+    --muted-foreground: var(--ink-soft);
+    --primary: var(--signal);
+    --primary-foreground: #FFFFFF;
+    --border: var(--rule);
+    --input: var(--rule);
+    --ring: var(--signal);
+    --radius: 6px;
   }
 
   .dark {
-    --background: hsl(222.2, 84%, 4.9%);
-    --foreground: hsl(210, 40%, 98%);
+    --paper: #0E1116;
+    --card: #151A21;
+    --ink: #ECE8DF;
+    --ink-soft: #9A958A;
+    --rule: #2A313B;
+    --signal: #FF5A2C;
+    --ok: #3CCB82;
+    --warn: #E8B03A;
+    --bad: #FF6B5E;
+    --info: #6C8CFF;
 
-    --card: hsl(222.2, 84%, 6%);
-    --card-foreground: hsl(210, 40%, 98%);
-
-    --popover: hsl(222.2, 84%, 4.9%);
-    --popover-foreground: hsl(210, 40%, 98%);
-
-    --primary: hsl(173, 58%, 39%);
-    --primary-foreground: hsl(222.2, 47.4%, 11.2%);
-
-    --secondary: hsl(217.2, 32.6%, 17.5%);
-    --secondary-foreground: hsl(210, 40%, 98%);
-
-    --muted: hsl(217.2, 32.6%, 17.5%);
-    --muted-foreground: hsl(215, 20.2%, 65.1%);
-
-    --accent: hsl(173, 58%, 39%);
-    --accent-foreground: hsl(210, 40%, 98%);
-
-    --destructive: hsl(0, 62.8%, 30.6%);
-    --destructive-foreground: hsl(210, 40%, 98%);
-
-    --warning: hsl(38, 92%, 50%);
-    --warning-foreground: hsl(48, 96%, 89%);
-
-    --border: hsl(217.2, 32.6%, 17.5%);
-    --input: hsl(217.2, 32.6%, 17.5%);
-    --ring: hsl(173, 58%, 39%);
+    --background: var(--paper);
+    --foreground: var(--ink);
+    --muted: var(--card);
+    --muted-foreground: var(--ink-soft);
+    --primary: var(--signal);
+    --primary-foreground: #FFFFFF;
+    --border: var(--rule);
+    --input: var(--rule);
+    --ring: var(--signal);
   }
 }
 
@@ -75,5 +55,7 @@
   body {
     background-color: var(--background);
     color: var(--foreground);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
   }
 }

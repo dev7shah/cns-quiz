@@ -15,17 +15,19 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
       <Comp
         ref={ref}
         className={cn(
-          "inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50",
+          "inline-flex items-center justify-center whitespace-nowrap rounded-[6px] text-sm font-medium font-sans transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-signal disabled:pointer-events-none disabled:opacity-50",
+          "border border-ink", // 1px ink border
+          "shadow-[2px_2px_0_var(--color-rule)] hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none active:translate-x-[2px] active:translate-y-[2px] active:shadow-none", // offset shadow moving 2px
           {
-            "bg-primary text-primary-foreground shadow hover:bg-primary/90": variant === "default",
-            "bg-destructive text-destructive-foreground shadow-sm hover:bg-destructive/90": variant === "destructive",
-            "border border-input bg-background shadow-sm hover:bg-accent hover:text-accent-foreground": variant === "outline",
-            "bg-secondary text-secondary-foreground shadow-sm hover:bg-secondary/80": variant === "secondary",
-            "hover:bg-accent hover:text-accent-foreground": variant === "ghost",
-            "text-primary underline-offset-4 hover:underline": variant === "link",
+            "bg-signal text-white": variant === "default",
+            "bg-bad text-white": variant === "destructive",
+            "bg-paper text-ink": variant === "outline",
+            "bg-card text-ink": variant === "secondary",
+            "border-transparent bg-transparent text-ink shadow-none hover:bg-rule hover:translate-x-0 hover:translate-y-0": variant === "ghost",
+            "border-transparent bg-transparent text-signal underline-offset-4 hover:underline shadow-none hover:translate-x-0 hover:translate-y-0": variant === "link",
             "h-9 px-4 py-2": size === "default",
-            "h-8 rounded-md px-3 text-xs": size === "sm",
-            "h-10 rounded-md px-8": size === "lg",
+            "h-8 px-3 text-xs": size === "sm",
+            "h-10 px-8 text-base": size === "lg",
             "h-9 w-9": size === "icon",
           },
           className

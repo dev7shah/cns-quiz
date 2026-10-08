@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/Card"
+import { Button } from "@/components/ui/Button"
 import { calculatePasswordEntropy, getPasswordStrengthLabel, isVulnerableToDictionary } from "@/lib/auth/password"
 import { generateTOTP } from "@/lib/auth/totp"
 import { sha256 } from "@/lib/crypto/hash"
@@ -33,56 +34,59 @@ export default function AuthPlayground() {
   }, [totpSecret])
 
   return (
-    <div className="space-y-8 p-2">
+    <div className="space-y-12">
       <Card>
-        <CardHeader><CardTitle>Password Strength & Salting</CardTitle></CardHeader>
+        <CardHeader>
+          <CardTitle className="font-serif text-3xl">Password Strength & Salting</CardTitle>
+          <p className="text-ink-soft text-sm font-sans mt-2">See how entropy and dictionary checks affect password strength, and how salting changes the hash.</p>
+        </CardHeader>
         <CardContent className="space-y-6">
           <div>
-            <label className="text-sm font-bold mb-1 block">Password Input</label>
+            <label className="font-mono text-[10px] uppercase tracking-wider font-bold mb-2 block text-ink">Password Input</label>
             <input 
               type="text"
-              className="w-full p-2 border rounded bg-background" 
+              className="w-full p-3 border border-ink bg-paper font-mono text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-signal" 
               value={password} 
               onChange={e => setPassword(e.target.value)}
               placeholder="Type a password..."
             />
           </div>
 
-          <div className="grid md:grid-cols-2 gap-4">
-            <div className="p-4 border rounded bg-muted/50">
-              <h4 className="font-bold mb-2 text-sm">Security Metrics</h4>
-              <div className="flex justify-between mb-1 text-sm">
-                <span>Entropy:</span>
-                <span className="font-mono">{entropy} bits</span>
+          <div className="grid md:grid-cols-2 gap-6 font-mono text-sm">
+            <div className="p-4 border border-rule bg-card space-y-2">
+              <h4 className="font-bold text-[10px] uppercase tracking-wider text-ink mb-4 border-b border-rule pb-2">Security Metrics</h4>
+              <div className="flex justify-between mb-1">
+                <span className="text-ink-soft">Entropy</span>
+                <strong>{entropy} bits</strong>
               </div>
-              <div className="flex justify-between mb-1 text-sm">
-                <span>Strength:</span>
-                <span className={`font-bold ${strength.color}`}>{strength.label}</span>
+              <div className="flex justify-between mb-1">
+                <span className="text-ink-soft">Strength</span>
+                <strong className={strength.color.replace('text-', 'text-')}>{strength.label}</strong>
               </div>
-              <div className="flex justify-between text-sm">
-                <span>Dictionary Attack:</span>
+              <div className="flex justify-between">
+                <span className="text-ink-soft">Dictionary Attack</span>
                 {dictVuln ? (
-                  <span className="text-destructive font-bold">Vulnerable!</span>
+                  <strong className="text-bad">Vulnerable!</strong>
                 ) : (
-                  <span className="text-green-500">Resistant</span>
+                  <strong className="text-ok">Resistant</strong>
                 )}
               </div>
             </div>
 
-            <div className="p-4 border rounded bg-muted/50">
-              <h4 className="font-bold mb-2 text-sm">Salting & Hashing</h4>
-              <div className="mb-2">
-                <label className="text-xs font-bold block mb-1">Database Salt (per user)</label>
+            <div className="p-4 border border-rule bg-card space-y-4">
+              <h4 className="font-bold text-[10px] uppercase tracking-wider text-ink mb-2 border-b border-rule pb-2">Salting & Hashing</h4>
+              <div>
+                <label className="font-mono text-[10px] uppercase tracking-wider font-bold mb-2 block text-ink">Database Salt (per user)</label>
                 <input 
-                  className="w-full p-1 text-sm border rounded bg-background" 
+                  className="w-full p-2 border border-ink bg-paper text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-signal" 
                   value={salt} 
                   onChange={e => setSalt(e.target.value)}
                 />
               </div>
               <div>
-                <label className="text-xs font-bold block mb-1">Resulting Database Hash</label>
-                <div className="p-2 bg-background border rounded font-mono text-xs break-all h-12 flex items-center">
-                  {hashedPass}
+                <label className="font-mono text-[10px] uppercase tracking-wider font-bold mb-2 block text-signal">Resulting Database Hash</label>
+                <div className="p-3 bg-signal/10 border border-signal rounded-[4px] font-mono break-all text-sm text-ink tracking-widest min-h-[48px] flex items-center">
+                  {hashedPass || "Generating..."}
                 </div>
               </div>
             </div>
@@ -91,33 +95,35 @@ export default function AuthPlayground() {
       </Card>
 
       <Card>
-        <CardHeader><CardTitle>TOTP Authenticator (Google Authenticator Simulator)</CardTitle></CardHeader>
-        <CardContent>
-          <p className="text-muted-foreground text-sm mb-4">
+        <CardHeader>
+          <CardTitle className="font-serif text-3xl">TOTP Authenticator Simulator</CardTitle>
+          <p className="text-ink-soft text-sm font-sans mt-2">
             TOTP uses a shared secret and the current UTC time. No network requests are made.
           </p>
+        </CardHeader>
+        <CardContent>
           <div className="grid md:grid-cols-2 gap-8 items-center">
             <div>
-              <label className="text-sm font-bold mb-1 block">Shared Secret Key</label>
+              <label className="font-mono text-[10px] uppercase tracking-wider font-bold mb-2 block text-ink">Shared Secret Key</label>
               <input 
-                className="w-full p-2 border rounded bg-background uppercase font-mono" 
+                className="w-full p-3 border border-ink bg-paper font-mono text-sm uppercase focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-signal" 
                 value={totpSecret} 
                 onChange={e => setTotpSecret(e.target.value.toUpperCase())}
               />
             </div>
             
-            <div className="flex flex-col items-center justify-center p-6 border-2 border-primary rounded-xl bg-card">
-              <div className="text-5xl font-mono font-bold tracking-widest text-primary mb-4">
+            <div className="flex flex-col items-center justify-center p-6 border border-rule bg-paper">
+              <div className="text-5xl font-mono font-bold tracking-widest text-signal mb-4">
                 {totpCode.slice(0,3)} {totpCode.slice(3,6)}
               </div>
-              <div className="w-full bg-muted rounded-full h-2">
+              <div className="w-full bg-rule h-1 overflow-hidden">
                 <div 
-                  className={`h-2 rounded-full transition-all duration-1000 ${timeLeft < 5 ? 'bg-destructive' : 'bg-primary'}`} 
+                  className={`h-full transition-all duration-1000 ${timeLeft < 5 ? 'bg-bad' : 'bg-signal'}`} 
                   style={{ width: `${(timeLeft / 30) * 100}%` }}
                 />
               </div>
-              <div className="text-xs text-muted-foreground mt-2">
-                Changes in {timeLeft} seconds
+              <div className="text-[10px] uppercase font-mono text-ink-soft mt-4 tracking-widest">
+                Changes in {timeLeft}s
               </div>
             </div>
           </div>

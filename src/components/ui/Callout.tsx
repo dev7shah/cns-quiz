@@ -2,33 +2,38 @@ import * as React from "react"
 import { cn } from "@/lib/utils"
 
 export interface CalloutProps extends React.HTMLAttributes<HTMLDivElement> {
-  variant?: "default" | "warning" | "danger" | "success"
-  icon?: React.ReactNode
+  variant?: "default" | "warning" | "danger" | "success" | "info"
+  title?: string
 }
 
 export function Callout({
   className,
   children,
   variant = "default",
-  icon,
+  title,
   ...props
 }: CalloutProps) {
   return (
     <div
       className={cn(
-        "rounded-lg border p-4 flex items-start space-x-3",
+        "border-l-[3px] py-2 pl-4 pr-2 my-4 bg-transparent",
         {
-          "bg-secondary/50 border-border text-secondary-foreground": variant === "default",
-          "bg-warning/10 border-warning/20 text-warning-foreground": variant === "warning",
-          "bg-destructive/10 border-destructive/20 text-destructive-foreground": variant === "danger",
-          "bg-primary/10 border-primary/20 text-primary-foreground": variant === "success",
+          "border-signal text-ink": variant === "default",
+          "border-warn text-ink": variant === "warning",
+          "border-bad text-ink": variant === "danger",
+          "border-ok text-ink": variant === "success",
+          "border-info text-ink": variant === "info",
         },
         className
       )}
       {...props}
     >
-      {icon && <div className="mt-0.5 shrink-0">{icon}</div>}
-      <div className="flex-1 overflow-hidden leading-relaxed">{children}</div>
+      {title && (
+        <div className="font-mono text-[11px] tracking-[0.08em] uppercase mb-1 font-bold">
+          {title}
+        </div>
+      )}
+      <div className="text-sm leading-relaxed">{children}</div>
     </div>
   )
 }
