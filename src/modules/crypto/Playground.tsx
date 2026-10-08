@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react"
+import { useState, useMemo, useEffect } from "react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/Card"
 import { Button } from "@/components/ui/Button"
 import { caesarCipher, bruteForceCaesar } from "@/lib/crypto/caesar"
@@ -18,7 +18,8 @@ export default function CryptoPlayground() {
 
   const [rsaP, setRsaP] = useState(61)
   const [rsaQ, setRsaQ] = useState(53)
-  const rsaKeys = React.useMemo(() => generateRSAKeys(rsaP, rsaQ), [rsaP, rsaQ])
+  const [rsaMessage, setRsaMessage] = useState(65)
+  const rsaKeys = useMemo(() => generateRSAKeys(rsaP, rsaQ), [rsaP, rsaQ])
 
   let rsaEncrypted = ""
   let rsaDecrypted = ""
