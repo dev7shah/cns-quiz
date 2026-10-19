@@ -101,27 +101,29 @@ export default function QuizPlay() {
           00:{state.timeLeft.toString().padStart(2, '0')}
         </div>
 
-        <div className="flex gap-2">
+        <div className="flex gap-2 items-center">
           {state.phase === 'asking' && (
-            <div className="hidden md:flex gap-2 font-mono text-[10px] text-ink-soft uppercase items-center">
-              <span>Shortcuts:</span>
-              <span className="border border-rule px-1 rounded bg-paper">Space</span> to Reveal,
-              <span className="border border-rule px-1 rounded bg-paper">P</span> to Pause
-            </div>
+            <>
+              <div className="hidden md:flex gap-2 font-mono text-[10px] text-ink-soft uppercase items-center mr-2">
+                <span className="border border-rule px-1 rounded bg-paper">Space</span> or
+              </div>
+              <Button variant="outline" className="font-mono text-xs rounded-none border-ink" onClick={() => dispatch({ type: 'REVEAL' })}>
+                Reveal Answer
+              </Button>
+              <Button variant="outline" className="font-mono text-xs rounded-none" onClick={() => dispatch({ type: 'PAUSE' })}>
+                {state.paused ? 'Resume' : 'Pause'}
+              </Button>
+            </>
           )}
           {state.phase === 'revealed' && (
-            <div className="hidden md:flex gap-2 font-mono text-[10px] text-ink-soft uppercase items-center">
-              <span>Shortcuts:</span>
-              <span className="border border-rule px-1 rounded bg-paper">N</span> for Next,
-              <span className="border border-rule px-1 rounded bg-paper">1-9</span> to Award Pts
-            </div>
-          )}
-          {/* Fallback buttons for mouse users */}
-          {state.phase === 'asking' && (
-            <Button variant="outline" className="md:hidden font-mono text-xs rounded-none" onClick={() => dispatch({ type: 'REVEAL' })}>Reveal</Button>
-          )}
-          {state.phase === 'revealed' && (
-            <Button variant="outline" className="md:hidden font-mono text-xs rounded-none" onClick={() => dispatch({ type: 'NEXT' })}>Next</Button>
+            <>
+              <div className="hidden md:flex gap-2 font-mono text-[10px] text-ink-soft uppercase items-center mr-2">
+                <span className="border border-rule px-1 rounded bg-paper">1-9</span> award pts ·
+              </div>
+              <Button className="font-mono text-xs rounded-none bg-ink text-paper border border-ink hover:bg-ink-soft" onClick={() => dispatch({ type: 'NEXT' })}>
+                Next Question →
+              </Button>
+            </>
           )}
         </div>
       </div>
