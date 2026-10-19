@@ -88,7 +88,10 @@ export function GuidedLesson({
               )}
 
               {isActive && (
-                <div className="bg-card border border-rule p-6 rounded-[6px] mb-8">
+                <div
+                  className="bg-card border border-rule p-6 rounded-[6px] mb-8"
+                  onClick={(e) => e.stopPropagation()}
+                >
                   <div className="flex justify-between items-center mb-4">
                     <span className="font-mono text-[11px] uppercase tracking-wider font-bold">See it work</span>
                     <div className="flex gap-2">
@@ -119,7 +122,7 @@ export function GuidedLesson({
               </Callout>
 
               {step.checkpoint && isActive && (
-                <div className="mt-12 border-t border-rule pt-8">
+                <div className="mt-12 border-t border-rule pt-8" onClick={(e) => e.stopPropagation()}>
                   <h3 className="font-mono text-[11px] uppercase tracking-wider font-bold mb-4">Quick Checkpoint</h3>
                   <p className="mb-4 font-medium">{step.checkpoint.q}</p>
                   <div className="space-y-2">

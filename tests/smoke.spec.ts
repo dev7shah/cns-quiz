@@ -1,70 +1,56 @@
 import { test, expect } from '@playwright/test';
 
-const MODULES = ['crypto', 'auth', 'firewall', 'cloud', 'attacks', 'ids', 'tls', 'ai'];
-const TABS = ['Learn', 'Playground', 'Complexity', 'Quiz', 'Cheat Sheet'];
+const routes = [
+  '/',
+  '/quiz',
+  '/revision',
+  '/modules/crypto',
+  '/modules/auth',
+  '/modules/firewall',
+  '/modules/cloud',
+  '/modules/attacks',
+  '/modules/ids',
+  '/modules/tls',
+  '/modules/ai'
+];
 
-test.describe('Smoke Tests for CNS Security Lab', () => {
-  // Capture console errors
-  test.beforeEach(async ({ page }) => {
+for (const route of routes) {
+  test(`Route ${route} should not have console errors and buttons should work`, async ({ page }) => {
+    const errors: string[] = [];
     page.on('console', msg => {
-      if (msg.type() === 'error') {
-        console.log(`Console Error: "${msg.text()}"`);
+      if (msg.type() === 'error' || msg.type() === 'warning') {
+        // Ignore next-dev/turbopack warnings
+        if (!msg.text().includes('Fast Refresh') && !msg.text().includes('turbopack')) {
+          errors.push(`[${msg.type()}] ${msg.text()}`);
+        }
       }
     });
-    page.on('pageerror', exception => {
-      console.log(`Page Error: "${exception}"`);
+    page.on('pageerror', err => {
+      errors.push(err.message);
     });
-    page.on('requestfailed', request => {
-      console.log(`Request Failed: "${request.url()}" - ${request.failure()?.errorText}`);
-    });
-  });
 
-  test('Homepage loads correctly', async ({ page }) => {
-    await page.goto('/');
-    await expect(page).toHaveTitle(/CNS Security Lab/);
-    await expect(page.locator('text=CNS Security Lab').first()).toBeVisible();
-  });
+    await page.goto(`http://localhost:3000${route}`, { waitUntil: 'networkidle' });
 
-  test('Visit all modules and their tabs', async ({ page }) => {
-    for (const mod of MODULES) {
-      await page.goto(`/modules/${mod}`);
-      // Wait for network idle to ensure module is loaded
-      await page.waitForLoadState('networkidle');
-      
-      // Click through all tabs
-      for (const tab of TABS) {
-        const tabLocator = page.locator(`button:has-text("${tab}")`);
-        if (await tabLocator.isVisible()) {
-          await tabLocator.click();
-          // Short wait for tab content to render
-          await page.waitForTimeout(200);
+    if (errors.length > 0) {
+      throw new Error(`Console errors found on ${route}: ${errors.join('\\n')}`);
+    }
+
+    // Try to click every button to verify interaction (skip links that navigate away from domain for testing)
+    const buttons = await page.$$('button');
+    for (let i = 0; i < buttons.length; i++) {
+      try {
+        await buttons[i].click({ timeout: 1000 });
+        await page.waitForTimeout(200); // Wait for potential state changes or errors
+      } catch (e: any) {
+        // It's expected that some buttons might unmount others (e.g. tabs) or be covered
+        if (!e.message.includes('not attached to the DOM') && !e.message.includes('intercepts pointer events')) {
+          console.log(`Failed to click button ${i} on ${route}: ${e.message}`);
         }
       }
     }
-  });
 
-  test('Quiz flow completes without crashing', async ({ page }) => {
-    await page.goto('/quiz');
-    // We expect the setup screen
-    // Let's click "Start Quick Match"
-    const startButton = page.locator('button:has-text("Start Quick Match")');
-    if (await startButton.isVisible()) {
-      await startButton.click();
+    if (errors.length > 0) {
+      throw new Error(`Console errors found after interaction on ${route}: ${errors.join('\\n')}`);
     }
-    
-    // Check if we are in the quiz
-    await page.waitForTimeout(1000); // Wait for potential state changes
-    // Just a basic check that it doesn't hard crash
-    expect(await page.locator('body').innerText()).toContain('Team');
   });
-
-  test('Revision Hub flashcards render', async ({ page }) => {
-    await page.goto('/revision');
-    const flipButton = page.locator('button:has-text("Flip")');
-    if (await flipButton.isVisible()) {
-      await flipButton.click();
-    }
-    // Make sure no crash
-    await page.waitForTimeout(500);
-  });
-});
+}

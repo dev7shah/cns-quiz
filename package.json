@@ -6,7 +6,8 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "test": "playwright test tests/smoke.spec.ts"
   },
   "dependencies": {
     "@radix-ui/react-slot": "^1.4.0",

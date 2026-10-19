@@ -1,35 +1,35 @@
 import { notFound } from "next/navigation"
 import dynamic from "next/dynamic"
 
-const CryptoModule = dynamic(() => import("@/modules/crypto").then(mod => mod.default), {
+const CryptoModule = dynamic(() => import("@/modules/crypto"), {
   loading: () => <p className="p-8 text-center text-muted-foreground">Loading Cryptography Module...</p>
 })
 
-const AuthModule = dynamic(() => import("@/modules/auth").then(mod => mod.default), {
+const AuthModule = dynamic(() => import("@/modules/auth"), {
   loading: () => <p className="p-8 text-center text-muted-foreground">Loading Authentication Module...</p>
 })
 
-const FirewallModule = dynamic(() => import("@/modules/firewall").then(mod => mod.default), {
+const FirewallModule = dynamic(() => import("@/modules/firewall"), {
   loading: () => <p className="p-8 text-center text-muted-foreground">Loading Firewall Module...</p>
 })
 
-const CloudModule = dynamic(() => import("@/modules/cloud").then(mod => mod.default), {
+const CloudModule = dynamic(() => import("@/modules/cloud"), {
   loading: () => <p className="p-8 text-center text-muted-foreground">Loading Cloud Module...</p>
 })
 
-const AttacksModule = dynamic(() => import("@/modules/attacks").then(mod => mod.default), {
+const AttacksModule = dynamic(() => import("@/modules/attacks"), {
   loading: () => <p className="p-8 text-center text-muted-foreground">Loading Attacks Module...</p>
 })
 
-const IDSModule = dynamic(() => import("@/modules/ids").then(mod => mod.default), {
+const IDSModule = dynamic(() => import("@/modules/ids"), {
   loading: () => <p className="p-8 text-center text-muted-foreground">Loading IDS Module...</p>
 })
 
-const TLSModule = dynamic(() => import("@/modules/tls").then(mod => mod.default), {
+const TLSModule = dynamic(() => import("@/modules/tls"), {
   loading: () => <p className="p-8 text-center text-muted-foreground">Loading TLS Module...</p>
 })
 
-const AIModule = dynamic(() => import("@/modules/ai").then(mod => mod.default), {
+const AIModule = dynamic(() => import("@/modules/ai"), {
   loading: () => <p className="p-8 text-center text-muted-foreground">Loading AI Security Module...</p>
 })
 
