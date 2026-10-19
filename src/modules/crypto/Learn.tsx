@@ -96,6 +96,7 @@ export const cryptoLessonSteps: LessonStepType[] = [
     id: "hashing",
     title: "Hashing: The One-Way Blender",
     analogy: "Think of a hash function like a blender. You can put a perfectly good apple in, and you get apple juice out. But you can never take apple juice and turn it back into an apple. It only goes one way.",
+    simplerExplanation: "Hashing is a magical paper shredder. You feed in any password or file, and it spits out a unique fixed-length string of gibberish. You can NEVER turn that gibberish back into the original file. If you change even one letter in your password, the entire shredded output looks completely different. Websites store the shredded string, so even if they get hacked, nobody sees your real password.",
     diagram: "hashing",
     subSteps: [
       { caption: "We hash the word 'Hello'. It produces a 64-character hex string.", highlight: [] },
@@ -118,6 +119,7 @@ export const cryptoLessonSteps: LessonStepType[] = [
     id: "symmetric",
     title: "Symmetric Encryption: The Padlocked Box",
     analogy: "Imagine a strongbox with a padlock. To lock it, you need a specific physical key. To unlock it, you need that EXACT same physical key. If Alice wants to send a secret to Bob, she locks the box and mails it. But wait—how does she get the key to Bob without someone copying it in the mail?",
+    simplerExplanation: "Symmetric encryption means both people use the EXACT same secret key to scramble and unscramble a message. It's super fast, but it has one massive headache: how do you give your friend the secret key in the first place if you're talking over an insecure internet where someone might be eavesdropping?",
     diagram: "symmetric",
     subSteps: [
       { caption: "Alice and Bob must agree on a Shared Secret Key.", highlight: [] },
@@ -139,6 +141,7 @@ export const cryptoLessonSteps: LessonStepType[] = [
     id: "asymmetric",
     title: "Asymmetric Encryption: The Mailbox",
     analogy: "Bob buys a mailbox with a slot (Public Key). He leaves it on the street. Anyone can walk up and drop a letter in the slot—meaning anyone can encrypt a message to Bob. But only Bob has the physical key (Private Key) to open the back of the mailbox and read the letters.",
+    simplerExplanation: "Instead of sharing one key, everyone gets TWO keys: a Public key and a Private key. Your Public key is like a street mailbox: anyone can drop a letter inside to lock it. But only YOU have the Private key to unlock the back door and read the letters. That means strangers can send you private messages without ever needing to share a secret password beforehand!",
     diagram: "asymmetric",
     subSteps: [
       { caption: "Bob generates a Key Pair. The Private Key is kept secret. The Public Key is shared everywhere.", highlight: [] },

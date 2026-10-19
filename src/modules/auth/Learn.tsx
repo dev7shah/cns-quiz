@@ -118,6 +118,7 @@ export const authLessonSteps: LessonStepType[] = [
     id: "authn-authz",
     title: "AuthN vs AuthZ: The Bouncer and The Bartender",
     analogy: "Authentication (AuthN) is the bouncer at the club checking your ID to see WHO you are. Authorization (AuthZ) is the bartender checking your wristband to see WHAT you're allowed to do (e.g. VIP area).",
+    simplerExplanation: "AuthN = 'Who are you?' (Entering your username and password, showing an ID card). AuthZ = 'What are you allowed to touch?' (Checking if your account is an admin or a regular viewer). You must prove who you are first (AuthN) before the system decides what doors you're allowed to open (AuthZ).",
     diagram: "authn-authz",
     subSteps: [
       { caption: "Authentication verifies identity.", highlight: [] },
@@ -140,6 +141,7 @@ export const authLessonSteps: LessonStepType[] = [
     id: "passwords",
     title: "Password Storage: Salting the Hash",
     analogy: "If you just hash a password, an attacker can use a pre-calculated dictionary (Rainbow Table). Adding a Salt is like adding a random, secret ingredient to a recipe before baking. Even if two people have the 'password123' recipe, their final baked goods (hashes) look completely different.",
+    simplerExplanation: "If 100 people choose the password 'ilovecats', a plain hashing function would store 100 identical scrambled codes. Hackers pre-calculate tables (Rainbow Tables) of common words and crack them in seconds. A 'salt' is just adding a random string of nonsense to each password before hashing it. That way, every single person gets a completely unique scrambled code!",
     diagram: "passwords",
     subSteps: [
       { caption: "Basic Hashing is vulnerable because the same password always produces the same hash.", highlight: [] },
@@ -161,6 +163,7 @@ export const authLessonSteps: LessonStepType[] = [
     id: "mfa",
     title: "MFA: Layers of Defense",
     analogy: "MFA is like a bank vault that requires a combination code (something you know), a physical key (something you have), and a retinal scan (something you are). Stealing just one won't get you in.",
+    simplerExplanation: "Multi-Factor Authentication means requiring at least two completely different kinds of proof to log in: 1. Something you know (your password), 2. Something you possess (your physical phone receiving an authenticator code), or 3. Something you are (your fingerprint / FaceID). Even if a thief steals your password, they can't break in without your phone or your finger.",
     diagram: "mfa",
     subSteps: [
       { caption: "Knowledge Factor: Password, PIN, Security Question.", highlight: [] },

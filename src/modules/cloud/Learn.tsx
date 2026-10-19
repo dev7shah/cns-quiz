@@ -77,6 +77,7 @@ export const cloudLessonSteps: LessonStepType[] = [
     id: "shared",
     title: "Shared Responsibility: The Landlord and Tenant",
     analogy: "Think of the cloud like renting an apartment. The landlord (Cloud Provider) secures the building doors, fixes the plumbing, and maintains the elevator. But if you (the Tenant) leave your apartment door unlocked and get robbed, that's your fault.",
+    simplerExplanation: "Renting servers from Amazon or Microsoft is like renting an apartment. The landlord (Amazon/AWS) protects the building structure, guards the physical entrance, and makes sure power stays on (Security OF the cloud). But YOU are the tenant: if you forget to lock your apartment door or leave passwords written on a sticky note, that's your responsibility (Security IN the cloud).",
     diagram: "shared",
     subSteps: [
       { caption: "Provider secures physical data centers, hardware, and networks (Security OF the Cloud).", highlight: [] },
@@ -99,6 +100,7 @@ export const cloudLessonSteps: LessonStepType[] = [
     id: "iam",
     title: "IAM & Misconfiguration: The Master Key",
     analogy: "Giving someone the master key to your entire office building when they only need to check the mailbox out front.",
+    simplerExplanation: "Identity & Access Management (IAM) is the rulebook deciding who can touch what. The #1 mistake in the cloud is being lazy and giving everyone 'AdministratorAccess' (a master skeleton key). If an intern gets phished, the hacker now possesses total admin control over your entire company's cloud database.",
     diagram: "iam",
     subSteps: [
       { caption: "Bob is incorrectly given 'AdministratorAccess' policy instead of least privilege.", highlight: [] },

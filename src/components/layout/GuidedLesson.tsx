@@ -8,6 +8,7 @@ export interface LessonStepType {
   id: string
   title: string
   analogy: string
+  simplerExplanation?: string   // ELI5 version shown when "Explain simpler" is checked
   diagram: string
   subSteps: { caption: string; highlight: string[] }[]
   examAnswer: string
@@ -73,24 +74,37 @@ export function GuidedLesson({
               </div>
               <h2 className="font-serif text-4xl text-ink mb-6">{step.title}</h2>
 
-              <div className="flex items-center gap-4 mb-6">
-                <label className="flex items-center gap-2 cursor-pointer font-sans text-sm text-ink-soft hover:text-ink transition-colors">
-                  <input
-                    type="checkbox"
-                    className="accent-signal"
-                    checked={explainSimpler}
-                    onChange={(e) => setExplainSimpler(e.target.checked)}
-                  />
-                  Confused? Explain simpler
-                </label>
+              <div className="flex items-center gap-3 mb-6" onClick={(e) => e.stopPropagation()}>
+                <button
+                  type="button"
+                  onClick={() => setExplainSimpler(!explainSimpler)}
+                  className={cn(
+                    "inline-flex items-center gap-2 px-3 py-1.5 text-xs font-mono tracking-wider uppercase border transition-all rounded-[4px] cursor-pointer",
+                    explainSimpler
+                      ? "bg-signal text-paper border-signal shadow-sm font-bold"
+                      : "bg-card text-ink-soft border-rule hover:border-ink hover:text-ink"
+                  )}
+                >
+                  <span>{explainSimpler ? "💡 Simpler Mode: ON" : "💡 Confused? Explain simpler"}</span>
+                </button>
+                {explainSimpler && (
+                  <span className="text-[11px] font-mono text-signal uppercase tracking-wider">
+                    In Plain English
+                  </span>
+                )}
               </div>
 
               {explainSimpler ? (
-                <p className="text-xl leading-relaxed text-ink mb-8 font-serif italic">
-                  Imagine this: {step.analogy}
-                </p>
+                <div className="bg-signal/5 border-l-4 border-signal p-5 rounded-r-[6px] mb-8 space-y-2">
+                  <div className="flex items-center gap-2 font-mono text-[10px] uppercase tracking-wider font-bold text-signal">
+                    <span>💡 In Plain English (ELI5)</span>
+                  </div>
+                  <p className="text-lg leading-relaxed text-ink font-sans">
+                    {step.simplerExplanation || step.analogy}
+                  </p>
+                </div>
               ) : (
-                <p className="text-lg leading-relaxed text-ink mb-8">
+                <p className="text-lg leading-relaxed text-ink mb-8 font-sans">
                   {step.analogy}
                 </p>
               )}

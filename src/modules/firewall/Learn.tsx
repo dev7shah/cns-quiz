@@ -85,6 +85,7 @@ export const firewallLessonSteps: LessonStepType[] = [
     id: "stateless",
     title: "Stateless Firewalls: The Bouncer with Amnesia",
     analogy: "A stateless firewall is like a bouncer checking IDs who immediately forgets you after you walk in. If you step out and come right back, they check your ID all over again.",
+    simplerExplanation: "A stateless firewall looks at every single data packet completely on its own, with zero memory of what happened a millisecond ago. If you send a request out to Google, and Google sends the answer back, a stateless firewall will block Google's reply unless an administrator manually wrote a rule allowing it back in!",
     diagram: "stateless",
     subSteps: [
       { caption: "PC initiates outbound traffic.", highlight: [] },
@@ -105,6 +106,7 @@ export const firewallLessonSteps: LessonStepType[] = [
     id: "stateful",
     title: "Stateful Firewalls: The Smart Concierge",
     analogy: "A stateful firewall is like a concierge. If you ask for a pizza delivery, they write it down (State Table). When the pizza guy arrives, the concierge sees your note and lets him up.",
+    simplerExplanation: "A stateful firewall keeps a scratchpad (the State Table) of active conversations. When you ask Google for a webpage, the firewall jots down: 'Hey, Computer #4 just asked Google a question'. When Google's answer arrives, the firewall checks its scratchpad, recognizes the reply, and automatically lets it through.",
     diagram: "stateful",
     subSteps: [
       { caption: "PC sends request. Firewall records connection state in its State Table.", highlight: [] },

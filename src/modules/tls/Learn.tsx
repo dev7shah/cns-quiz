@@ -84,6 +84,7 @@ export const tlsLessonSteps: LessonStepType[] = [
     id: "pki",
     title: "PKI: The Trust Anchor",
     analogy: "Think of a Certificate Authority (CA) like a passport agency. Anyone can print a card saying 'I am Google', but your browser only trusts cards stamped by a recognized passport agency.",
+    simplerExplanation: "Anyone can create a fake website and claim 'I am Bank of America'. PKI is like a government passport system: a trusted Certificate Authority officially signs Bank of America's digital certificate. Your computer already comes with a built-in list of trusted passport authorities, so it immediately knows if the website's certificate is genuine or a fake.",
     diagram: "pki",
     subSteps: [
       { caption: "We have a Certificate Authority (CA).", highlight: [] },
@@ -106,6 +107,7 @@ export const tlsLessonSteps: LessonStepType[] = [
     id: "handshake",
     title: "The TLS Handshake",
     analogy: "Like two spies meeting. Spy 1: 'I speak French and Spanish, my code is 123'. Spy 2: 'Let's speak French, here is my ID badge, my code is 456'. Then they use those codes to generate a shared secret language.",
+    simplerExplanation: "Before you and Netflix start streaming private video, your browser and Netflix perform a quick 3-step 'secret handshake'. 1. Say hello and compare encryption options. 2. Verify Netflix's certificate. 3. Use clever math to agree on a brand-new shared secret key. Once the handshake is finished, all data travels across the internet encrypted with that fast secret key.",
     diagram: "handshake",
     subSteps: [
       { caption: "Client Hello: Client sends supported ciphers and a random number.", highlight: [] },

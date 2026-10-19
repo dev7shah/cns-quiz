@@ -128,6 +128,7 @@ export const attacksLessonSteps: LessonStepType[] = [
     id: "sqli",
     title: "SQL Injection (SQLi): The Jedi Mind Trick",
     analogy: "SQL Injection is like a Jedi mind trick for databases. You ask the database a question, but you sneak in a command. 'Show me user 5... AND give me all the passwords.' The database gets confused and obeys the smuggled command.",
+    simplerExplanation: "Imagine a form that asks for your name, and you type: 'Bob; also unlock all prison doors'. If the computer naively pastes your text directly into its internal command runner, it will print your name AND unlock the doors. That's SQL injection. The defense is Parameterized Queries: teaching the computer that anything entered in a box is strictly plain text, never instructions.",
     diagram: "sqli",
     subSteps: [
       { caption: "Normal usage works fine when user input is treated as simple text.", highlight: [] },
@@ -150,6 +151,7 @@ export const attacksLessonSteps: LessonStepType[] = [
     id: "xss",
     title: "Cross-Site Scripting (XSS): The Poisoned Apple",
     analogy: "XSS is like giving someone a poisoned apple. The attacker leaves a malicious script on a trusted website (like a forum post). When an innocent victim reads the post, their browser eats the apple and runs the script.",
+    simplerExplanation: "Imagine leaving a comment on a blog post, but your comment actually contains hidden JavaScript code. When any normal visitor opens the blog post, their browser thinks the website author wrote that script and automatically runs it. The hacker's script can now steal the visitor's login cookies or pretend to be them.",
     diagram: "xss",
     subSteps: [
       { caption: "The attacker injects malicious JavaScript into the application (e.g., Stored XSS).", highlight: [] },
@@ -171,6 +173,7 @@ export const attacksLessonSteps: LessonStepType[] = [
     id: "ddos",
     title: "DDoS: The Traffic Jam",
     analogy: "DDoS is like a thousand fake cars suddenly swarming a highway on-ramp. Legitimate drivers (real users) can't get onto the highway because it's completely jammed with fake traffic.",
+    simplerExplanation: "Imagine 10,000 automated bots simultaneously flooding a pizza shop's telephone lines with fake orders. The phone lines stay busy 24/7, and actual paying customers can never get through. DDoS doesn't steal your money or hack your database—it just overwhelms your servers until they crash.",
     diagram: "ddos",
     subSteps: [
       { caption: "An attacker controls thousands of compromised devices (a Botnet).", highlight: [] },

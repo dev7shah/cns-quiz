@@ -116,6 +116,7 @@ export const idsLessonSteps: LessonStepType[] = [
     id: "intro",
     title: "IDS vs IPS: The Guard Dog vs The Bouncer",
     analogy: "An IDS (Intrusion Detection System) is like a guard dog. It watches everyone coming in. If it sees someone suspicious, it barks (alerts), but it can't physically stop them. An IPS (Intrusion Prevention System) is like a bouncer. It stands in the doorway and physically blocks suspicious people from entering.",
+    simplerExplanation: "IDS = Security Camera with a Siren: it watches network traffic passively and sounds an alarm when it spots an attack, but it doesn't block the hacker. IPS = Armed Guard at the Gate: it sits directly in the path of the traffic and physically drops and blocks malicious packets in real time.",
     diagram: "intro",
     subSteps: [
       { caption: "Normal traffic flows through the network without issues.", highlight: [] },
@@ -138,6 +139,7 @@ export const idsLessonSteps: LessonStepType[] = [
     id: "signature",
     title: "Signature-Based Detection: The Wanted Poster",
     analogy: "Signature-based detection is like giving the bouncer a book of 'Wanted' posters. The bouncer compares every person walking in to the posters. If there's an exact match, they trigger an alert. If there's no poster, they let them in.",
+    simplerExplanation: "Signature detection checks traffic against a catalog of known malicious fingerprints. If someone uses a known virus or attack string that was discovered last month, it catches them 100% of the time with zero guesswork. But if a hacker invents a brand new attack today (a Zero-Day), it flies right under the radar because it's not in the catalog yet.",
     diagram: "signature",
     subSteps: [
       { caption: "The IDS receives a normal web request. No signatures match.", highlight: [] },
@@ -159,6 +161,7 @@ export const idsLessonSteps: LessonStepType[] = [
     id: "anomaly",
     title: "Anomaly-Based Detection: The Baseline",
     analogy: "Anomaly-based detection is like a bouncer who learns the 'vibe' of the club over a few weeks. If a guy walks in wearing a ski mask in July, the bouncer knows that's weird and flags him, even without a 'Wanted' poster.",
+    simplerExplanation: "Anomaly detection learns what 'everyday normal' traffic looks like (e.g., how many emails employees send per hour). If there's a bizarre spike—like an accounting laptop uploading 20 gigabytes to Russia at 3 AM—it triggers an alert even if it has never seen that specific malware before. The tradeoff: harmless unusual events trigger annoying false alarms.",
     diagram: "anomaly",
     subSteps: [
       { caption: "The IDS builds a statistical baseline of 'normal' network behavior over time.", highlight: [] },
