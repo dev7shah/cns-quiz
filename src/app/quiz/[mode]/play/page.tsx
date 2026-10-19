@@ -39,7 +39,8 @@ export default async function QuizPlayPage({
   // Filter or prioritize questions based on mode
   let filteredQuestions = [...m1Questions]
   if (mode === 'numerical-lab') {
-    filteredQuestions = m1Questions.filter(q => q.type === 'numeric' || q.tags.includes('math'))
+    filteredQuestions = m1Questions.filter(q => q.type === 'numeric')
+    if (filteredQuestions.length === 0) filteredQuestions = m1Questions.filter(q => q.tags.includes('math'))
     if (filteredQuestions.length === 0) filteredQuestions = m1Questions
   } else if (mode === 'diagram-quiz') {
     filteredQuestions = m1Questions.filter(q => q.type === 'label' || q.type === 'order' || q.type === 'spot')

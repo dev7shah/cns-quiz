@@ -1,10 +1,28 @@
 import { TopicPresentation } from "@/lib/present/types"
+import { principlesPresentation } from "./m1/principles"
+import { osiArchitecturePresentation } from "./m1/osiArchitecture"
+import { symmetricModelPresentation } from "./m1/symmetricModel"
 import { caesarPresentation } from "./m1/caesar"
+import { affinePresentation } from "./m1/affine"
 import { playfairPresentation } from "./m1/playfair"
+import { vigenerePresentation } from "./m1/vigenere"
+import { hillPresentation } from "./m1/hill"
+import { transpositionPresentation } from "./m1/transposition"
+import { productCiphersPresentation } from "./m1/productCiphers"
+import { cryptanalysisPresentation } from "./m1/cryptanalysis"
 
 const presentations: Record<string, TopicPresentation> = {
+  'm1/principles': principlesPresentation,
+  'm1/osi-architecture': osiArchitecturePresentation,
+  'm1/symmetric-model': symmetricModelPresentation,
   'm1/caesar': caesarPresentation,
-  'm1/playfair': playfairPresentation
+  'm1/affine': affinePresentation,
+  'm1/playfair': playfairPresentation,
+  'm1/vigenere': vigenerePresentation,
+  'm1/hill': hillPresentation,
+  'm1/transposition': transpositionPresentation,
+  'm1/product-ciphers': productCiphersPresentation,
+  'm1/cryptanalysis': cryptanalysisPresentation
 }
 
 export function getPresentation(moduleId: string, topicId: string): TopicPresentation | undefined {
@@ -34,4 +52,16 @@ export function getPresentation(moduleId: string, topicId: string): TopicPresent
   }
 }
 
-export { caesarPresentation, playfairPresentation }
+export {
+  principlesPresentation,
+  osiArchitecturePresentation,
+  symmetricModelPresentation,
+  caesarPresentation,
+  affinePresentation,
+  playfairPresentation,
+  vigenerePresentation,
+  hillPresentation,
+  transpositionPresentation,
+  productCiphersPresentation,
+  cryptanalysisPresentation
+}

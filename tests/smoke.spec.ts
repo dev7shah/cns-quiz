@@ -30,7 +30,7 @@ for (const route of routes) {
       errors.push(err.message);
     });
 
-    await page.goto(`http://localhost:3000${route}`, { waitUntil: 'networkidle' });
+    await page.goto(route, { waitUntil: 'networkidle' });
 
     if (errors.length > 0) {
       throw new Error(`Console errors found on ${route}: ${errors.join('\\n')}`);

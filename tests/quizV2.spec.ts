@@ -92,18 +92,25 @@ test.describe('Quiz v2 Assessment Engine E2E Tests', () => {
     await page.goto('/quiz/diagram-quiz/play')
     await page.waitForLoadState('networkidle')
 
-    // Answer questions until finish
-    for (let i = 0; i < 3; i++) {
-      // Click reveal
+    // Answer questions until finish button is reached
+    while (await page.locator('button:has-text("Finish & View Results")').count() === 0) {
       const revealBtn = page.locator('button:has-text("Confirm & Reveal Answer")')
       if (await revealBtn.isVisible()) {
         await revealBtn.click()
       }
-
-      // Click next or finish
-      const nextBtn = page.locator('button:has-text("Next Question"), button:has-text("Finish & View Results")')
-      await nextBtn.click()
+      const nextBtn = page.locator('button:has-text("Next Question")')
+      if (await nextBtn.isVisible()) {
+        await nextBtn.click()
+      }
     }
+
+    // Final question reveal and finish
+    const finalReveal = page.locator('button:has-text("Confirm & Reveal Answer")')
+    if (await finalReveal.isVisible()) {
+      await finalReveal.click()
+    }
+    const finishBtn = page.locator('button:has-text("Finish & View Results")')
+    await finishBtn.click()
 
     // Results report must be displayed
     await expect(page.locator('h1:has-text("Assessment Performance")')).toBeVisible()

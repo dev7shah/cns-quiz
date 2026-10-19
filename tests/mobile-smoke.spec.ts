@@ -26,7 +26,7 @@ for (const route of routes) {
       }
     });
 
-    await page.goto(`http://localhost:3000${route}`, { waitUntil: 'networkidle' });
+    await page.goto(route, { waitUntil: 'networkidle' });
 
     // Verify no horizontal overflow beyond viewport width
     const scrollWidth = await page.evaluate(() => document.documentElement.scrollWidth);

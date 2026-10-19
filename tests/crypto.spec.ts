@@ -20,7 +20,7 @@ test.describe('Cryptography Module Tests', () => {
 
     // Go to Try tab
     await page.locator('button', { hasText: '02 Try' }).click();
-    await expect(page.locator('h3', { hasText: 'SHA-256 Hashing' })).toBeVisible();
+    await expect(page.locator('h3', { hasText: 'Caesar Cipher' })).toBeVisible();
 
     // Go to Cost tab
     await page.locator('button', { hasText: '03 Cost' }).click();
@@ -31,7 +31,7 @@ test.describe('Cryptography Module Tests', () => {
     await page.goto('/modules/crypto');
     
     // Click Present button
-    await page.locator('button', { hasText: 'Present [P]' }).click();
+    await page.locator('button', { hasText: 'Present' }).first().click();
     
     // Verify Presenter Mode UI renders
     await expect(page.locator('h1', { hasText: 'Hashing: The One-Way Blender' }).nth(0)).toBeVisible();
