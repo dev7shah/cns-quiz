@@ -29,43 +29,43 @@ export default function CloudPlayground() {
   }
 
   return (
-    <div className="space-y-12">
+    <div className="space-y-8 sm:space-y-12">
       <Card>
         <CardHeader>
-          <CardTitle className="font-serif text-3xl">Cloud Security Posture Management (CSPM)</CardTitle>
-          <p className="text-ink-soft text-sm font-sans mt-2">Simulate cloud misconfigurations and evaluate the security score.</p>
+          <CardTitle className="font-serif text-2xl sm:text-3xl">Cloud Security Posture Management (CSPM)</CardTitle>
+          <p className="text-ink-soft text-xs sm:text-sm font-sans mt-1 sm:mt-2">Simulate cloud misconfigurations and evaluate the security score.</p>
         </CardHeader>
-        <CardContent className="space-y-6">
-          <div className="grid md:grid-cols-2 gap-8">
+        <CardContent className="space-y-4 sm:space-y-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 sm:gap-8">
             {/* Controls */}
-            <div className="space-y-6">
-              <div className="border border-rule p-4 bg-card">
+            <div className="space-y-4 sm:space-y-6">
+              <div className="border border-rule p-3 sm:p-4 bg-card">
                 <h3 className="font-mono text-[10px] uppercase tracking-wider font-bold mb-3 text-ink">S3 Bucket Configuration</h3>
-                <label className="flex items-center gap-2 mb-2 cursor-pointer font-sans text-sm text-ink">
+                <label className="flex items-center gap-2 mb-2 cursor-pointer font-sans text-sm text-ink min-h-[32px]">
                   <input type="checkbox" checked={bucket.PublicAccessBlock} onChange={e => setBucket({...bucket, PublicAccessBlock: e.target.checked})} className="w-4 h-4 accent-signal" />
                   Block Public Access
                 </label>
-                <label className="flex items-center gap-2 mb-2 cursor-pointer font-sans text-sm text-ink">
+                <label className="flex items-center gap-2 mb-2 cursor-pointer font-sans text-sm text-ink min-h-[32px]">
                   <input type="checkbox" checked={bucket.EncryptionAtRest} onChange={e => setBucket({...bucket, EncryptionAtRest: e.target.checked})} className="w-4 h-4 accent-signal" />
                   Enable Encryption at Rest (SSE)
                 </label>
-                <label className="flex items-center gap-2 cursor-pointer font-sans text-sm text-ink">
+                <label className="flex items-center gap-2 cursor-pointer font-sans text-sm text-ink min-h-[32px]">
                   <input type="checkbox" checked={bucket.MFA_Delete} onChange={e => setBucket({...bucket, MFA_Delete: e.target.checked})} className="w-4 h-4 accent-signal" />
                   Enable MFA Delete
                 </label>
               </div>
 
-              <div className="border border-rule p-4 bg-card">
+              <div className="border border-rule p-3 sm:p-4 bg-card">
                 <h3 className="font-mono text-[10px] uppercase tracking-wider font-bold mb-3 text-ink">IAM Users</h3>
                 {users.map((u, idx) => (
-                  <div key={idx} className="mb-4 p-3 border border-ink bg-paper flex flex-col gap-2">
-                    <div className="font-bold font-mono text-sm text-ink">{u.name} (Pass age: {u.passwordAgeDays}d)</div>
-                    <label className="flex items-center gap-2 text-sm cursor-pointer font-sans text-ink">
+                  <div key={idx} className="mb-3 sm:mb-4 p-3 border border-ink bg-paper flex flex-col gap-2">
+                    <div className="font-bold font-mono text-xs sm:text-sm text-ink">{u.name} (Pass age: {u.passwordAgeDays}d)</div>
+                    <label className="flex items-center gap-2 text-sm cursor-pointer font-sans text-ink min-h-[32px]">
                       <input type="checkbox" checked={u.hasMFA} onChange={() => toggleUserMfa(idx)} className="w-4 h-4 accent-signal" />
                       MFA Enabled
                     </label>
                     <select 
-                      className="p-2 border border-ink text-sm w-full bg-paper focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-signal font-mono"
+                      className="p-2 border border-ink text-xs sm:text-sm w-full bg-paper focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-signal font-mono"
                       value={u.attachedPolicies[0]}
                       onChange={(e) => changeUserPolicy(idx, e.target.value)}
                     >
@@ -80,25 +80,25 @@ export default function CloudPlayground() {
 
             {/* Results */}
             <div className="flex flex-col h-full">
-              <div className="flex items-center justify-between mb-4 p-4 border border-rule bg-card">
+              <div className="flex items-center justify-between mb-4 p-3 sm:p-4 border border-rule bg-card">
                 <h3 className="font-mono text-[10px] uppercase tracking-wider font-bold text-ink">Security Score</h3>
-                <div className={`text-3xl font-serif ${report.score >= 90 ? 'text-ok' : report.score >= 60 ? 'text-signal' : 'text-bad'}`}>
+                <div className={`text-2xl sm:text-3xl font-serif ${report.score >= 90 ? 'text-ok' : report.score >= 60 ? 'text-signal' : 'text-bad'}`}>
                   {report.score} / 100
                 </div>
               </div>
 
-              <div className="flex-1 border border-rule p-4 bg-paper overflow-y-auto">
+              <div className="flex-1 border border-rule p-3 sm:p-4 bg-paper overflow-y-auto min-h-[200px]">
                 <h4 className="font-mono text-[10px] uppercase tracking-wider font-bold text-bad mb-2">Findings</h4>
                 {report.findings.length === 0 ? (
                   <p className="text-sm text-ok italic mb-4 font-sans">No critical issues found!</p>
                 ) : (
-                  <ul className="list-disc pl-5 text-sm text-bad mb-6 space-y-2 font-mono text-xs">
+                  <ul className="list-disc pl-5 text-sm text-bad mb-4 sm:mb-6 space-y-1 sm:space-y-2 font-mono text-xs">
                     {report.findings.map((f, i) => <li key={i}>{f}</li>)}
                   </ul>
                 )}
 
-                <h4 className="font-mono text-[10px] uppercase tracking-wider font-bold text-ok mb-2 pt-4 border-t border-rule">Passed Checks</h4>
-                <ul className="list-disc pl-5 text-sm text-ok space-y-2 font-mono text-xs">
+                <h4 className="font-mono text-[10px] uppercase tracking-wider font-bold text-ok mb-2 pt-3 sm:pt-4 border-t border-rule">Passed Checks</h4>
+                <ul className="list-disc pl-5 text-sm text-ok space-y-1 sm:space-y-2 font-mono text-xs">
                   {report.passed.map((p, i) => <li key={i}>{p}</li>)}
                 </ul>
               </div>

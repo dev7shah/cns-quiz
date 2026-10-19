@@ -29,3 +29,19 @@
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-jetbrains-mono);
 }
+
+@media print {
+  body {
+    background-color: #ffffff !important;
+    color: #16130F !important;
+  }
+
+  .no-print {
+    display: none !important;
+  }
+
+  .page-break {
+    page-break-after: always;
+    break-after: page;
+  }
+}

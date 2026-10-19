@@ -26,13 +26,13 @@ export default function Dashboard() {
         <div className="absolute -left-20 top-[60%] text-[200px] font-serif text-rule opacity-10">§</div>
       </div>
 
-      <main className="flex-1 container mx-auto px-6 py-20 max-w-6xl relative z-10">
-        <header className="mb-20 text-center md:text-left flex flex-col md:flex-row items-center justify-between gap-12">
-          <div className="max-w-2xl">
+      <main className="flex-1 container mx-auto px-4 sm:px-6 py-8 sm:py-12 md:py-20 max-w-6xl relative z-10">
+        <header className="mb-12 md:mb-20 text-center md:text-left flex flex-col md:flex-row items-center justify-between gap-8 md:gap-12">
+          <div className="max-w-2xl w-full">
             <motion.div 
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
-              className="inline-block bg-card border border-ink text-ink font-mono text-[10px] uppercase tracking-widest px-3 py-1 mb-6"
+              className="inline-block bg-card border border-ink text-ink font-mono text-[10px] uppercase tracking-widest px-3 py-1 mb-4 sm:mb-6"
             >
               Interactive Learning Environment v2.0
             </motion.div>
@@ -40,7 +40,7 @@ export default function Dashboard() {
               initial={{ opacity: 0, y: -20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.1 }}
-              className="text-5xl md:text-7xl font-serif text-ink tracking-tight mb-6 leading-none"
+              className="text-4xl sm:text-5xl md:text-7xl font-serif text-ink tracking-tight mb-4 md:mb-6 leading-tight"
             >
               The Modern <br/>
               <span className="text-signal italic">Security Lab</span>
@@ -49,7 +49,7 @@ export default function Dashboard() {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ delay: 0.2 }}
-              className="text-xl text-ink-soft max-w-lg mb-10 font-sans leading-relaxed"
+              className="text-base sm:text-lg md:text-xl text-ink-soft max-w-lg mb-8 md:mb-10 font-sans leading-relaxed mx-auto md:mx-0"
             >
               A precision instrument for mastering Computer Network Security. Featuring scrollytelling lessons, live simulators, and an interactive team quiz challenge.
             </motion.p>
@@ -58,14 +58,14 @@ export default function Dashboard() {
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.3 }}
-              className="flex flex-wrap gap-4 justify-center md:justify-start"
+              className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center md:justify-start w-full sm:w-auto"
             >
-              <Button size="lg" className="bg-signal hover:bg-signal/90 text-paper border border-signal font-bold uppercase tracking-wider text-sm h-14 px-8" asChild>
+              <Button size="lg" className="w-full sm:w-auto bg-signal hover:bg-signal/90 text-paper border border-signal font-bold uppercase tracking-wider text-xs sm:text-sm h-12 sm:h-14 px-6 sm:px-8" asChild>
                 <Link href="/modules/crypto">
                   Enter Laboratory <ArrowRight className="ml-2 h-4 w-4" />
                 </Link>
               </Button>
-              <Button size="lg" className="bg-card hover:bg-rule text-ink border border-ink font-bold uppercase tracking-wider text-sm h-14 px-8" asChild>
+              <Button size="lg" className="w-full sm:w-auto bg-card hover:bg-rule text-ink border border-ink font-bold uppercase tracking-wider text-xs sm:text-sm h-12 sm:h-14 px-6 sm:px-8" asChild>
                 <Link href="/quiz">
                   <Flame className="mr-2 h-4 w-4" /> Live Quiz
                 </Link>
@@ -77,39 +77,39 @@ export default function Dashboard() {
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ delay: 0.4 }}
-            className="w-full md:w-auto flex flex-col gap-4"
+            className="w-full md:w-auto flex flex-col gap-3 sm:gap-4 items-center md:items-start"
           >
-            <div className="bg-card border border-ink p-6 max-w-sm flex items-start gap-4">
-              <div className="bg-signal/10 p-3 text-signal shrink-0">
-                <Presentation className="h-6 w-6" />
+            <div className="bg-card border border-ink p-4 sm:p-6 w-full max-w-sm flex items-start gap-4 text-left">
+              <div className="bg-signal/10 p-2.5 sm:p-3 text-signal shrink-0">
+                <Presentation className="h-5 w-5 sm:h-6 sm:w-6" />
               </div>
               <div>
-                <h3 className="font-bold text-sm uppercase tracking-wider font-mono mb-2">Lecturer Ready</h3>
-                <p className="text-sm text-ink-soft">Press [P] in any module to launch the distraction-free Presenter Mode overlay.</p>
+                <h3 className="font-bold text-xs sm:text-sm uppercase tracking-wider font-mono mb-1 sm:mb-2">Lecturer Ready</h3>
+                <p className="text-xs sm:text-sm text-ink-soft">Press Present or [P] in any module to launch the distraction-free Presenter Mode.</p>
               </div>
             </div>
-            <div className="bg-paper border border-rule p-6 max-w-sm flex items-start gap-4 relative left-0 md:-left-8">
-              <div className="bg-ok/10 p-3 text-ok shrink-0">
-                <GraduationCap className="h-6 w-6" />
+            <div className="bg-paper border border-rule p-4 sm:p-6 w-full max-w-sm flex items-start gap-4 relative left-0 md:-left-8 text-left">
+              <div className="bg-ok/10 p-2.5 sm:p-3 text-ok shrink-0">
+                <GraduationCap className="h-5 w-5 sm:h-6 sm:w-6" />
               </div>
               <div>
-                <h3 className="font-bold text-sm uppercase tracking-wider font-mono mb-2">Exam Focused</h3>
-                <p className="text-sm text-ink-soft">Every concept is broken down into a real-world analogy, visual diagram, and strict exam definition.</p>
+                <h3 className="font-bold text-xs sm:text-sm uppercase tracking-wider font-mono mb-1 sm:mb-2">Exam Focused</h3>
+                <p className="text-xs sm:text-sm text-ink-soft">Every concept is broken down into a real-world analogy, visual diagram, and strict exam definition.</p>
               </div>
             </div>
           </motion.div>
         </header>
 
         <section>
-          <div className="flex items-center gap-4 mb-8">
-            <h2 className="text-2xl font-serif text-ink">Syllabus Modules</h2>
-            <div className="flex-1 h-px bg-rule"></div>
-            <Link href="/revision" className="text-sm font-mono uppercase tracking-wider text-signal hover:underline">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 sm:gap-4 mb-6 md:mb-8">
+            <h2 className="text-xl sm:text-2xl font-serif text-ink">Syllabus Modules</h2>
+            <div className="hidden sm:block flex-1 h-px bg-rule"></div>
+            <Link href="/revision" className="text-xs sm:text-sm font-mono uppercase tracking-wider text-signal hover:underline">
               Access Revision Hub &rarr;
             </Link>
           </div>
           
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          <div className="grid gap-3 sm:gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
             {modules.map((module, i) => (
               <motion.div
                 key={module.id}

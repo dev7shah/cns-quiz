@@ -16,43 +16,43 @@ export default function RevisionPage() {
         transition={{ duration: 0.5 }}
         className="max-w-6xl mx-auto"
       >
-        <div className="mb-12 border-b border-rule pb-8 text-center">
-          <div className="inline-block bg-card border border-ink text-ink font-mono text-[10px] uppercase tracking-widest px-3 py-1 mb-6">
+        <div className="mb-6 sm:mb-12 border-b border-rule pb-6 sm:pb-8 text-center">
+          <div className="inline-block bg-card border border-ink text-ink font-mono text-[10px] uppercase tracking-widest px-3 py-1 mb-4 sm:mb-6">
             Review Mode
           </div>
-          <h1 className="text-5xl font-serif text-ink tracking-tight mb-4">Revision Hub</h1>
-          <p className="text-ink-soft text-lg font-sans max-w-2xl mx-auto">
+          <h1 className="text-3xl sm:text-5xl font-serif text-ink tracking-tight mb-2 sm:mb-4">Revision Hub</h1>
+          <p className="text-ink-soft text-sm sm:text-lg font-sans max-w-2xl mx-auto">
             Master the concepts, review complex algorithms, and prep for the final Viva.
           </p>
         </div>
 
         <Tabs defaultValue="flashcards" className="w-full">
-          <div className="flex justify-center mb-12">
-            <TabsList className="flex bg-card border border-ink shadow-[4px_4px_0_var(--rule)] h-auto p-0">
+          <div className="flex justify-center mb-6 sm:mb-12 overflow-x-auto -mx-2 px-2 scrollbar-none">
+            <TabsList className="flex bg-card border border-ink shadow-[3px_3px_0_var(--rule)] sm:shadow-[4px_4px_0_var(--rule)] h-auto p-0 w-max">
               <TabsTrigger 
                 value="flashcards" 
-                className="rounded-none border-r border-ink data-[state=active]:bg-signal data-[state=active]:text-paper px-8 py-4 font-mono uppercase tracking-widest text-xs"
+                className="rounded-none border-r border-ink data-[state=active]:bg-signal data-[state=active]:text-paper px-4 sm:px-6 md:px-8 py-3 sm:py-4 font-mono uppercase tracking-wider sm:tracking-widest text-[10px] sm:text-xs shrink-0 whitespace-nowrap"
               >
-                <div className="flex items-center gap-2">
-                  <BookOpen className="h-4 w-4" />
+                <div className="flex items-center gap-1.5 sm:gap-2">
+                  <BookOpen className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
                   Flashcards
                 </div>
               </TabsTrigger>
               <TabsTrigger 
                 value="complexity" 
-                className="rounded-none border-r border-ink data-[state=active]:bg-signal data-[state=active]:text-paper px-8 py-4 font-mono uppercase tracking-widest text-xs"
+                className="rounded-none border-r border-ink data-[state=active]:bg-signal data-[state=active]:text-paper px-4 sm:px-6 md:px-8 py-3 sm:py-4 font-mono uppercase tracking-wider sm:tracking-widest text-[10px] sm:text-xs shrink-0 whitespace-nowrap"
               >
-                <div className="flex items-center gap-2">
-                  <TableProperties className="h-4 w-4" />
+                <div className="flex items-center gap-1.5 sm:gap-2">
+                  <TableProperties className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
                   Complexity
                 </div>
               </TabsTrigger>
               <TabsTrigger 
                 value="viva" 
-                className="rounded-none data-[state=active]:bg-signal data-[state=active]:text-paper px-8 py-4 font-mono uppercase tracking-widest text-xs"
+                className="rounded-none data-[state=active]:bg-signal data-[state=active]:text-paper px-4 sm:px-6 md:px-8 py-3 sm:py-4 font-mono uppercase tracking-wider sm:tracking-widest text-[10px] sm:text-xs shrink-0 whitespace-nowrap"
               >
-                <div className="flex items-center gap-2">
-                  <Speech className="h-4 w-4" />
+                <div className="flex items-center gap-1.5 sm:gap-2">
+                  <Speech className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
                   Viva Prep
                 </div>
               </TabsTrigger>

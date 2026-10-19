@@ -35,17 +35,17 @@ test.describe('Cryptography Module Tests', () => {
     
     // Verify Presenter Mode UI renders
     await expect(page.locator('h1', { hasText: 'Hashing: The One-Way Blender' }).nth(0)).toBeVisible();
-    await expect(page.locator('text=Step 1 of 3')).toBeVisible();
+    await expect(page.locator('button', { hasText: 'Exit ✕' })).toBeVisible();
 
     // Press Escape to close
     await page.keyboard.press('Escape');
     
     // Verify it closed
-    await expect(page.locator('text=Step 1 of 3')).not.toBeVisible();
+    await expect(page.locator('button', { hasText: 'Exit ✕' })).not.toBeVisible();
 
     // Trigger via P key
     await page.keyboard.press('P');
-    await expect(page.locator('text=Step 1 of 3')).toBeVisible();
+    await expect(page.locator('button', { hasText: 'Exit ✕' })).toBeVisible();
 
     // Toggle Speaker Notes
     await page.keyboard.press('s');

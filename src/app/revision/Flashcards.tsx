@@ -37,45 +37,45 @@ export default function Flashcards() {
   }
 
   return (
-    <div className="flex flex-col items-center justify-center py-12 max-w-2xl mx-auto">
-      <div className="font-mono text-[10px] uppercase tracking-widest text-ink-soft mb-8 bg-card border border-rule px-4 py-1">
+    <div className="flex flex-col items-center justify-center py-6 sm:py-12 max-w-2xl mx-auto px-2">
+      <div className="font-mono text-[10px] uppercase tracking-widest text-ink-soft mb-6 sm:mb-8 bg-card border border-rule px-4 py-1">
         Index {String(currentIndex + 1).padStart(2, '0')} / {String(flashcards.length).padStart(2, '0')}
       </div>
 
-      <div className="relative w-full aspect-[3/2] perspective-[1000px] cursor-pointer" onClick={() => setIsFlipped(!isFlipped)}>
+      <div className="relative w-full min-h-[280px] sm:min-h-[320px] md:aspect-[3/2] perspective-[1000px] cursor-pointer" onClick={() => setIsFlipped(!isFlipped)}>
         <motion.div
-          className="w-full h-full preserve-3d"
+          className="w-full h-full min-h-[280px] sm:min-h-[320px] preserve-3d"
           animate={{ rotateX: isFlipped ? 180 : 0 }}
           transition={{ type: "spring", stiffness: 260, damping: 20 }}
           style={{ transformStyle: "preserve-3d" }}
         >
           {/* Front */}
-          <div className="absolute w-full h-full backface-hidden p-8 md:p-12 flex flex-col items-center justify-center text-center bg-card border border-ink shadow-[4px_4px_0_var(--rule)]">
-            <div className="absolute top-4 left-4 font-mono text-xs text-signal font-bold uppercase tracking-widest">Question</div>
-            <h2 className="text-3xl md:text-4xl font-serif leading-tight text-ink">{flashcards[currentIndex].q}</h2>
+          <div className="absolute inset-0 w-full h-full backface-hidden p-6 sm:p-8 md:p-12 flex flex-col items-center justify-center text-center bg-card border border-ink shadow-[4px_4px_0_var(--rule)] overflow-y-auto">
+            <div className="absolute top-3 left-3 sm:top-4 sm:left-4 font-mono text-[10px] sm:text-xs text-signal font-bold uppercase tracking-widest">Question</div>
+            <h2 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-serif leading-snug text-ink pt-4 sm:pt-0">{flashcards[currentIndex].q}</h2>
           </div>
 
           {/* Back */}
-          <div className="absolute w-full h-full backface-hidden p-8 md:p-12 flex flex-col items-center justify-center text-center bg-paper border border-ok shadow-[4px_4px_0_var(--ok)]" style={{ transform: "rotateX(180deg)" }}>
-            <div className="absolute top-4 right-4 font-mono text-xs text-ok font-bold uppercase tracking-widest">Answer</div>
-            <p className="text-xl md:text-2xl font-sans leading-relaxed text-ink">{flashcards[currentIndex].a}</p>
+          <div className="absolute inset-0 w-full h-full backface-hidden p-6 sm:p-8 md:p-12 flex flex-col items-center justify-center text-center bg-paper border border-ok shadow-[4px_4px_0_var(--ok)] overflow-y-auto" style={{ transform: "rotateX(180deg)" }}>
+            <div className="absolute top-3 right-3 sm:top-4 sm:right-4 font-mono text-[10px] sm:text-xs text-ok font-bold uppercase tracking-widest">Answer</div>
+            <p className="text-sm sm:text-base md:text-xl lg:text-2xl font-sans leading-relaxed text-ink pt-4 sm:pt-0">{flashcards[currentIndex].a}</p>
           </div>
         </motion.div>
       </div>
 
-      <div className="flex items-center gap-6 mt-12">
-        <Button variant="outline" onClick={handlePrev} className="h-12 w-12 rounded-none border border-ink text-ink hover:bg-card hover:text-signal transition-colors p-0 flex items-center justify-center">
-          <ChevronLeft className="h-6 w-6" />
+      <div className="flex items-center gap-4 sm:gap-6 mt-8 sm:mt-12">
+        <Button variant="outline" onClick={handlePrev} className="h-10 w-10 sm:h-12 sm:w-12 rounded-none border border-ink text-ink hover:bg-card hover:text-signal transition-colors p-0 flex items-center justify-center">
+          <ChevronLeft className="h-5 w-5 sm:h-6 sm:w-6" />
         </Button>
-        <Button variant="ghost" onClick={() => setIsFlipped(!isFlipped)} className="gap-2 font-mono uppercase tracking-wider text-xs border border-transparent hover:border-ink rounded-none">
-          <RefreshCw className="h-4 w-4" />
+        <Button variant="ghost" onClick={() => setIsFlipped(!isFlipped)} className="gap-2 font-mono uppercase tracking-wider text-xs border border-transparent hover:border-ink rounded-none h-10 sm:h-12 px-4">
+          <RefreshCw className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
           Flip
         </Button>
-        <Button variant="outline" onClick={handleNext} className="h-12 w-12 rounded-none border border-ink text-ink hover:bg-card hover:text-signal transition-colors p-0 flex items-center justify-center">
-          <ChevronRight className="h-6 w-6" />
+        <Button variant="outline" onClick={handleNext} className="h-10 w-10 sm:h-12 sm:w-12 rounded-none border border-ink text-ink hover:bg-card hover:text-signal transition-colors p-0 flex items-center justify-center">
+          <ChevronRight className="h-5 w-5 sm:h-6 sm:w-6" />
         </Button>
       </div>
-      <p className="text-[10px] uppercase tracking-widest font-mono text-ink-soft mt-8">Click the card to reveal the answer</p>
+      <p className="text-[10px] uppercase tracking-widest font-mono text-ink-soft mt-6 sm:mt-8">Tap or click the card to reveal the answer</p>
 
       {/* Required CSS for 3D flip effect */}
       <style dangerouslySetInnerHTML={{__html: `

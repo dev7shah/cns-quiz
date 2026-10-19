@@ -32,37 +32,37 @@ export default function IDSPlayground() {
   }
 
   return (
-    <div className="space-y-12">
+    <div className="space-y-8 sm:space-y-12">
       <Card>
         <CardHeader>
-          <div className="flex justify-between items-center flex-wrap gap-4">
+          <div className="flex flex-col sm:flex-row justify-between sm:items-center gap-3 sm:gap-4">
             <div>
-              <CardTitle className="font-serif text-3xl">Network Traffic Logs</CardTitle>
-              <p className="text-ink-soft text-sm font-sans mt-2">Simulate real-time network traffic and pass it through the IDS.</p>
+              <CardTitle className="font-serif text-2xl sm:text-3xl">Network Traffic Logs</CardTitle>
+              <p className="text-ink-soft text-xs sm:text-sm font-sans mt-1 sm:mt-2">Simulate real-time network traffic and pass it through the IDS.</p>
             </div>
-            <div className="flex gap-2">
-              <Button variant="outline" size="sm" onClick={addNormalTraffic}>+ Normal</Button>
-              <Button variant="outline" size="sm" onClick={addMaliciousTraffic}>+ Malicious</Button>
-              <Button size="sm" onClick={runSimulation} className="bg-signal text-paper hover:bg-signal/90 border border-signal shadow-sm font-mono uppercase tracking-wider text-[11px] font-bold">Analyze Logs</Button>
+            <div className="flex flex-wrap gap-2">
+              <Button variant="outline" size="sm" onClick={addNormalTraffic} className="text-xs h-8 px-2.5">+ Normal</Button>
+              <Button variant="outline" size="sm" onClick={addMaliciousTraffic} className="text-xs h-8 px-2.5">+ Malicious</Button>
+              <Button size="sm" onClick={runSimulation} className="bg-signal text-paper hover:bg-signal/90 border border-signal shadow-sm font-mono uppercase tracking-wider text-[11px] font-bold h-8 px-3">Analyze Logs</Button>
             </div>
           </div>
         </CardHeader>
         <CardContent>
-          <div className="border border-rule bg-card max-h-80 overflow-y-auto">
-            <table className="w-full text-sm font-mono text-left">
+          <div className="border border-rule bg-card max-h-80 overflow-y-auto overflow-x-auto">
+            <table className="w-full text-xs sm:text-sm font-mono text-left min-w-[360px]">
               <thead className="bg-paper sticky top-0 border-b border-rule z-10 text-[10px] uppercase tracking-wider text-ink-soft font-bold">
                 <tr>
-                  <th className="p-3 border-r border-rule">ID</th>
-                  <th className="p-3 border-r border-rule">Source IP</th>
-                  <th className="p-3">Action / Payload</th>
+                  <th className="p-2.5 sm:p-3 border-r border-rule">ID</th>
+                  <th className="p-2.5 sm:p-3 border-r border-rule">Source IP</th>
+                  <th className="p-2.5 sm:p-3">Action / Payload</th>
                 </tr>
               </thead>
               <tbody>
                 {logs.map(log => (
                   <tr key={log.id} className="border-b border-rule last:border-0 hover:bg-rule/50 transition-colors text-ink">
-                    <td className="p-3 border-r border-rule">{log.id}</td>
-                    <td className="p-3 border-r border-rule">{log.ip}</td>
-                    <td className="p-3 break-all">{log.action}</td>
+                    <td className="p-2.5 sm:p-3 border-r border-rule whitespace-nowrap">{log.id}</td>
+                    <td className="p-2.5 sm:p-3 border-r border-rule whitespace-nowrap">{log.ip}</td>
+                    <td className="p-2.5 sm:p-3 break-all">{log.action}</td>
                   </tr>
                 ))}
               </tbody>
@@ -74,13 +74,13 @@ export default function IDSPlayground() {
       {alerts.length > 0 && (
         <Card className="border-bad shadow-[0_0_15px_rgba(var(--color-bad-rgb),0.1)]">
           <CardHeader>
-            <CardTitle className="font-serif text-3xl text-bad">IDS Alerts ({alerts.length})</CardTitle>
-            <p className="text-ink-soft text-sm font-sans mt-2">The IDS has matched signatures or anomalies against the traffic.</p>
+            <CardTitle className="font-serif text-2xl sm:text-3xl text-bad">IDS Alerts ({alerts.length})</CardTitle>
+            <p className="text-ink-soft text-xs sm:text-sm font-sans mt-1 sm:mt-2">The IDS has matched signatures or anomalies against the traffic.</p>
           </CardHeader>
           <CardContent>
-            <div className="space-y-4 font-mono">
+            <div className="space-y-3 sm:space-y-4 font-mono">
               {alerts.map((alert, i) => (
-                <div key={i} className={`p-4 border bg-card flex items-start gap-4 ${
+                <div key={i} className={`p-3 sm:p-4 border bg-card flex items-start gap-3 sm:gap-4 ${
                   alert.severity === 'CRITICAL' ? 'border-bad text-bad' :
                   alert.severity === 'HIGH' ? 'border-orange-500 text-orange-600' :
                   'border-signal text-signal'
@@ -89,8 +89,8 @@ export default function IDSPlayground() {
                     {alert.severity}
                   </div>
                   <div>
-                    <div className="font-bold text-sm">{alert.message}</div>
-                    <div className="text-[11px] opacity-80 mt-2 uppercase tracking-wider">Triggered by Event ID: {alert.eventId}</div>
+                    <div className="font-bold text-xs sm:text-sm">{alert.message}</div>
+                    <div className="text-[10px] sm:text-[11px] opacity-80 mt-1 sm:mt-2 uppercase tracking-wider">Triggered by Event ID: {alert.eventId}</div>
                   </div>
                 </div>
               ))}

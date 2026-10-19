@@ -57,10 +57,10 @@ export function GuidedLesson({
   }
 
   return (
-    <div className="flex flex-col lg:flex-row gap-12 max-w-[1180px] mx-auto w-full relative">
+    <div className="flex flex-col lg:flex-row gap-6 lg:gap-12 max-w-[1180px] mx-auto w-full relative">
 
       {/* Left Column: Text */}
-      <div className="flex-1 max-w-[720px] space-y-16 pb-32">
+      <div className="flex-1 max-w-[720px] space-y-10 sm:space-y-16 pb-16 md:pb-32 w-full min-w-0">
         {steps.map((step, idx) => {
           const isActive = idx === activeStepIndex
           return (
@@ -69,12 +69,12 @@ export function GuidedLesson({
               className={cn("transition-opacity duration-500 cursor-pointer", isActive ? "opacity-100" : "opacity-30")}
               onClick={() => handleStepChange(idx)}
             >
-              <div className="font-mono text-xs text-signal tracking-widest uppercase mb-4">
+              <div className="font-mono text-xs text-signal tracking-widest uppercase mb-3 md:mb-4">
                 Step {String(idx + 1).padStart(2, '0')} / {String(steps.length).padStart(2, '0')}
               </div>
-              <h2 className="font-serif text-4xl text-ink mb-6">{step.title}</h2>
+              <h2 className="font-serif text-2xl sm:text-3xl md:text-4xl text-ink mb-4 md:mb-6">{step.title}</h2>
 
-              <div className="flex items-center gap-3 mb-6" onClick={(e) => e.stopPropagation()}>
+              <div className="flex items-center gap-3 mb-4 md:mb-6 flex-wrap" onClick={(e) => e.stopPropagation()}>
                 <button
                   type="button"
                   onClick={() => setExplainSimpler(!explainSimpler)}
@@ -95,18 +95,30 @@ export function GuidedLesson({
               </div>
 
               {explainSimpler ? (
-                <div className="bg-signal/5 border-l-4 border-signal p-5 rounded-r-[6px] mb-8 space-y-2">
+                <div className="bg-signal/5 border-l-4 border-signal p-4 sm:p-5 rounded-r-[6px] mb-6 md:mb-8 space-y-2">
                   <div className="flex items-center gap-2 font-mono text-[10px] uppercase tracking-wider font-bold text-signal">
                     <span>💡 In Plain English (ELI5)</span>
                   </div>
-                  <p className="text-lg leading-relaxed text-ink font-sans">
+                  <p className="text-base sm:text-lg leading-relaxed text-ink font-sans">
                     {step.simplerExplanation || step.analogy}
                   </p>
                 </div>
               ) : (
-                <p className="text-lg leading-relaxed text-ink mb-8 font-sans">
+                <p className="text-base sm:text-lg leading-relaxed text-ink mb-6 md:mb-8 font-sans">
                   {step.analogy}
                 </p>
+              )}
+
+              {/* Mobile Diagram View for Active Step */}
+              {isActive && DiagramComponent && (
+                <div 
+                  className="lg:hidden my-6 border border-rule bg-card rounded-[6px] p-4 flex items-center justify-center overflow-x-auto shadow-sm"
+                  onClick={(e) => e.stopPropagation()}
+                >
+                  <div className="w-full flex justify-center">
+                    <DiagramComponent activeSubStep={activeSubStepIndex} />
+                  </div>
+                </div>
               )}
 
               {/* See it work — stopPropagation so Back/Next don't bubble to parent onClick */}
@@ -115,20 +127,20 @@ export function GuidedLesson({
                 const hasNextStep = activeStepIndex < steps.length - 1
                 return (
                   <div
-                    className="bg-card border border-rule p-6 rounded-[6px] mb-8"
+                    className="bg-card border border-rule p-4 sm:p-6 rounded-[6px] mb-6 md:mb-8"
                     onClick={(e) => e.stopPropagation()}
                   >
-                    <div className="flex justify-between items-center mb-4">
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4">
                       <div className="flex items-center gap-3">
                         <span className="font-mono text-[11px] uppercase tracking-wider font-bold">See it work</span>
                         {/* Sub-step dot indicators */}
-                        <div className="flex gap-1">
+                        <div className="flex gap-1.5">
                           {activeStep.subSteps.map((_, i) => (
                             <button
                               key={i}
                               onClick={() => setActiveSubStepIndex(i)}
                               className={cn(
-                                "w-2 h-2 rounded-full transition-colors",
+                                "w-2.5 h-2.5 rounded-full transition-colors",
                                 i === activeSubStepIndex ? "bg-signal" : "bg-rule hover:bg-ink-soft"
                               )}
                             />
@@ -141,6 +153,7 @@ export function GuidedLesson({
                           size="sm"
                           onClick={handlePrevSubStep}
                           disabled={activeSubStepIndex === 0}
+                          className="text-xs h-8 px-2.5"
                         >
                           ← Back
                         </Button>
@@ -148,7 +161,7 @@ export function GuidedLesson({
                           <Button
                             size="sm"
                             onClick={() => handleStepChange(activeStepIndex + 1)}
-                            className="bg-signal text-paper border-signal hover:bg-signal/90 font-mono text-[11px] uppercase tracking-wider"
+                            className="bg-signal text-paper border-signal hover:bg-signal/90 font-mono text-[11px] uppercase tracking-wider h-8 px-2.5"
                           >
                             Next Step →
                           </Button>
@@ -158,6 +171,7 @@ export function GuidedLesson({
                             size="sm"
                             onClick={handleNextSubStep}
                             disabled={isLastSubStep}
+                            className="text-xs h-8 px-2.5"
                           >
                             Next →
                           </Button>

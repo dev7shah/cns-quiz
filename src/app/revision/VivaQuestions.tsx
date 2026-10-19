@@ -21,34 +21,34 @@ export default function VivaQuestions() {
   const [openIndex, setOpenIndex] = useState<number | null>(null)
 
   return (
-    <div className="space-y-6 max-w-4xl mx-auto py-8">
-      <div className="mb-12 border-b border-rule pb-6">
-        <h2 className="text-4xl font-serif text-ink mb-2">Examiner Q&A Bank</h2>
-        <p className="text-ink-soft font-sans">
+    <div className="space-y-4 sm:space-y-6 max-w-4xl mx-auto py-4 sm:py-8">
+      <div className="mb-6 sm:mb-12 border-b border-rule pb-4 sm:pb-6">
+        <h2 className="text-2xl sm:text-4xl font-serif text-ink mb-2">Examiner Q&A Bank</h2>
+        <p className="text-ink-soft text-xs sm:text-sm font-sans">
           The top 10 most frequently asked oral examination questions across all security modules.
         </p>
       </div>
 
-      <div className="space-y-4">
+      <div className="space-y-3 sm:space-y-4">
         {vivaQuestions.map((item, i) => (
           <div 
             key={i} 
-            className={`border transition-colors duration-200 ${openIndex === i ? 'bg-card border-ink shadow-[4px_4px_0_var(--rule)]' : 'bg-paper border-rule hover:border-ink hover:bg-card'}`}
+            className={`border transition-colors duration-200 ${openIndex === i ? 'bg-card border-ink shadow-[3px_3px_0_var(--rule)] sm:shadow-[4px_4px_0_var(--rule)]' : 'bg-paper border-rule hover:border-ink hover:bg-card'}`}
           >
             <button
-              className="w-full flex items-center justify-between p-6 text-left cursor-pointer focus:outline-none"
+              className="w-full flex items-center justify-between p-3.5 sm:p-6 text-left cursor-pointer focus:outline-none"
               onClick={() => setOpenIndex(openIndex === i ? null : i)}
             >
-              <div className="flex gap-6 items-start">
-                <span className="font-mono text-signal font-bold mt-1">
+              <div className="flex gap-3 sm:gap-6 items-start">
+                <span className="font-mono text-signal font-bold mt-0.5 text-xs sm:text-sm">
                   {String(i + 1).padStart(2, '0')}
                 </span>
-                <span className="text-xl font-serif text-ink">{item.q}</span>
+                <span className="text-base sm:text-lg md:text-xl font-serif text-ink">{item.q}</span>
               </div>
               {openIndex === i ? (
-                <ChevronUp className="h-5 w-5 text-signal flex-shrink-0 ml-4" />
+                <ChevronUp className="h-4 w-4 sm:h-5 sm:w-5 text-signal flex-shrink-0 ml-2 sm:ml-4" />
               ) : (
-                <ChevronDown className="h-5 w-5 text-ink-soft flex-shrink-0 ml-4" />
+                <ChevronDown className="h-4 w-4 sm:h-5 sm:w-5 text-ink-soft flex-shrink-0 ml-2 sm:ml-4" />
               )}
             </button>
             
@@ -60,8 +60,8 @@ export default function VivaQuestions() {
                   exit={{ height: 0, opacity: 0 }}
                   className="overflow-hidden"
                 >
-                  <div className="p-6 pt-0 ml-[3.25rem] mr-6 pb-6 text-ink border-t border-rule mt-2">
-                    <div className="font-mono text-[10px] uppercase tracking-widest text-ink-soft mb-3 pt-4">Expected Answer</div>
+                  <div className="p-4 sm:p-6 pt-0 sm:ml-[3.25rem] sm:mr-6 pb-4 sm:pb-6 text-ink border-t border-rule mt-1 sm:mt-2 text-sm sm:text-base">
+                    <div className="font-mono text-[10px] uppercase tracking-widest text-ink-soft mb-2 sm:mb-3 pt-3 sm:pt-4">Expected Answer</div>
                     <p className="font-sans leading-relaxed">{item.a}</p>
                   </div>
                 </motion.div>

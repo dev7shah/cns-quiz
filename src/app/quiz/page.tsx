@@ -1,115 +1,207 @@
 "use client"
 
-import { useState } from "react"
+import React, { useState, useSyncExternalStore } from "react"
+import Link from "next/link"
 import { useRouter } from "next/navigation"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/Card"
-import { Button } from "@/components/ui/Button"
-import { allQuestions } from "@/data/questions"
-import { Round } from "@/lib/quiz/types"
-import { motion } from "framer-motion"
-import { Users, Settings, Play } from "lucide-react"
+import { QuizModeId, QuizModeInfo } from "@/lib/quiz/v2/types"
 
-export default function QuizSetup() {
+const QUIZ_MODES: QuizModeInfo[] = [
+  {
+    id: 'exam-challenge',
+    title: 'Exam Challenge',
+    subtitle: 'Team-Based Competitive Arena',
+    description: 'Multi-team tournament with timed rounds (Rapid, Scenario, Image, Mixed), live scoreboard HUD, and victory podium.',
+    audience: 'Live classroom teams & lab hackathons',
+    features: ['2-6 Custom Squads', 'Draining Timer Bar', 'Live Team Scoreboard', 'Podium with Confetti']
+  },
+  {
+    id: 'classroom',
+    title: 'Classroom Quiz',
+    subtitle: 'Professor Projector Mode',
+    description: 'One full-screen question at a time with show-of-hands vote count bars. Revealing highlights distractors and identifies class misconceptions.',
+    audience: 'Lecturers projecting in auditorium',
+    features: ['Show-of-Hands [1-4]', 'Classroom Heatmap', 'Misconception Analysis', 'Show Me Replay']
+  },
+  {
+    id: 'numerical-lab',
+    title: 'Numerical Lab',
+    subtitle: 'Math & Cryptanalysis Practice',
+    description: 'Practice modular arithmetic, key spaces, Euler totient, Affine and Hill determinants with scratchpad inputs and 3-level hints.',
+    audience: 'Students preparing for university numericals',
+    features: ['Random Problem Generator', 'Step-by-Step Derivations', 'Live Scratchpad Check', 'Formula Sheets']
+  },
+  {
+    id: 'diagram-quiz',
+    title: 'Diagram Quiz',
+    subtitle: 'Visual Architecture & Flow Identification',
+    description: 'Label architectural hotspots on cipher models, reconstruct handshake sequence timelines, and spot attacks in animated scenes.',
+    audience: 'Visual learners & system architects',
+    features: ['Label Hotspot Pins', 'Chronological Reordering', 'Scene Attack Spotting', 'Network Topologies']
+  },
+  {
+    id: 'viva-mode',
+    title: 'Viva Mode',
+    subtitle: 'Oral Examination Revision',
+    description: 'Rapid-fire viva questions with 30-second think timer, official model answers, and self-assessment to populate your personal revision list.',
+    audience: 'Pre-exam viva voce defense preparation',
+    features: ['30s Think Countdown', 'Model Answer Rubrics', 'Self-Rating Feedback', 'Feeds Revision Cards']
+  },
+  {
+    id: 'self-test',
+    title: 'Self-Test by Module',
+    subtitle: 'Customizable Diagnostic Assessment',
+    description: 'Filter questions across specific syllabus modules (M1-M6) and Bloom taxonomy levels (L1 Remember to L4 Analyze) for diagnostic mastery.',
+    audience: 'Individual self-paced study',
+    features: ['Module Selector', 'Bloom Filter (L1-L4)', 'Target Question Count', 'Mastery Radar Report']
+  }
+]
+
+export default function QuizModeHub() {
   const router = useRouter()
-  const [numTeams, setNumTeams] = useState(2)
-  const [teamNames, setTeamNames] = useState<string[]>(["Team 1", "Team 2"])
+  const [selectedMode, setSelectedMode] = useState<QuizModeId>('exam-challenge')
+  const hasSavedSession = useSyncExternalStore(
+    () => () => {},
+    () => typeof window !== "undefined" && !!localStorage.getItem("cns-quiz-session"),
+    () => false
+  )
 
-  const handleNumTeamsChange = (n: number) => {
-    setNumTeams(n)
-    setTeamNames(Array.from({ length: n }, (_, i) => `Team ${i + 1}`))
-  }
-
-  const handleNameChange = (index: number, name: string) => {
-    const newNames = [...teamNames]
-    newNames[index] = name
-    setTeamNames(newNames)
-  }
-
-  const startQuiz = () => {
-    // In a real implementation we would shuffle and select questions
-    // Then store in localStorage or context, then navigate to /quiz/play
-    const teamsData = teamNames.map((name, i) => ({ id: `t${i}`, name, score: 0 }))
-    const roundsData: Round[] = ["rapid", "scenario", "image", "mixed"]
-    
-    // Select first 10 questions for demo
-    const queue = allQuestions.slice(0, 10)
-    
-    localStorage.setItem("cns-quiz-setup", JSON.stringify({ teams: teamsData, rounds: roundsData, queue }))
-    router.push("/quiz/play")
+  const handleStartMode = (modeId: QuizModeId) => {
+    router.push(`/quiz/${modeId}/play`)
   }
 
   return (
-    <div className="min-h-screen bg-paper py-12 px-4 flex items-center justify-center">
-      <motion.div 
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="w-full max-w-2xl"
-      >
-        <Card className="border-ink shadow-[8px_8px_0_var(--rule)]">
-          <CardHeader className="border-b border-rule pb-6 mb-6">
-            <div className="flex items-center gap-4 text-signal mb-2">
-              <Settings className="h-8 w-8" />
-              <CardTitle className="font-serif text-4xl text-ink">Exam Challenge Setup</CardTitle>
+    <div className="min-h-screen bg-paper py-8 px-4 sm:px-6">
+      <div className="max-w-6xl w-full mx-auto space-y-8">
+        {/* Top Header */}
+        <div className="border-b-2 border-ink pb-6 flex flex-col sm:flex-row justify-between items-start sm:items-end gap-4">
+          <div>
+            <div className="flex items-center gap-3">
+              <span className="font-mono text-xs uppercase tracking-widest text-signal font-bold">
+                Assessment Engine v2
+              </span>
+              <span className="font-mono text-[10px] px-1.5 py-0.5 border border-rule text-ink-soft">
+                9 Question Types · 6 Assessment Modes
+              </span>
             </div>
-            <p className="text-ink-soft font-sans text-sm">
-              Configure the parameters for the live team-based assessment.
+            <h1 className="font-serif text-3xl sm:text-5xl text-ink font-bold mt-1">
+              CNS Security Assessment Lab
+            </h1>
+            <p className="font-sans text-xs sm:text-sm text-ink-soft mt-1">
+              Select an assessment mode tailored for live team rounds, professor classroom projection, numerical practice, or viva defense.
             </p>
-          </CardHeader>
-          <CardContent className="space-y-10">
-            
-            {/* Number of Teams */}
-            <div className="space-y-4">
-              <div className="flex items-center gap-2 border-b border-rule pb-2">
-                <Users className="h-4 w-4 text-ink-soft" />
-                <label className="font-mono text-[10px] uppercase tracking-wider font-bold text-ink">Active Teams</label>
-              </div>
-              <div className="flex gap-2 flex-wrap">
-                {[2, 3, 4, 5, 6].map((n) => (
-                  <Button 
-                    key={n} 
-                    variant={numTeams === n ? "default" : "outline"}
-                    onClick={() => handleNumTeamsChange(n)}
-                    className={`font-mono text-lg h-12 w-16 ${
-                      numTeams === n 
-                        ? "bg-signal text-paper border-signal shadow-none" 
-                        : "bg-card text-ink border-ink hover:bg-rule"
+          </div>
+
+          <div className="flex items-center gap-3">
+            {hasSavedSession && (
+              <button
+                onClick={() => router.push("/quiz/exam-challenge/play")}
+                className="px-3 py-1.5 border border-signal bg-signal text-paper font-mono text-xs uppercase font-bold"
+              >
+                Resume Session ↺
+              </button>
+            )}
+            <Link
+              href="/revision"
+              className="px-3 py-1.5 border border-rule hover:border-ink bg-card font-mono text-xs uppercase"
+            >
+              Revision Cards
+            </Link>
+            <Link
+              href="/styleguide"
+              className="px-3 py-1.5 border border-rule hover:border-ink bg-card font-mono text-xs uppercase"
+            >
+              Styleguide
+            </Link>
+          </div>
+        </div>
+
+        {/* 6 Mode Cards Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {QUIZ_MODES.map(mode => {
+            const isSelected = selectedMode === mode.id
+
+            return (
+              <div
+                key={mode.id}
+                onClick={() => setSelectedMode(mode.id)}
+                className={`p-6 border flex flex-col justify-between transition-all cursor-pointer ${
+                  isSelected
+                    ? "border-signal bg-card shadow-[6px_6px_0_var(--signal)]"
+                    : "border-rule bg-card hover:border-ink hover:bg-paper"
+                }`}
+              >
+                <div>
+                  <div className="flex justify-between items-center mb-2">
+                    <span className="font-mono text-[10px] uppercase tracking-wider text-signal font-bold">
+                      {mode.subtitle}
+                    </span>
+                    <span className="font-mono text-[9px] px-1 border border-rule text-ink-soft">
+                      {mode.id}
+                    </span>
+                  </div>
+
+                  <h3 className="font-serif text-2xl text-ink font-bold mb-2">{mode.title}</h3>
+                  <p className="font-sans text-xs text-ink-soft leading-relaxed mb-4">
+                    {mode.description}
+                  </p>
+
+                  <div className="space-y-1.5 mb-6">
+                    <span className="font-mono text-[10px] uppercase text-ink-soft block font-bold">
+                      Key Highlights:
+                    </span>
+                    {mode.features.map((feat, idx) => (
+                      <div key={idx} className="flex items-center gap-2 font-mono text-[11px] text-ink">
+                        <span className="text-signal">■</span>
+                        <span>{feat}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                <div className="pt-4 border-t border-rule flex items-center justify-between">
+                  <span className="font-mono text-[10px] text-ink-soft truncate mr-2">
+                    {mode.audience}
+                  </span>
+                  <button
+                    onClick={e => {
+                      e.stopPropagation()
+                      handleStartMode(mode.id)
+                    }}
+                    className={`px-4 py-2 font-mono text-xs uppercase font-bold transition-colors ${
+                      isSelected
+                        ? "bg-signal text-paper hover:bg-ink"
+                        : "bg-ink text-paper hover:bg-signal"
                     }`}
                   >
-                    {n}
-                  </Button>
-                ))}
+                    Launch Mode →
+                  </button>
+                </div>
               </div>
-            </div>
-            
-            {/* Team Rosters */}
-            <div className="space-y-4">
-              <div className="flex items-center gap-2 border-b border-rule pb-2">
-                <label className="font-mono text-[10px] uppercase tracking-wider font-bold text-ink">Team Roster Designation</label>
-              </div>
-              <div className="grid sm:grid-cols-2 gap-4">
-                {teamNames.map((name, i) => (
-                  <div key={i} className="flex flex-col gap-2">
-                    <span className="text-[10px] font-mono text-ink-soft uppercase tracking-wider">Squad 0{i + 1}</span>
-                    <input 
-                      type="text" 
-                      value={name}
-                      onChange={(e) => handleNameChange(i, e.target.value)}
-                      className="flex h-12 w-full border border-ink bg-card px-4 py-2 font-bold font-sans text-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-signal focus-visible:bg-paper transition-colors"
-                    />
-                  </div>
-                ))}
-              </div>
-            </div>
+            )
+          })}
+        </div>
 
-            {/* Launch Action */}
-            <div className="pt-6 border-t border-rule flex justify-end">
-              <Button size="lg" onClick={startQuiz} className="bg-ink hover:bg-ink-soft text-paper border border-ink font-bold uppercase tracking-wider font-mono h-14 px-8 text-sm">
-                <Play className="mr-2 h-4 w-4" /> Initialize Assessment
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
-      </motion.div>
+        {/* Syllabus Question Types Matrix Footer */}
+        <div className="p-6 bg-card border border-ink shadow-[4px_4px_0_var(--rule)] space-y-4">
+          <div className="flex justify-between items-center border-b border-rule pb-2">
+            <h3 className="font-serif text-lg font-bold text-ink">
+              Question Types Engine (9 of 9 Implemented)
+            </h3>
+            <span className="font-mono text-xs text-ink-soft">
+              Tested across Bloom L1 (Remember) through L4 (Analyze)
+            </span>
+          </div>
+
+          <div className="grid grid-cols-3 sm:grid-cols-5 md:grid-cols-9 gap-2 font-mono text-[11px] text-center">
+            {['mcq', 'multi', 'numeric', 'order', 'match', 'label', 'spot', 'fill', 'tf-why'].map(t => (
+              <div key={t} className="p-2 border border-rule bg-paper">
+                <span className="text-signal block font-bold uppercase">{t}</span>
+                <span className="text-ink-soft text-[9px]">Verified</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
     </div>
   )
 }

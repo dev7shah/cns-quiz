@@ -7,7 +7,9 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "test": "playwright test tests/smoke.spec.ts"
+    "test:unit": "vitest run",
+    "test:e2e": "playwright test",
+    "test": "vitest run && playwright test"
   },
   "dependencies": {
     "@radix-ui/react-slot": "^1.4.0",

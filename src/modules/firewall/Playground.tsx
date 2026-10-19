@@ -23,29 +23,34 @@ export default function FirewallPlayground() {
     <div className="space-y-12">
       <Card>
         <CardHeader>
-          <CardTitle className="font-serif text-3xl">Access Control List (ACL) Simulator</CardTitle>
-          <p className="text-ink-soft text-sm font-sans mt-2">See how top-down rule processing works in action.</p>
+          <CardTitle className="font-serif text-2xl sm:text-3xl">Access Control List (ACL) Simulator</CardTitle>
+          <p className="text-ink-soft text-xs sm:text-sm font-sans mt-1 sm:mt-2">See how top-down rule processing works in action.</p>
         </CardHeader>
-        <CardContent className="space-y-6">
-          <div className="bg-paper border border-rule rounded-[4px] overflow-hidden">
-            <div className="grid grid-cols-6 gap-2 p-4 font-mono text-[10px] uppercase tracking-wider font-bold bg-card border-b border-rule text-ink">
-              <div>Order</div><div>Action</div><div>Proto</div><div>Source IP</div><div>Dest IP</div><div>Port</div>
-            </div>
-            {rules.map((rule, idx) => (
-              <div 
-                key={rule.id} 
-                className={`grid grid-cols-6 gap-2 p-4 text-sm font-mono border-b border-rule last:border-0 ${evaluation.matchedRuleId === rule.id ? 'bg-signal/10 text-signal font-bold' : 'text-ink'}`}
-              >
-                <div>{idx + 1}</div>
-                <div className={rule.action === "ALLOW" ? "text-ok" : "text-bad"}>{rule.action}</div>
-                <div>{rule.protocol}</div>
-                <div>{rule.sourceIp}</div>
-                <div>{rule.destIp}</div>
-                <div>{rule.destPort}</div>
+        <CardContent className="space-y-4 sm:space-y-6">
+          <div className="sm:hidden font-mono text-[10px] uppercase tracking-wider text-ink-soft text-right">
+            Scroll horizontally &rarr;
+          </div>
+          <div className="bg-paper border border-rule rounded-[4px] overflow-x-auto">
+            <div className="min-w-[480px]">
+              <div className="grid grid-cols-6 gap-2 p-3 sm:p-4 font-mono text-[10px] uppercase tracking-wider font-bold bg-card border-b border-rule text-ink">
+                <div>Order</div><div>Action</div><div>Proto</div><div>Source IP</div><div>Dest IP</div><div>Port</div>
               </div>
-            ))}
-            <div className={`grid grid-cols-6 gap-2 p-4 text-sm font-mono italic ${!evaluation.matchedRuleId ? 'bg-bad/10 text-bad font-bold' : 'text-ink-soft'}`}>
-              <div>*</div><div>DENY</div><div>ANY</div><div>ANY</div><div>ANY</div><div>ANY</div>
+              {rules.map((rule, idx) => (
+                <div 
+                  key={rule.id} 
+                  className={`grid grid-cols-6 gap-2 p-3 sm:p-4 text-xs sm:text-sm font-mono border-b border-rule last:border-0 ${evaluation.matchedRuleId === rule.id ? 'bg-signal/10 text-signal font-bold' : 'text-ink'}`}
+                >
+                  <div>{idx + 1}</div>
+                  <div className={rule.action === "ALLOW" ? "text-ok" : "text-bad"}>{rule.action}</div>
+                  <div>{rule.protocol}</div>
+                  <div>{rule.sourceIp}</div>
+                  <div>{rule.destIp}</div>
+                  <div>{rule.destPort}</div>
+                </div>
+              ))}
+              <div className={`grid grid-cols-6 gap-2 p-3 sm:p-4 text-xs sm:text-sm font-mono italic ${!evaluation.matchedRuleId ? 'bg-bad/10 text-bad font-bold' : 'text-ink-soft'}`}>
+                <div>*</div><div>DENY</div><div>ANY</div><div>ANY</div><div>ANY</div><div>ANY</div>
+              </div>
             </div>
           </div>
           <p className="text-xs text-ink-soft font-sans">Note: In this simulation, IP matching must be exact or &quot;ANY&quot;.</p>
@@ -54,10 +59,10 @@ export default function FirewallPlayground() {
 
       <Card>
         <CardHeader>
-          <CardTitle className="font-serif text-3xl">Send a Packet</CardTitle>
+          <CardTitle className="font-serif text-2xl sm:text-3xl">Send a Packet</CardTitle>
         </CardHeader>
-        <CardContent className="space-y-8">
-          <div className="grid md:grid-cols-4 gap-6">
+        <CardContent className="space-y-6 sm:space-y-8">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6">
             <div>
               <label className="font-mono text-[10px] uppercase tracking-wider font-bold mb-2 block text-ink">Protocol</label>
               <select className="w-full p-3 border border-ink bg-paper font-mono focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-signal" value={packet.protocol} onChange={e => setPacket({...packet, protocol: e.target.value as Protocol})}>
@@ -80,14 +85,14 @@ export default function FirewallPlayground() {
             </div>
           </div>
 
-          <div className="flex flex-col items-center justify-center p-8 border border-rule bg-card rounded-[4px]">
+          <div className="flex flex-col items-center justify-center p-5 sm:p-8 border border-rule bg-card rounded-[4px]">
             <div className="text-[10px] font-mono uppercase tracking-wider font-bold text-ink mb-2">Packet Status</div>
             {evaluation.action === "ALLOW" ? (
-              <div className="text-4xl font-black text-ok font-mono tracking-widest">ALLOWED ✓</div>
+              <div className="text-3xl sm:text-4xl font-black text-ok font-mono tracking-widest">ALLOWED ✓</div>
             ) : (
-              <div className="text-4xl font-black text-bad font-mono tracking-widest">DROPPED ✕</div>
+              <div className="text-3xl sm:text-4xl font-black text-bad font-mono tracking-widest">DROPPED ✕</div>
             )}
-            <div className="text-ink-soft mt-4 font-sans text-sm">
+            <div className="text-ink-soft mt-3 sm:mt-4 font-sans text-xs sm:text-sm text-center">
               {evaluation.matchedRuleId 
                 ? `Matched by Rule #${rules.findIndex(r => r.id === evaluation.matchedRuleId) + 1}`
                 : "Dropped by Default Implicit Deny Rule"}

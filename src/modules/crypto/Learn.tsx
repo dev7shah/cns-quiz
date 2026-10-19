@@ -1,6 +1,5 @@
 import * as React from "react"
 import { GuidedLesson, LessonStepType } from "@/components/layout/GuidedLesson"
-import { Button } from "@/components/ui/Button"
 
 // --- Diagrams ---
 

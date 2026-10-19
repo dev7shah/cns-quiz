@@ -1,6 +1,5 @@
 import { useState, useEffect } from "react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/Card"
-import { Button } from "@/components/ui/Button"
 import { calculatePasswordEntropy, getPasswordStrengthLabel, isVulnerableToDictionary } from "@/lib/auth/password"
 import { generateTOTP } from "@/lib/auth/totp"
 import { sha256 } from "@/lib/crypto/hash"
@@ -34,13 +33,13 @@ export default function AuthPlayground() {
   }, [totpSecret])
 
   return (
-    <div className="space-y-12">
+    <div className="space-y-8 sm:space-y-12">
       <Card>
         <CardHeader>
-          <CardTitle className="font-serif text-3xl">Password Strength & Salting</CardTitle>
-          <p className="text-ink-soft text-sm font-sans mt-2">See how entropy and dictionary checks affect password strength, and how salting changes the hash.</p>
+          <CardTitle className="font-serif text-2xl sm:text-3xl">Password Strength & Salting</CardTitle>
+          <p className="text-ink-soft text-xs sm:text-sm font-sans mt-1 sm:mt-2">See how entropy and dictionary checks affect password strength, and how salting changes the hash.</p>
         </CardHeader>
-        <CardContent className="space-y-6">
+        <CardContent className="space-y-4 sm:space-y-6">
           <div>
             <label className="font-mono text-[10px] uppercase tracking-wider font-bold mb-2 block text-ink">Password Input</label>
             <input 
@@ -52,9 +51,9 @@ export default function AuthPlayground() {
             />
           </div>
 
-          <div className="grid md:grid-cols-2 gap-6 font-mono text-sm">
-            <div className="p-4 border border-rule bg-card space-y-2">
-              <h4 className="font-bold text-[10px] uppercase tracking-wider text-ink mb-4 border-b border-rule pb-2">Security Metrics</h4>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6 font-mono text-sm">
+            <div className="p-3 sm:p-4 border border-rule bg-card space-y-2">
+              <h4 className="font-bold text-[10px] uppercase tracking-wider text-ink mb-3 sm:mb-4 border-b border-rule pb-2">Security Metrics</h4>
               <div className="flex justify-between mb-1">
                 <span className="text-ink-soft">Entropy</span>
                 <strong>{entropy} bits</strong>
@@ -73,10 +72,10 @@ export default function AuthPlayground() {
               </div>
             </div>
 
-            <div className="p-4 border border-rule bg-card space-y-4">
+            <div className="p-3 sm:p-4 border border-rule bg-card space-y-3 sm:space-y-4">
               <h4 className="font-bold text-[10px] uppercase tracking-wider text-ink mb-2 border-b border-rule pb-2">Salting & Hashing</h4>
               <div>
-                <label className="font-mono text-[10px] uppercase tracking-wider font-bold mb-2 block text-ink">Database Salt (per user)</label>
+                <label className="font-mono text-[10px] uppercase tracking-wider font-bold mb-1 sm:mb-2 block text-ink">Database Salt (per user)</label>
                 <input 
                   className="w-full p-2 border border-ink bg-paper text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-signal" 
                   value={salt} 
@@ -84,8 +83,8 @@ export default function AuthPlayground() {
                 />
               </div>
               <div>
-                <label className="font-mono text-[10px] uppercase tracking-wider font-bold mb-2 block text-signal">Resulting Database Hash</label>
-                <div className="p-3 bg-signal/10 border border-signal rounded-[4px] font-mono break-all text-sm text-ink tracking-widest min-h-[48px] flex items-center">
+                <label className="font-mono text-[10px] uppercase tracking-wider font-bold mb-1 sm:mb-2 block text-signal">Resulting Database Hash</label>
+                <div className="p-2.5 sm:p-3 bg-signal/10 border border-signal rounded-[4px] font-mono break-all text-xs sm:text-sm text-ink tracking-widest min-h-[44px] flex items-center">
                   {hashedPass || "Generating..."}
                 </div>
               </div>
@@ -96,13 +95,13 @@ export default function AuthPlayground() {
 
       <Card>
         <CardHeader>
-          <CardTitle className="font-serif text-3xl">TOTP Authenticator Simulator</CardTitle>
-          <p className="text-ink-soft text-sm font-sans mt-2">
+          <CardTitle className="font-serif text-2xl sm:text-3xl">TOTP Authenticator Simulator</CardTitle>
+          <p className="text-ink-soft text-xs sm:text-sm font-sans mt-1 sm:mt-2">
             TOTP uses a shared secret and the current UTC time. No network requests are made.
           </p>
         </CardHeader>
         <CardContent>
-          <div className="grid md:grid-cols-2 gap-8 items-center">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 sm:gap-8 items-center">
             <div>
               <label className="font-mono text-[10px] uppercase tracking-wider font-bold mb-2 block text-ink">Shared Secret Key</label>
               <input 
@@ -112,8 +111,8 @@ export default function AuthPlayground() {
               />
             </div>
             
-            <div className="flex flex-col items-center justify-center p-6 border border-rule bg-paper">
-              <div className="text-5xl font-mono font-bold tracking-widest text-signal mb-4">
+            <div className="flex flex-col items-center justify-center p-4 sm:p-6 border border-rule bg-paper">
+              <div className="text-3xl sm:text-4xl md:text-5xl font-mono font-bold tracking-widest text-signal mb-3 sm:mb-4">
                 {totpCode.slice(0,3)} {totpCode.slice(3,6)}
               </div>
               <div className="w-full bg-rule h-1 overflow-hidden">
@@ -122,7 +121,7 @@ export default function AuthPlayground() {
                   style={{ width: `${(timeLeft / 30) * 100}%` }}
                 />
               </div>
-              <div className="text-[10px] uppercase font-mono text-ink-soft mt-4 tracking-widest">
+              <div className="text-[10px] uppercase font-mono text-ink-soft mt-3 sm:mt-4 tracking-widest">
                 Changes in {timeLeft}s
               </div>
             </div>

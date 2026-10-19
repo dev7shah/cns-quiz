@@ -1,0 +1,135 @@
+import { test, expect } from '@playwright/test'
+
+test.describe('Presenter Mode v2 E2E Tests', () => {
+  test('Loads /present/m1/caesar with zero console errors and renders plates', async ({ page }) => {
+    const consoleErrors: string[] = []
+    page.on('console', msg => {
+      if (msg.type() === 'error') consoleErrors.push(msg.text())
+    })
+    page.on('pageerror', err => {
+      consoleErrors.push(err.message)
+    })
+
+    await page.goto('/present/m1/caesar')
+    await page.waitForLoadState('networkidle')
+
+    // Title and headline visible
+    await expect(page.locator('h1:has-text("The Shift That Began Cryptography")')).toBeVisible()
+
+    // Top status bar
+    const presentHeader = page.locator('header:has-text("Introduction and Classical Cryptography")')
+    await expect(presentHeader).toContainText('Plate 1 of 9')
+
+    expect(consoleErrors).toEqual([])
+  })
+
+  test('Navigates forward and backward using Next / Back controls', async ({ page }) => {
+    await page.goto('/present/m1/caesar')
+    await page.waitForLoadState('networkidle')
+
+    const presentHeader = page.locator('header:has-text("Introduction and Classical Cryptography")')
+
+    // Click Next button
+    const nextBtn = page.locator('button:has-text("Next →")')
+    await expect(nextBtn).toBeVisible()
+    await nextBtn.click()
+
+    // Plate 2 (Analogy)
+    await expect(presentHeader).toContainText('Plate 2 of 9')
+    await expect(page.locator('h1:has-text("Concentric Alphabet Disks")')).toBeVisible()
+
+    // Click Back button
+    const backBtn = page.locator('button:has-text("← Back")')
+    await expect(backBtn).toBeVisible()
+    await backBtn.click()
+
+    // Back to Plate 1
+    await expect(presentHeader).toContainText('Plate 1 of 9')
+  })
+
+  test('Presenter tools: Notes (S), Laser (L), Draw (D), Blackout (B), Grid (G), ELI5 (E), Help (?)', async ({ page }) => {
+    await page.goto('/present/m1/caesar')
+    await page.waitForLoadState('networkidle')
+
+    // 1. Speaker notes toggled with key 's'
+    await page.keyboard.press('s')
+    await expect(page.locator('h3:has-text("Presenter Script")')).toBeVisible()
+    await page.keyboard.press('s')
+    await expect(page.locator('h3:has-text("Presenter Script")')).not.toBeVisible()
+
+    // 2. Blackout toggled with key 'b'
+    await page.keyboard.press('b')
+    await expect(page.locator('text=Focus on Presenter')).toBeVisible()
+    await page.keyboard.press('b')
+    await expect(page.locator('text=Focus on Presenter')).not.toBeVisible()
+
+    // 3. Plate Jump Grid toggled with key 'g'
+    await page.keyboard.press('g')
+    await expect(page.locator('h2:has-text("Topic Plate Overview")')).toBeVisible()
+    await page.keyboard.press('Escape')
+    await expect(page.locator('h2:has-text("Topic Plate Overview")')).not.toBeVisible()
+
+    // 4. Help dialog toggled with key '?'
+    await page.keyboard.press('?')
+    await expect(page.locator('h3:has-text("Presenter Keyboard Shortcuts")')).toBeVisible()
+    await page.keyboard.press('Escape')
+
+    // 5. ELI5 toggle button
+    const eli5Btn = page.locator('button:has-text("ELI5 [E]")')
+    await expect(eli5Btn).toBeVisible()
+    await eli5Btn.click()
+    await expect(page.locator('text=ELI5:')).toBeVisible()
+  })
+
+  test('Worked Example Plate: Step-by-step reveal and problem generation', async ({ page }) => {
+    await page.goto('/present/m1/caesar')
+    await page.waitForLoadState('networkidle')
+
+    const presentHeader = page.locator('header:has-text("Introduction and Classical Cryptography")')
+
+    // Jump to Worked Example plate (Plate 5) via rail thumbnail
+    const plate5Thumb = page.locator('aside button:has-text("Worked Numerical")')
+    await expect(plate5Thumb).toBeVisible()
+    await plate5Thumb.click()
+
+    await expect(presentHeader).toContainText('Plate 5 of 9')
+    await expect(page.locator('h3:has-text("Encrypt the plaintext")')).toBeVisible()
+
+    // Step 1: Click Reveal Next Step
+    const revealBtn = page.locator('button:has-text("Reveal Next Step")')
+    await expect(revealBtn).toBeVisible()
+    await revealBtn.click()
+    await expect(page.locator('text=STEP 1:')).toBeVisible()
+
+    // Test Generate Another
+    const genBtn = page.locator('button:has-text("Generate Another")')
+    await expect(genBtn).toBeVisible()
+    await genBtn.click()
+    await expect(page.locator('text=Numerical Exercise')).toBeVisible()
+  })
+
+  test('Ask the Room Plate: Show-of-hands vote counter and answer reveal', async ({ page }) => {
+    await page.goto('/present/m1/caesar')
+    await page.waitForLoadState('networkidle')
+
+    const presentHeader = page.locator('header:has-text("Introduction and Classical Cryptography")')
+
+    // Jump to Ask The Room plate (Plate 8)
+    const plate8Thumb = page.locator('aside button:has-text("The Key Space Paradox")')
+    await expect(plate8Thumb).toBeVisible()
+    await plate8Thumb.click()
+
+    await expect(presentHeader).toContainText('Plate 8 of 9')
+    await expect(page.locator('text=Classroom Show-of-Hands Poll')).toBeVisible()
+
+    // Vote for option 2 (press '2')
+    await page.keyboard.press('2')
+    await expect(page.locator('text=1 votes')).toBeVisible()
+
+    // Reveal answer
+    const revealBtn = page.locator('button:has-text("Reveal Correct Answer")')
+    await expect(revealBtn).toBeVisible()
+    await revealBtn.click()
+    await expect(page.locator('text=Answer Verified:')).toBeVisible()
+  })
+})

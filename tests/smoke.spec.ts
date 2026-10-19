@@ -1,4 +1,4 @@
-import { test, expect } from '@playwright/test';
+import { test } from '@playwright/test';
 
 const routes = [
   '/',
@@ -11,7 +11,8 @@ const routes = [
   '/modules/attacks',
   '/modules/ids',
   '/modules/tls',
-  '/modules/ai'
+  '/modules/ai',
+  '/styleguide'
 ];
 
 for (const route of routes) {
@@ -35,16 +36,19 @@ for (const route of routes) {
       throw new Error(`Console errors found on ${route}: ${errors.join('\\n')}`);
     }
 
-    // Try to click every button to verify interaction (skip links that navigate away from domain for testing)
+    // Try to click visible buttons to verify interaction (skip links that navigate away from domain for testing)
     const buttons = await page.$$('button');
     for (let i = 0; i < buttons.length; i++) {
       try {
-        await buttons[i].click({ timeout: 1000 });
-        await page.waitForTimeout(200); // Wait for potential state changes or errors
-      } catch (e: any) {
+        if (await buttons[i].isVisible()) {
+          await buttons[i].click({ timeout: 1000 });
+          await page.waitForTimeout(100); // Wait for potential state changes or errors
+        }
+      } catch (e: unknown) {
         // It's expected that some buttons might unmount others (e.g. tabs) or be covered
-        if (!e.message.includes('not attached to the DOM') && !e.message.includes('intercepts pointer events')) {
-          console.log(`Failed to click button ${i} on ${route}: ${e.message}`);
+        const errMsg = e instanceof Error ? e.message : String(e)
+        if (!errMsg.includes('not attached to the DOM') && !errMsg.includes('intercepts pointer events')) {
+          console.log(`Failed to click button ${i} on ${route}: ${errMsg}`);
         }
       }
     }

@@ -26,29 +26,42 @@ export function ModuleShell({
   onPresent
 }: ModuleShellProps) {
   return (
-    <div className="container mx-auto px-4 py-12 max-w-[1280px]">
-      <Tabs defaultValue="learn" className="w-full flex flex-col md:flex-row gap-12 items-start">
+    <div className="container mx-auto px-4 py-6 md:py-12 max-w-[1280px]">
+      <Tabs defaultValue="learn" className="w-full flex flex-col md:flex-row gap-6 md:gap-12 items-start">
         
-        {/* Left Sticky Rail */}
-        <div className="md:sticky md:top-24 w-full md:w-[200px] shrink-0 space-y-8">
+        {/* Left Rail / Mobile Top Bar */}
+        <div className="w-full md:w-[220px] md:sticky md:top-24 shrink-0 space-y-4 md:space-y-8">
           <div>
-            <h1 className="text-3xl font-serif text-ink tracking-tight mb-2 leading-tight">{title}</h1>
-            <p className="text-xs font-mono text-ink-soft uppercase tracking-wider">{description.split(' ')[0]} Module</p>
+            <h1 className="text-2xl sm:text-3xl font-serif text-ink tracking-tight mb-1 md:mb-2 leading-tight">{title}</h1>
+            <p className="text-[11px] font-mono text-ink-soft uppercase tracking-wider">{description.split(' ')[0]} Module</p>
           </div>
 
-          <TabsList className="flex flex-col items-start w-full gap-2 border-none">
-            <TabsTrigger value="learn" className="w-full justify-start text-left text-sm py-2 px-3 border-l-2 border-transparent data-[state=active]:border-signal data-[state=active]:bg-signal/5">01 Learn</TabsTrigger>
-            <TabsTrigger value="playground" className="w-full justify-start text-left text-sm py-2 px-3 border-l-2 border-transparent data-[state=active]:border-signal data-[state=active]:bg-signal/5">02 Try</TabsTrigger>
-            <TabsTrigger value="complexity" className="w-full justify-start text-left text-sm py-2 px-3 border-l-2 border-transparent data-[state=active]:border-signal data-[state=active]:bg-signal/5">03 Cost</TabsTrigger>
-            <TabsTrigger value="quiz" className="w-full justify-start text-left text-sm py-2 px-3 border-l-2 border-transparent data-[state=active]:border-signal data-[state=active]:bg-signal/5">04 Quiz</TabsTrigger>
-            <TabsTrigger value="cheatsheet" className="w-full justify-start text-left text-sm py-2 px-3 border-l-2 border-transparent data-[state=active]:border-signal data-[state=active]:bg-signal/5">05 Recap</TabsTrigger>
-          </TabsList>
+          {/* Horizontal scrollable tab list on mobile, vertical sticky rail on desktop */}
+          <div className="overflow-x-auto pb-1 -mx-4 px-4 md:mx-0 md:px-0 md:pb-0 scrollbar-none">
+            <TabsList className="flex flex-row md:flex-col items-center md:items-start w-max md:w-full gap-1.5 md:gap-2 border-b md:border-none pb-2 md:pb-0 bg-transparent">
+              <TabsTrigger value="learn" className="shrink-0 whitespace-nowrap text-left text-xs sm:text-sm py-2 px-3 rounded md:rounded-none border md:border-0 md:border-l-2 border-rule md:border-transparent data-[state=active]:border-signal data-[state=active]:bg-signal data-[state=active]:text-paper md:data-[state=active]:bg-signal/5 md:data-[state=active]:text-ink transition-colors">
+                01 Learn
+              </TabsTrigger>
+              <TabsTrigger value="playground" className="shrink-0 whitespace-nowrap text-left text-xs sm:text-sm py-2 px-3 rounded md:rounded-none border md:border-0 md:border-l-2 border-rule md:border-transparent data-[state=active]:border-signal data-[state=active]:bg-signal data-[state=active]:text-paper md:data-[state=active]:bg-signal/5 md:data-[state=active]:text-ink transition-colors">
+                02 Try
+              </TabsTrigger>
+              <TabsTrigger value="complexity" className="shrink-0 whitespace-nowrap text-left text-xs sm:text-sm py-2 px-3 rounded md:rounded-none border md:border-0 md:border-l-2 border-rule md:border-transparent data-[state=active]:border-signal data-[state=active]:bg-signal data-[state=active]:text-paper md:data-[state=active]:bg-signal/5 md:data-[state=active]:text-ink transition-colors">
+                03 Cost
+              </TabsTrigger>
+              <TabsTrigger value="quiz" className="shrink-0 whitespace-nowrap text-left text-xs sm:text-sm py-2 px-3 rounded md:rounded-none border md:border-0 md:border-l-2 border-rule md:border-transparent data-[state=active]:border-signal data-[state=active]:bg-signal data-[state=active]:text-paper md:data-[state=active]:bg-signal/5 md:data-[state=active]:text-ink transition-colors">
+                04 Quiz
+              </TabsTrigger>
+              <TabsTrigger value="cheatsheet" className="shrink-0 whitespace-nowrap text-left text-xs sm:text-sm py-2 px-3 rounded md:rounded-none border md:border-0 md:border-l-2 border-rule md:border-transparent data-[state=active]:border-signal data-[state=active]:bg-signal data-[state=active]:text-paper md:data-[state=active]:bg-signal/5 md:data-[state=active]:text-ink transition-colors">
+                05 Recap
+              </TabsTrigger>
+            </TabsList>
+          </div>
 
           {onPresent && (
-            <div className="pt-8 border-t border-rule">
-              <Button onClick={onPresent} variant="outline" className="w-full justify-start gap-2">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
-                Present [P]
+            <div className="pt-2 md:pt-8 md:border-t border-rule">
+              <Button onClick={onPresent} variant="outline" size="sm" className="w-full justify-center md:justify-start gap-2 font-mono text-xs uppercase tracking-wider">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
+                Present <span className="hidden md:inline">[P]</span>
               </Button>
             </div>
           )}
