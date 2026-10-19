@@ -96,23 +96,67 @@ export function GuidedLesson({
               )}
 
               {/* See it work — stopPropagation so Back/Next don't bubble to parent onClick */}
-              {isActive && (
-                <div
-                  className="bg-card border border-rule p-6 rounded-[6px] mb-8"
-                  onClick={(e) => e.stopPropagation()}
-                >
-                  <div className="flex justify-between items-center mb-4">
-                    <span className="font-mono text-[11px] uppercase tracking-wider font-bold">See it work</span>
-                    <div className="flex gap-2">
-                      <Button variant="outline" size="sm" onClick={handlePrevSubStep} disabled={activeSubStepIndex === 0}>Back</Button>
-                      <Button variant="outline" size="sm" onClick={handleNextSubStep} disabled={activeSubStepIndex === activeStep.subSteps.length - 1}>Next</Button>
+              {isActive && (() => {
+                const isLastSubStep = activeSubStepIndex === activeStep.subSteps.length - 1
+                const hasNextStep = activeStepIndex < steps.length - 1
+                return (
+                  <div
+                    className="bg-card border border-rule p-6 rounded-[6px] mb-8"
+                    onClick={(e) => e.stopPropagation()}
+                  >
+                    <div className="flex justify-between items-center mb-4">
+                      <div className="flex items-center gap-3">
+                        <span className="font-mono text-[11px] uppercase tracking-wider font-bold">See it work</span>
+                        {/* Sub-step dot indicators */}
+                        <div className="flex gap-1">
+                          {activeStep.subSteps.map((_, i) => (
+                            <button
+                              key={i}
+                              onClick={() => setActiveSubStepIndex(i)}
+                              className={cn(
+                                "w-2 h-2 rounded-full transition-colors",
+                                i === activeSubStepIndex ? "bg-signal" : "bg-rule hover:bg-ink-soft"
+                              )}
+                            />
+                          ))}
+                        </div>
+                      </div>
+                      <div className="flex gap-2">
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={handlePrevSubStep}
+                          disabled={activeSubStepIndex === 0}
+                        >
+                          ← Back
+                        </Button>
+                        {isLastSubStep && hasNextStep ? (
+                          <Button
+                            size="sm"
+                            onClick={() => handleStepChange(activeStepIndex + 1)}
+                            className="bg-signal text-paper border-signal hover:bg-signal/90 font-mono text-[11px] uppercase tracking-wider"
+                          >
+                            Next Step →
+                          </Button>
+                        ) : (
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={handleNextSubStep}
+                            disabled={isLastSubStep}
+                          >
+                            Next →
+                          </Button>
+                        )}
+                      </div>
                     </div>
+                    <p className="text-sm font-sans text-ink leading-relaxed">
+                      <strong>Step {activeSubStepIndex + 1} of {activeStep.subSteps.length}:</strong>{" "}
+                      {activeStep.subSteps[activeSubStepIndex]?.caption}
+                    </p>
                   </div>
-                  <p className="text-sm font-sans text-ink leading-relaxed">
-                    <strong>Step {activeSubStepIndex + 1}:</strong> {activeStep.subSteps[activeSubStepIndex]?.caption}
-                  </p>
-                </div>
-              )}
+                )
+              })()}
 
               {step.watchOut && (
                 <Callout variant="warning" title="Watch Out">
