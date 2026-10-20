@@ -53,4 +53,39 @@ test.describe('Cryptography Module Tests', () => {
     await page.keyboard.press('s');
     await expect(page.locator('text=Speaker Notes')).not.toBeVisible();
   });
+
+  test('Interactive M3 Playground tabs: HMAC, Birthday, Signatures, and PKI', async ({ page }) => {
+    await page.goto('/modules/crypto');
+    await page.locator('button', { hasText: '02 Try' }).click();
+
+    // 1. HMAC tab
+    const hmacTab = page.locator('button:has-text("HMAC")');
+    await expect(hmacTab).toBeVisible();
+    await hmacTab.click();
+    await expect(page.locator('h3:has-text("HMAC (RFC 2104)")')).toBeVisible();
+
+    // 2. Birthday tab & collision search
+    const bdayTab = page.locator('button:has-text("Birthday Attack")');
+    await expect(bdayTab).toBeVisible();
+    await bdayTab.click();
+    await expect(page.locator('h3:has-text("Birthday Paradox & Hash Collisions")')).toBeVisible();
+    const findColBtn = page.locator('button:has-text("Find Collision Now")');
+    await expect(findColBtn).toBeVisible();
+    await findColBtn.click();
+    await expect(page.locator('text=COLLISION FOUND')).toBeVisible();
+
+    // 3. Digital Signatures tab
+    const sigTab = page.locator('button:has-text("Signatures")');
+    await expect(sigTab).toBeVisible();
+    await sigTab.click();
+    await expect(page.locator('h3:has-text("Digital Signatures & The PS3 Exploit")')).toBeVisible();
+    await expect(page.locator('text=EXPLOIT SUCCESSFUL! Master Private Key Recovered:')).toBeVisible();
+
+    // 4. PKI & X.509 Chain tab
+    const pkiTab = page.locator('button:has-text("PKI & X.509")');
+    await expect(pkiTab).toBeVisible();
+    await pkiTab.click();
+    await expect(page.locator('h3:has-text("PKI & X.509 Chain Validator")')).toBeVisible();
+    await expect(page.locator('text=CHAIN VALIDATION: TRUSTED SECURE CONNECTION')).toBeVisible();
+  });
 });

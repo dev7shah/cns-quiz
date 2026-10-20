@@ -150,12 +150,12 @@ test.describe('Presenter Mode v2 E2E Tests', () => {
     await expect(presentHeader).toBeVisible()
 
     // Title of hook plate
-    await expect(page.locator('h1:has-text("The Electronic Codebook Penguin")')).toBeVisible()
+    await expect(page.locator('h1:has-text("The Ghost in the Cipher")')).toBeVisible()
 
     // Navigate to Plate 2 (ModeDiagram interactive figure)
     const nextBtn = page.locator('button:has-text("Next →")')
     await nextBtn.click()
-    await expect(page.locator('h1:has-text("Interactive Block Cipher Modes")')).toBeVisible()
+    await expect(page.locator('h1:has-text("Block Cipher Modes of Operation")')).toBeVisible()
 
     expect(consoleErrors).toEqual([])
   })
@@ -194,6 +194,72 @@ test.describe('Presenter Mode v2 E2E Tests', () => {
     const plate3Thumb = page.locator('aside button:has-text("Interactive Curve Plot")')
     await plate3Thumb.click()
     await expect(page.locator('h1:has-text("Interactive Curve Plot over Finite Field")')).toBeVisible()
+
+    expect(consoleErrors).toEqual([])
+  })
+
+  test('Loads /present/m3/mac-hmac and navigates plates with zero console errors', async ({ page }) => {
+    const consoleErrors: string[] = []
+    page.on('console', msg => {
+      if (msg.type() === 'error') consoleErrors.push(msg.text())
+    })
+    page.on('pageerror', err => {
+      consoleErrors.push(err.message)
+    })
+
+    await page.goto('/present/m3/mac-hmac')
+    await page.waitForLoadState('networkidle')
+
+    await expect(page.locator('h1:has-text("The Naive Hashing Trap")')).toBeVisible()
+
+    // Navigate to Plate 2
+    const nextBtn = page.locator('button:has-text("Next →")')
+    await nextBtn.click()
+    await expect(page.locator('h1:has-text("HMAC Structure & The Nested Barrier")')).toBeVisible()
+
+    expect(consoleErrors).toEqual([])
+  })
+
+  test('Loads /present/m3/digital-signatures with zero console errors and checks worked example', async ({ page }) => {
+    const consoleErrors: string[] = []
+    page.on('console', msg => {
+      if (msg.type() === 'error') consoleErrors.push(msg.text())
+    })
+    page.on('pageerror', err => {
+      consoleErrors.push(err.message)
+    })
+
+    await page.goto('/present/m3/digital-signatures')
+    await page.waitForLoadState('networkidle')
+
+    await expect(page.locator('h1:has-text("The Sony PS3 Disaster")')).toBeVisible()
+
+    // Jump to Worked Example
+    const workedThumb = page.locator('aside button:has-text("RSA Signature")')
+    await workedThumb.click()
+    await expect(page.locator('h1:has-text("Worked Example: RSA Signature Computation")')).toBeVisible()
+
+    expect(consoleErrors).toEqual([])
+  })
+
+  test('Loads /present/m3/pki-certificates and renders Chain of Trust with zero console errors', async ({ page }) => {
+    const consoleErrors: string[] = []
+    page.on('console', msg => {
+      if (msg.type() === 'error') consoleErrors.push(msg.text())
+    })
+    page.on('pageerror', err => {
+      consoleErrors.push(err.message)
+    })
+
+    await page.goto('/present/m3/pki-certificates')
+    await page.waitForLoadState('networkidle')
+
+    await expect(page.locator('h1:has-text("The DigiNotar Catastrophe")')).toBeVisible()
+
+    // Navigate to Plate 2 (Chain of Trust)
+    const nextBtn = page.locator('button:has-text("Next →")')
+    await nextBtn.click()
+    await expect(page.locator('h1:has-text("The Hierarchical Chain of Trust")')).toBeVisible()
 
     expect(consoleErrors).toEqual([])
   })

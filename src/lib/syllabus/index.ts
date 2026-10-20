@@ -166,15 +166,15 @@ export const SYLLABUS: ModuleInfo[] = [
     title: 'Cryptographic Hashes and Digital Signatures',
     hours: 7,
     bloomRange: 'L1-L4',
-    status: 'soon',
+    status: 'ready',
     description: 'Message authentication requirements, MAC, HMAC, hash properties, MD5, SHA families, digital signature standards, RSA/ECC signatures, and PKI.',
     topics: [
-      { id: 'auth-requirements', title: 'Authentication Requirements & Functions', hours: 1.0, bloom: 'L2', status: 'soon', description: 'Message confidentiality vs authenticity and non-repudiation.', tags: ['auth'] },
-      { id: 'mac-hmac', title: 'MAC and HMAC', hours: 1.0, bloom: 'L3', status: 'soon', description: 'Keyed hash construction and nested hashing guarantees.', tags: ['auth', 'crypto'] },
-      { id: 'hash-functions', title: 'Cryptographic Hash Properties', hours: 1.0, bloom: 'L2', status: 'soon', description: 'Pre-image resistance, second pre-image resistance, and collision resistance.', tags: ['crypto'] },
-      { id: 'md5-sha', title: 'MD5, SHA-1, SHA-2, SHA-3', hours: 1.0, bloom: 'L3', status: 'soon', description: 'Merkle-Damgård construction, collision exploits, and sponge functions.', tags: ['crypto'] },
-      { id: 'digital-signatures', title: 'Digital Signatures (RSA & ECDSA)', hours: 1.5, bloom: 'L3', status: 'soon', description: 'Sign with private key, verify with public key, hash-then-sign paradigm.', tags: ['crypto', 'auth'] },
-      { id: 'pki-certificates', title: 'PKI & Digital Certificates', hours: 1.5, bloom: 'L4', status: 'soon', description: 'X.509 format, Certificate Authorities, trust chains, and revocation (CRL/OCSP).', tags: ['auth', 'tls'] }
+      { id: 'auth-requirements', title: 'Authentication Requirements & Functions', hours: 1.0, bloom: 'L2', status: 'ready', description: 'Message confidentiality vs authenticity and non-repudiation.', tags: ['auth'] },
+      { id: 'mac-hmac', title: 'MAC and HMAC', hours: 1.0, bloom: 'L3', status: 'ready', description: 'Keyed hash construction and nested hashing guarantees.', tags: ['auth', 'crypto'] },
+      { id: 'hash-functions', title: 'Cryptographic Hash Properties', hours: 1.0, bloom: 'L2', status: 'ready', description: 'Pre-image resistance, second pre-image resistance, and collision resistance.', tags: ['crypto'] },
+      { id: 'md5-sha', title: 'MD5, SHA-1, SHA-2, SHA-3', hours: 1.0, bloom: 'L3', status: 'ready', description: 'Merkle-Damgård construction, collision exploits, and sponge functions.', tags: ['crypto'] },
+      { id: 'digital-signatures', title: 'Digital Signatures (RSA & ECDSA)', hours: 1.5, bloom: 'L3', status: 'ready', description: 'Sign with private key, verify with public key, hash-then-sign paradigm.', tags: ['crypto', 'auth'] },
+      { id: 'pki-certificates', title: 'PKI & Digital Certificates', hours: 1.5, bloom: 'L4', status: 'ready', description: 'X.509 format, Certificate Authorities, trust chains, and revocation (CRL/OCSP).', tags: ['auth', 'tls'] }
     ]
   },
   {

@@ -26,6 +26,13 @@ import { eccPresentation } from "./m2/ecc"
 import { diffieHellmanPresentation } from "./m2/diffieHellman"
 import { lightweightTeaPresentation } from "./m2/lightweightTea"
 
+import { authRequirementsPresentation } from "./m3/authRequirements"
+import { macHmacPresentation } from "./m3/macHmac"
+import { hashPropertiesPresentation } from "./m3/hashProperties"
+import { md5ShaPresentation } from "./m3/md5Sha"
+import { digitalSignaturesPresentation } from "./m3/digitalSignatures"
+import { pkiCertificatesPresentation } from "./m3/pkiCertificates"
+
 const presentations: Record<string, TopicPresentation> = {
   // Module 1
   'm1/principles': principlesPresentation,
@@ -54,7 +61,15 @@ const presentations: Record<string, TopicPresentation> = {
   'm2/elgamal': elgamalPresentation,
   'm2/ecc': eccPresentation,
   'm2/diffie-hellman': diffieHellmanPresentation,
-  'm2/lightweight-tea': lightweightTeaPresentation
+  'm2/lightweight-tea': lightweightTeaPresentation,
+
+  // Module 3
+  'm3/auth-requirements': authRequirementsPresentation,
+  'm3/mac-hmac': macHmacPresentation,
+  'm3/hash-functions': hashPropertiesPresentation,
+  'm3/md5-sha': md5ShaPresentation,
+  'm3/digital-signatures': digitalSignaturesPresentation,
+  'm3/pki-certificates': pkiCertificatesPresentation
 }
 
 export function getPresentation(moduleId: string, topicId: string): TopicPresentation | undefined {
@@ -109,5 +124,11 @@ export {
   elgamalPresentation,
   eccPresentation,
   diffieHellmanPresentation,
-  lightweightTeaPresentation
+  lightweightTeaPresentation,
+  authRequirementsPresentation,
+  macHmacPresentation,
+  hashPropertiesPresentation,
+  md5ShaPresentation,
+  digitalSignaturesPresentation,
+  pkiCertificatesPresentation
 }

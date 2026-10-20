@@ -45,6 +45,29 @@ import { ECCurve, isCurveNonSingular, ecAdd, ecMultiply, findCurvePoints, ECPoin
 import { generateElGamalKey, elgamalEncrypt, elgamalDecrypt } from "@/lib/crypto/elgamal"
 import { generateRabinKeys, rabinEncrypt, rabinDecrypt } from "@/lib/crypto/rabin"
 import { teaEncrypt, teaDecrypt, TeaKey, TeaState } from "@/lib/crypto/tea"
+import { computeHMACEducational, simulateLengthExtensionAttack } from "@/lib/crypto/hmac"
+import {
+  birthdayCollisionProbability,
+  requiredTrialsForCollision,
+  findBirthdayCollision,
+  measureAvalanche,
+  CollisionResult
+} from "@/lib/crypto/hashProperties"
+import {
+  rsaSign,
+  rsaVerify,
+  simulateRsaMultiplicativeAttack,
+  ecdsaSign,
+  ecdsaVerify,
+  exploitEcdsaNonceReuse
+} from "@/lib/crypto/signatures"
+import {
+  validateCertificateChain,
+  SAMPLE_ROOT_CA,
+  SAMPLE_INTERMEDIATE_CA,
+  SAMPLE_LEAF_CERT,
+  X509Certificate
+} from "@/lib/crypto/pki"
 
 export default function CryptoPlayground() {
   // Tab selector for classical vs modern
@@ -63,6 +86,10 @@ export default function CryptoPlayground() {
     | 'rabin'
     | 'tea'
     | 'hash'
+    | 'hmac'
+    | 'birthday'
+    | 'signatures'
+    | 'pki'
   >('caesar')
 
   // --- 1. Caesar State ---
@@ -276,6 +303,73 @@ export default function CryptoPlayground() {
     return { enc, dec }
   }, [teaV0, teaV1])
 
+  // --- 15. M3: HMAC State ---
+  const [hmacKey, setHmacKey] = useState("secret_key")
+  const [hmacMsg, setHmacMsg] = useState("Transfer $500 to Bob")
+  const [hmacExtMsg, setHmacExtMsg] = useState("&role=admin")
+  const [hmacSimulateExt, setHmacSimulateExt] = useState(false)
+  const hmacBreakdown = useMemo(() => computeHMACEducational(hmacKey, hmacMsg, 16), [hmacKey, hmacMsg])
+  const lengthExtSim = useMemo(() => simulateLengthExtensionAttack(hmacMsg, hmacExtMsg, 16), [hmacMsg, hmacExtMsg])
+
+  // --- 16. M3: Birthday Paradox State ---
+  const [birthdayBits, setBirthdayBits] = useState(16)
+  const [birthdayCollision, setBirthdayCollision] = useState<CollisionResult | null>(null)
+  const [isSearchingCollision, setIsSearchingCollision] = useState(false)
+  const requiredTrials50 = useMemo(() => requiredTrialsForCollision(0.5, birthdayBits), [birthdayBits])
+
+  // --- 17. M3: Digital Signatures State ---
+  const [sigDigest, setSigDigest] = useState(1234)
+  const [sigRsaTampered, setSigRsaTampered] = useState(false)
+  const [sigM1, setSigM1] = useState(10)
+  const [sigM2, setSigM2] = useState(20)
+  const [sigZ1, setSigZ1] = useState(9)
+  const [sigZ2, setSigZ2] = useState(14)
+  const [sigK, setSigK] = useState(3)
+  const [sigD, setSigD] = useState(5)
+
+  // RSA Sign Calculation
+  const rsaSigData = useMemo(() => {
+    const e = BigInt(17)
+    const d = BigInt(2753)
+    const n = BigInt(3233)
+    const dgst = BigInt(sigDigest)
+    const sig = rsaSign(dgst, d, n)
+    const effectiveSig = sigRsaTampered ? sig + BigInt(1) : sig
+    const isValid = rsaVerify(effectiveSig, dgst, e, n)
+    const forgery = simulateRsaMultiplicativeAttack(BigInt(sigM1), BigInt(sigM2), e, d, n)
+    return { e, d, n, sig, effectiveSig, isValid, forgery }
+  }, [sigDigest, sigRsaTampered, sigM1, sigM2])
+
+  // ECDSA Sign & PS3 Nonce Reuse Calculation
+  const ecdsaData = useMemo(() => {
+    const curve: ECCurve = { a: 0, b: 2, p: 13 }
+    const G: ECPoint = { x: 1, y: 4 }
+    const orderN = 19
+    const Q = ecMultiply(sigD, G, curve)
+    const sig1 = ecdsaSign(curve, G, orderN, sigD, sigZ1, sigK)
+    const sig2 = ecdsaSign(curve, G, orderN, sigD, sigZ2, sigK)
+    const isSig1Valid = sig1 && Q ? ecdsaVerify(curve, G, orderN, Q, sigZ1, sig1) : false
+    const exploit = sig1 && sig2 ? exploitEcdsaNonceReuse(sig1, sigZ1, sig2, sigZ2, orderN) : null
+    return { curve, G, orderN, Q, sig1, sig2, isSig1Valid, exploit }
+  }, [sigD, sigZ1, sigZ2, sigK])
+
+  // --- 18. M3: PKI Certificate Chain State ---
+  const [pkiLeafExpired, setPkiLeafExpired] = useState(false)
+  const [pkiLeafRevoked, setPkiLeafRevoked] = useState(false)
+  const [pkiUntrustedRoot, setPkiUntrustedRoot] = useState(false)
+
+  const pkiChainData = useMemo(() => {
+    const leaf: X509Certificate = {
+      ...SAMPLE_LEAF_CERT,
+      validNotAfter: pkiLeafExpired ? "2024-01-01T00:00:00Z" : SAMPLE_LEAF_CERT.validNotAfter
+    }
+    const chain = [leaf, SAMPLE_INTERMEDIATE_CA]
+    const trustStore = pkiUntrustedRoot ? [] : [SAMPLE_ROOT_CA]
+    const revoked = pkiLeafRevoked ? [leaf.serialNumber] : []
+    const validation = validateCertificateChain(chain, trustStore, new Date("2026-06-01T00:00:00Z"), revoked)
+    return { chain, trustStore, validation }
+  }, [pkiLeafExpired, pkiLeafRevoked, pkiUntrustedRoot])
+
   const tabs: { id: typeof activeTab; label: string; tag: string }[] = [
     { id: 'caesar', label: 'Caesar', tag: 'Shift' },
     { id: 'affine', label: 'Affine', tag: 'Linear' },
@@ -290,7 +384,11 @@ export default function CryptoPlayground() {
     { id: 'elgamal', label: 'ElGamal', tag: 'M2 · DLP' },
     { id: 'rabin', label: 'Rabin', tag: 'M2 · Roots' },
     { id: 'tea', label: 'TEA', tag: 'M2 · IoT' },
-    { id: 'hash', label: 'SHA-256', tag: 'Digest' }
+    { id: 'hash', label: 'SHA-256', tag: 'M3 · Digest' },
+    { id: 'hmac', label: 'HMAC', tag: 'M3 · RFC 2104' },
+    { id: 'birthday', label: 'Birthday Attack', tag: 'M3 · Collisions' },
+    { id: 'signatures', label: 'Signatures', tag: 'M3 · PS3 Hack' },
+    { id: 'pki', label: 'PKI & X.509', tag: 'M3 · Trust' }
   ]
 
   return (
@@ -1445,13 +1543,13 @@ export default function CryptoPlayground() {
           <CardHeader>
             <div className="flex justify-between items-start">
               <div>
-                <span className="font-mono text-[10px] uppercase tracking-widest text-signal font-bold">M3 · Topic Preview</span>
-                <CardTitle className="font-serif text-2xl sm:text-3xl mt-1">SHA-256 Hashing</CardTitle>
+                <span className="font-mono text-[10px] uppercase tracking-widest text-signal font-bold">M3 · Topic 4</span>
+                <CardTitle className="font-serif text-2xl sm:text-3xl mt-1">SHA-256 Hashing & Avalanche Effect</CardTitle>
               </div>
-              <span className="font-mono text-xs px-2 py-1 bg-paper border border-rule text-ink-soft">Avalanche Effect</span>
+              <span className="font-mono text-xs px-2 py-1 bg-paper border border-rule text-ink-soft">Deterministic Digest</span>
             </div>
             <p className="text-ink-soft text-xs sm:text-sm font-sans mt-2">
-              Cryptographic hash function producing a deterministic 256-bit fixed-length output.
+              Merkle-Damgård construction producing a deterministic 256-bit fixed-length output with strict avalanche dispersion.
             </p>
           </CardHeader>
           <CardContent className="space-y-6">
@@ -1465,7 +1563,7 @@ export default function CryptoPlayground() {
               />
             </div>
             <div>
-              <label className="font-mono text-[10px] uppercase tracking-wider font-bold mb-2 block text-ink">Output Digest (Hex)</label>
+              <label className="font-mono text-[10px] uppercase tracking-wider font-bold mb-2 block text-ink">Output Digest (256-bit Hex)</label>
               <div className="p-4 bg-ink text-paper rounded-[4px] font-mono break-all text-xs sm:text-sm leading-relaxed tracking-wider shadow-inner">
                 {hashOutput || "Generating..."}
               </div>
@@ -1477,6 +1575,354 @@ export default function CryptoPlayground() {
               <Button onClick={() => setHashInput("cNS Security")} variant="outline" size="sm" className="text-xs">
                 &quot;cNS Security&quot; (1 bit change)
               </Button>
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
+      {/* --- HMAC TAB --- */}
+      {activeTab === 'hmac' && (
+        <Card>
+          <CardHeader>
+            <div className="flex justify-between items-start">
+              <div>
+                <span className="font-mono text-[10px] uppercase tracking-widest text-signal font-bold">M3 · Topic 2</span>
+                <CardTitle className="font-serif text-2xl sm:text-3xl mt-1">HMAC (RFC 2104) & Length Extension</CardTitle>
+              </div>
+              <span className="font-mono text-xs px-2 py-1 bg-paper border border-rule text-ink-soft">Nested Hashing</span>
+            </div>
+            <p className="text-ink-soft text-xs sm:text-sm font-sans mt-2">
+              Keyed-Hash Message Authentication Code using inner pad (0x36) and outer pad (0x5C) to block length extension attacks.
+            </p>
+          </CardHeader>
+          <CardContent className="space-y-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label className="font-mono text-[10px] uppercase tracking-wider font-bold mb-2 block text-ink">Secret Shared Key (K)</label>
+                <input
+                  className="w-full p-2.5 border border-ink bg-paper font-mono text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-signal"
+                  value={hmacKey}
+                  onChange={e => setHmacKey(e.target.value)}
+                />
+              </div>
+              <div>
+                <label className="font-mono text-[10px] uppercase tracking-wider font-bold mb-2 block text-ink">Message (M)</label>
+                <input
+                  className="w-full p-2.5 border border-ink bg-paper font-mono text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-signal"
+                  value={hmacMsg}
+                  onChange={e => setHmacMsg(e.target.value)}
+                />
+              </div>
+            </div>
+
+            {/* Step-by-Step Breakdown */}
+            <div className="p-4 border border-rule bg-card space-y-3 font-mono text-xs">
+              <div className="flex justify-between border-b border-rule pb-2 font-bold text-ink">
+                <span>STEP</span>
+                <span>VALUE / OPERATION</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-ink-soft">1. Padded Key (K+):</span>
+                <span className="text-signal truncate max-w-[280px] sm:max-w-md">{hmacBreakdown.normalizedKeyHex}</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-ink-soft">2. Inner Mask (K+ ^ ipad):</span>
+                <span className="truncate max-w-[280px] sm:max-w-md">{hmacBreakdown.kXorIpadHex}</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-ink-soft">3. Inner Hash Digest:</span>
+                <span className="font-bold">{hmacBreakdown.innerHashHex}</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-ink-soft">4. Outer Mask (K+ ^ opad):</span>
+                <span className="truncate max-w-[280px] sm:max-w-md">{hmacBreakdown.kXorOpadHex}</span>
+              </div>
+              <div className="flex justify-between pt-2 border-t border-rule font-bold text-sm">
+                <span className="text-ink">Final HMAC Result:</span>
+                <span className="text-signal">{hmacBreakdown.hmacResultHex}</span>
+              </div>
+            </div>
+
+            {/* Length Extension Vulnerability Toggle */}
+            <div className="p-4 border border-signal/40 bg-signal/5 rounded-[4px] space-y-3">
+              <div className="flex justify-between items-center">
+                <span className="font-mono text-xs font-bold text-signal uppercase tracking-wider">
+                  Vulnerability Spotlight: Length Extension Attack on Naive H(K || M)
+                </span>
+                <Button
+                  size="sm"
+                  variant="outline"
+                  onClick={() => setHmacSimulateExt(!hmacSimulateExt)}
+                  className="text-xs"
+                >
+                  {hmacSimulateExt ? "Hide Exploit" : "Simulate Exploit"}
+                </Button>
+              </div>
+
+              {hmacSimulateExt && (
+                <div className="space-y-3 font-mono text-xs pt-2 border-t border-signal/20">
+                  <div className="flex items-center gap-2">
+                    <span className="text-ink-soft">Extension Data:</span>
+                    <input
+                      className="p-1 border border-ink bg-paper font-mono text-xs"
+                      value={hmacExtMsg}
+                      onChange={e => setHmacExtMsg(e.target.value)}
+                    />
+                  </div>
+                  <div className="p-2 bg-bad/10 border border-bad/30 text-bad">
+                    <strong>Naive H(K || M):</strong> Forged Hash: {lengthExtSim.naiveForgedHash} (Vulnerable without knowing Key K!)
+                  </div>
+                  <div className="p-2 bg-ok/10 border border-ok/30 text-ok">
+                    <strong>HMAC RFC 2104:</strong> Completely immune. Outer hash hides inner compression state.
+                  </div>
+                </div>
+              )}
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
+      {/* --- BIRTHDAY ATTACK TAB --- */}
+      {activeTab === 'birthday' && (
+        <Card>
+          <CardHeader>
+            <div className="flex justify-between items-start">
+              <div>
+                <span className="font-mono text-[10px] uppercase tracking-widest text-signal font-bold">M3 · Topic 3</span>
+                <CardTitle className="font-serif text-2xl sm:text-3xl mt-1">Birthday Paradox & Hash Collisions</CardTitle>
+              </div>
+              <span className="font-mono text-xs px-2 py-1 bg-paper border border-rule text-ink-soft">O(2^(n/2)) Bound</span>
+            </div>
+            <p className="text-ink-soft text-xs sm:text-sm font-sans mt-2">
+              Why finding any hash collision requires only square-root effort (~2^(n/2) operations) compared to 2^n for pre-images.
+            </p>
+          </CardHeader>
+          <CardContent className="space-y-6">
+            <div className="space-y-2">
+              <div className="flex justify-between font-mono text-xs">
+                <span>Output Bit-Length (n): <strong>{birthdayBits} bits</strong></span>
+                <span>Total Keyspace (2^{birthdayBits}): <strong>{Math.pow(2, birthdayBits).toLocaleString()}</strong></span>
+              </div>
+              <input
+                type="range"
+                min="8"
+                max="32"
+                step="2"
+                value={birthdayBits}
+                onChange={e => setBirthdayBits(Number(e.target.value))}
+                className="w-full accent-signal"
+              />
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 font-mono text-xs pt-2">
+                <div className="p-3 border border-rule bg-card">
+                  <span className="text-ink-soft block">Pre-Image Search (50% Prob):</span>
+                  <strong className="text-sm">~{Math.round(0.693 * Math.pow(2, birthdayBits)).toLocaleString()} trials</strong>
+                </div>
+                <div className="p-3 border border-signal bg-signal/5">
+                  <span className="text-signal block font-bold">Collision Search (50% Birthday Prob):</span>
+                  <strong className="text-sm text-signal">~{requiredTrials50.toLocaleString()} trials</strong>
+                </div>
+              </div>
+            </div>
+
+            {/* Live 16-bit Collision Finder */}
+            <div className="p-4 border border-rule bg-card space-y-4">
+              <div className="flex justify-between items-center">
+                <div>
+                  <h4 className="font-mono text-xs font-bold text-ink uppercase tracking-wider">Live Real-Time Collision Finder (16-bit Hash)</h4>
+                  <p className="text-ink-soft text-xs font-sans">Searches 65,536 buckets; birthday bound predicts a collision in ~300 trials.</p>
+                </div>
+                <Button
+                  size="sm"
+                  onClick={() => {
+                    setIsSearchingCollision(true)
+                    setTimeout(() => {
+                      const res = findBirthdayCollision("demo_" + Date.now().toString(36))
+                      setBirthdayCollision(res)
+                      setIsSearchingCollision(false)
+                    }, 50)
+                  }}
+                  disabled={isSearchingCollision}
+                  className="bg-signal text-paper font-mono text-xs"
+                >
+                  {isSearchingCollision ? "Searching..." : "Find Collision Now"}
+                </Button>
+              </div>
+
+              {birthdayCollision && (
+                <div className="p-3 bg-paper border border-ok text-ok font-mono text-xs space-y-1">
+                  <div className="font-bold">COLLISION FOUND in {birthdayCollision.trials} trials! (Predicted: ~301)</div>
+                  <div className="text-ink text-[11px]">Message 1: <span className="font-bold">{birthdayCollision.input1}</span></div>
+                  <div className="text-ink text-[11px]">Message 2: <span className="font-bold">{birthdayCollision.input2}</span></div>
+                  <div className="text-signal font-bold pt-1 border-t border-rule">Shared Hash: {birthdayCollision.hashHex}</div>
+                </div>
+              )}
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
+      {/* --- DIGITAL SIGNATURES TAB --- */}
+      {activeTab === 'signatures' && (
+        <Card>
+          <CardHeader>
+            <div className="flex justify-between items-start">
+              <div>
+                <span className="font-mono text-[10px] uppercase tracking-widest text-signal font-bold">M3 · Topic 5</span>
+                <CardTitle className="font-serif text-2xl sm:text-3xl mt-1">Digital Signatures & The PS3 Exploit</CardTitle>
+              </div>
+              <span className="font-mono text-xs px-2 py-1 bg-paper border border-rule text-ink-soft">RSA & ECDSA</span>
+            </div>
+            <p className="text-ink-soft text-xs sm:text-sm font-sans mt-2">
+              Hash-then-Sign paradigm, raw RSA multiplicative homomorphic forgery, and ECDSA master key extraction via nonce reuse.
+            </p>
+          </CardHeader>
+          <CardContent className="space-y-6">
+            {/* RSA Digital Signature */}
+            <div className="p-4 border border-rule bg-card space-y-3 font-mono text-xs">
+              <h4 className="font-bold text-ink uppercase tracking-wider border-b border-rule pb-2">
+                1. RSA Signature: S = h^d mod n (p=61, q=53, n=3233, e=17, d=2753)
+              </h4>
+              <div className="flex flex-wrap items-center gap-4">
+                <label className="text-ink-soft">Message Digest (h):</label>
+                <input
+                  type="number"
+                  className="p-1 border border-ink bg-paper font-mono text-xs w-28"
+                  value={sigDigest}
+                  onChange={e => setSigDigest(Number(e.target.value))}
+                />
+                <Button
+                  size="sm"
+                  variant="outline"
+                  onClick={() => setSigRsaTampered(!sigRsaTampered)}
+                  className={`text-xs ${sigRsaTampered ? "bg-bad text-paper" : ""}`}
+                >
+                  {sigRsaTampered ? "Tampered (+1)" : "Tamper with Sig"}
+                </Button>
+              </div>
+              <div className="flex justify-between pt-1">
+                <span className="text-ink-soft">Computed Signature S:</span>
+                <span className="font-bold text-signal">{rsaSigData.effectiveSig.toString()}</span>
+              </div>
+              <div className="flex justify-between items-center pt-1 border-t border-rule">
+                <span>Verification Check (S^e mod n === h):</span>
+                <strong className={rsaSigData.isValid ? "text-ok" : "text-bad"}>
+                  {rsaSigData.isValid ? "VALID SIGNATURE" : "TAMPER DETECTED / INVALID"}
+                </strong>
+              </div>
+            </div>
+
+            {/* Sony PS3 Nonce Reuse Exploit */}
+            <div className="p-4 border border-signal/40 bg-signal/5 rounded-[4px] space-y-3 font-mono text-xs">
+              <h4 className="font-bold text-signal uppercase tracking-wider border-b border-signal/20 pb-2">
+                2. Sony PS3 Exploit: ECDSA Nonce Reuse (Curve y^2 ≡ x^3 + 2 mod 13, Order n = 19)
+              </h4>
+              <p className="text-ink-soft font-sans text-xs">
+                Alice signs two different game messages (z1 = {sigZ1}, z2 = {sigZ2}) using the SAME ephemeral nonce k = {sigK}.
+              </p>
+              {ecdsaData.sig1 && ecdsaData.sig2 && (
+                <div className="space-y-1 bg-paper p-3 border border-rule">
+                  <div>Signature 1 (r, s1): ({ecdsaData.sig1.r}, {ecdsaData.sig1.s})</div>
+                  <div>Signature 2 (r, s2): ({ecdsaData.sig2.r}, {ecdsaData.sig2.s}) <span className="text-signal font-bold">(r is IDENTICAL!)</span></div>
+                </div>
+              )}
+              {ecdsaData.exploit && (
+                <div className="p-3 bg-bad/10 border border-bad/30 text-bad space-y-1">
+                  <div className="font-bold">EXPLOIT SUCCESSFUL! Master Private Key Recovered:</div>
+                  <div>Recovered Nonce k: <strong>{ecdsaData.exploit.recoveredK}</strong> (Actual: {sigK})</div>
+                  <div>Recovered Private Key d: <strong>{ecdsaData.exploit.recoveredPrivateKey}</strong> (Actual: {sigD})</div>
+                </div>
+              )}
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
+      {/* --- PKI TAB --- */}
+      {activeTab === 'pki' && (
+        <Card>
+          <CardHeader>
+            <div className="flex justify-between items-start">
+              <div>
+                <span className="font-mono text-[10px] uppercase tracking-widest text-signal font-bold">M3 · Topic 6</span>
+                <CardTitle className="font-serif text-2xl sm:text-3xl mt-1">PKI & X.509 Chain Validator</CardTitle>
+              </div>
+              <span className="font-mono text-xs px-2 py-1 bg-paper border border-rule text-ink-soft">Hierarchy of Trust</span>
+            </div>
+            <p className="text-ink-soft text-xs sm:text-sm font-sans mt-2">
+              Validates digital certificates from Leaf to Intermediate CA up to pre-installed Root CA anchors with revocation and expiry checks.
+            </p>
+          </CardHeader>
+          <CardContent className="space-y-6">
+            {/* Control Toggles */}
+            <div className="flex flex-wrap gap-3 font-mono text-xs">
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={() => setPkiLeafExpired(!pkiLeafExpired)}
+                className={pkiLeafExpired ? "bg-bad text-paper" : ""}
+              >
+                {pkiLeafExpired ? "Leaf Expired [ON]" : "Simulate Expired Cert"}
+              </Button>
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={() => setPkiLeafRevoked(!pkiLeafRevoked)}
+                className={pkiLeafRevoked ? "bg-bad text-paper" : ""}
+              >
+                {pkiLeafRevoked ? "Leaf Revoked via CRL/OCSP [ON]" : "Simulate Revoked Cert"}
+              </Button>
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={() => setPkiUntrustedRoot(!pkiUntrustedRoot)}
+                className={pkiUntrustedRoot ? "bg-bad text-paper" : ""}
+              >
+                {pkiUntrustedRoot ? "Untrusted Root [ON]" : "Simulate Untrusted Root CA"}
+              </Button>
+            </div>
+
+            {/* Certificate Chain Flow */}
+            <div className="space-y-3 font-mono text-xs">
+              {/* Root */}
+              <div className="p-3 border border-rule bg-card flex justify-between items-center">
+                <div>
+                  <span className="text-[10px] text-signal font-bold uppercase block">Tier 1: Root CA (Self-Signed Anchor)</span>
+                  <strong>{SAMPLE_ROOT_CA.subject}</strong>
+                </div>
+                <span className="text-[10px] px-2 py-0.5 bg-paper border border-rule">Trust Store</span>
+              </div>
+              {/* Intermediate */}
+              <div className="p-3 border border-rule bg-card flex justify-between items-center ml-4">
+                <div>
+                  <span className="text-[10px] text-ink-soft font-bold uppercase block">Tier 2: Intermediate CA</span>
+                  <strong>{SAMPLE_INTERMEDIATE_CA.subject}</strong>
+                </div>
+                <span className="text-[10px] px-2 py-0.5 bg-paper border border-rule">isCA: TRUE</span>
+              </div>
+              {/* Leaf */}
+              <div className="p-3 border border-rule bg-card flex justify-between items-center ml-8">
+                <div>
+                  <span className="text-[10px] text-ink-soft font-bold uppercase block">Tier 3: Leaf Server Certificate</span>
+                  <strong>{SAMPLE_LEAF_CERT.subject}</strong>
+                </div>
+                <span className="text-[10px] px-2 py-0.5 bg-paper border border-rule">Domain Web Server</span>
+              </div>
+            </div>
+
+            {/* Validation Verdict */}
+            <div className={`p-4 border font-mono text-xs space-y-2 ${
+              pkiChainData.validation.isValid ? "bg-ok/10 border-ok text-ok" : "bg-bad/10 border-bad text-bad"
+            }`}>
+              <div className="font-bold text-sm">
+                {pkiChainData.validation.isValid ? "CHAIN VALIDATION: TRUSTED SECURE CONNECTION" : "CHAIN VALIDATION FAILED: WARNING"}
+              </div>
+              {pkiChainData.validation.errors.length > 0 && (
+                <ul className="list-disc list-inside space-y-1 pt-1 text-ink">
+                  {pkiChainData.validation.errors.map((err, idx) => (
+                    <li key={idx} className="text-bad font-bold">{err}</li>
+                  ))}
+                </ul>
+              )}
             </div>
           </CardContent>
         </Card>
