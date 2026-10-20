@@ -1,6 +1,6 @@
 import { notFound } from "next/navigation"
 import { QuizModeId } from "@/lib/quiz/v2/types"
-import { m1Questions } from "@/lib/quiz/v2/questions/m1"
+import { allQuestions } from "@/lib/quiz/v2/questions"
 import { QuizPlayer } from "@/components/quiz/v2/QuizPlayer"
 
 export function generateStaticParams() {
@@ -37,14 +37,14 @@ export default async function QuizPlayPage({
   }
 
   // Filter or prioritize questions based on mode
-  let filteredQuestions = [...m1Questions]
+  let filteredQuestions = [...allQuestions]
   if (mode === 'numerical-lab') {
-    filteredQuestions = m1Questions.filter(q => q.type === 'numeric')
-    if (filteredQuestions.length === 0) filteredQuestions = m1Questions.filter(q => q.tags.includes('math'))
-    if (filteredQuestions.length === 0) filteredQuestions = m1Questions
+    filteredQuestions = allQuestions.filter(q => q.type === 'numeric')
+    if (filteredQuestions.length === 0) filteredQuestions = allQuestions.filter(q => q.tags.includes('math'))
+    if (filteredQuestions.length === 0) filteredQuestions = allQuestions
   } else if (mode === 'diagram-quiz') {
-    filteredQuestions = m1Questions.filter(q => q.type === 'label' || q.type === 'order' || q.type === 'spot')
-    if (filteredQuestions.length === 0) filteredQuestions = m1Questions
+    filteredQuestions = allQuestions.filter(q => q.type === 'label' || q.type === 'order' || q.type === 'spot')
+    if (filteredQuestions.length === 0) filteredQuestions = allQuestions
   }
 
   return <QuizPlayer mode={mode} questions={filteredQuestions} />

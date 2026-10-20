@@ -6,6 +6,9 @@ import { TopicPresentation } from "@/lib/present/types"
 import { ScenePlayer } from "@/components/scene/ScenePlayer"
 import { PresenterToolsOverlay } from "./PresenterTools"
 import { CaesarConcentricDisks, CaesarModularFormula, PlayfairRulesVisual } from "./PlateFigures"
+import { FeistelDiagram } from "@/components/figures/FeistelDiagram"
+import { ModeDiagram } from "@/components/figures/ModeDiagram"
+import { CurvePlot } from "@/components/figures/CurvePlot"
 
 export function PresenterModeV2({
   presentation,
@@ -207,6 +210,27 @@ export function PresenterModeV2({
     }
     if (currentPlate.customFigure === 'PlayfairRulesVisual') {
       return <PlayfairRulesVisual />
+    }
+    if (currentPlate.customFigure === 'FeistelDiagram') {
+      return (
+        <div className="w-full max-w-2xl mx-auto">
+          <FeistelDiagram roundCount={16} />
+        </div>
+      )
+    }
+    if (currentPlate.customFigure === 'ModeDiagram') {
+      return (
+        <div className="w-full max-w-3xl mx-auto">
+          <ModeDiagram />
+        </div>
+      )
+    }
+    if (currentPlate.customFigure === 'CurvePlot') {
+      return (
+        <div className="w-full max-w-2xl mx-auto">
+          <CurvePlot a={1} b={1} prime={23} />
+        </div>
+      )
     }
 
     // 3. Worked Example Plate (with step reveal & "Your Turn")

@@ -11,7 +11,23 @@ import { transpositionPresentation } from "./m1/transposition"
 import { productCiphersPresentation } from "./m1/productCiphers"
 import { cryptanalysisPresentation } from "./m1/cryptanalysis"
 
+import { blockPrinciplesPresentation } from "./m2/blockPrinciples"
+import { feistelPresentation } from "./m2/feistel"
+import { modesPresentation } from "./m2/modes"
+import { desPresentation } from "./m2/des"
+import { aesPresentation } from "./m2/aes"
+import { blowfishPresentation } from "./m2/blowfish"
+import { rc5Presentation } from "./m2/rc5"
+import { publicKeyPrinciplesPresentation } from "./m2/publicKeyPrinciples"
+import { rsaPresentation } from "./m2/rsa"
+import { rabinPresentation } from "./m2/rabin"
+import { elgamalPresentation } from "./m2/elgamal"
+import { eccPresentation } from "./m2/ecc"
+import { diffieHellmanPresentation } from "./m2/diffieHellman"
+import { lightweightTeaPresentation } from "./m2/lightweightTea"
+
 const presentations: Record<string, TopicPresentation> = {
+  // Module 1
   'm1/principles': principlesPresentation,
   'm1/osi-architecture': osiArchitecturePresentation,
   'm1/symmetric-model': symmetricModelPresentation,
@@ -22,7 +38,23 @@ const presentations: Record<string, TopicPresentation> = {
   'm1/hill': hillPresentation,
   'm1/transposition': transpositionPresentation,
   'm1/product-ciphers': productCiphersPresentation,
-  'm1/cryptanalysis': cryptanalysisPresentation
+  'm1/cryptanalysis': cryptanalysisPresentation,
+
+  // Module 2
+  'm2/block-principles': blockPrinciplesPresentation,
+  'm2/feistel': feistelPresentation,
+  'm2/modes': modesPresentation,
+  'm2/des': desPresentation,
+  'm2/aes': aesPresentation,
+  'm2/blowfish': blowfishPresentation,
+  'm2/rc5': rc5Presentation,
+  'm2/public-key-principles': publicKeyPrinciplesPresentation,
+  'm2/rsa': rsaPresentation,
+  'm2/rabin': rabinPresentation,
+  'm2/elgamal': elgamalPresentation,
+  'm2/ecc': eccPresentation,
+  'm2/diffie-hellman': diffieHellmanPresentation,
+  'm2/lightweight-tea': lightweightTeaPresentation
 }
 
 export function getPresentation(moduleId: string, topicId: string): TopicPresentation | undefined {
@@ -42,7 +74,7 @@ export function getPresentation(moduleId: string, topicId: string): TopicPresent
         kind: 'concept',
         title: `${topicId.replace('-', ' ').toUpperCase()} Overview`,
         subtitle: 'Syllabus Topic in Progress',
-        caption: 'This topic presentation plate shell is ready; full interactive figures scaling in Step 3.',
+        caption: 'This topic presentation plate shell is ready; full interactive figures scaling in future modules.',
         speakerNotes: {
           script: `This topic is part of module ${moduleId.toUpperCase()}. The core concepts and animated figures are scheduled in the syllabus sequence.`,
           likelyQuestions: []
@@ -63,5 +95,19 @@ export {
   hillPresentation,
   transpositionPresentation,
   productCiphersPresentation,
-  cryptanalysisPresentation
+  cryptanalysisPresentation,
+  blockPrinciplesPresentation,
+  feistelPresentation,
+  modesPresentation,
+  desPresentation,
+  aesPresentation,
+  blowfishPresentation,
+  rc5Presentation,
+  publicKeyPrinciplesPresentation,
+  rsaPresentation,
+  rabinPresentation,
+  elgamalPresentation,
+  eccPresentation,
+  diffieHellmanPresentation,
+  lightweightTeaPresentation
 }

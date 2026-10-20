@@ -40,10 +40,30 @@ import {
   computeFrequencies,
   indexOfCoincidence
 } from "@/lib/crypto/cryptanalysis"
+import { runNormalDH, runMitmDH } from "@/lib/crypto/diffieHellman"
+import { ECCurve, isCurveNonSingular, ecAdd, ecMultiply, findCurvePoints, ECPoint } from "@/lib/crypto/ecc"
+import { generateElGamalKey, elgamalEncrypt, elgamalDecrypt } from "@/lib/crypto/elgamal"
+import { generateRabinKeys, rabinEncrypt, rabinDecrypt } from "@/lib/crypto/rabin"
+import { teaEncrypt, teaDecrypt, TeaKey, TeaState } from "@/lib/crypto/tea"
 
 export default function CryptoPlayground() {
   // Tab selector for classical vs modern
-  const [activeTab, setActiveTab] = useState<'caesar' | 'affine' | 'playfair' | 'vigenere' | 'hill' | 'transposition' | 'cryptanalysis' | 'rsa' | 'hash'>('caesar')
+  const [activeTab, setActiveTab] = useState<
+    | 'caesar'
+    | 'affine'
+    | 'playfair'
+    | 'vigenere'
+    | 'hill'
+    | 'transposition'
+    | 'cryptanalysis'
+    | 'rsa'
+    | 'diffie-hellman'
+    | 'ecc'
+    | 'elgamal'
+    | 'rabin'
+    | 'tea'
+    | 'hash'
+  >('caesar')
 
   // --- 1. Caesar State ---
   const [caesarInput, setCaesarInput] = useState("HELLO WORLD")
@@ -179,6 +199,83 @@ export default function CryptoPlayground() {
     sha256(hashInput).then(setHashOutput)
   }, [hashInput])
 
+  // --- 10. Diffie-Hellman State ---
+  const [dhP, setDhP] = useState(23)
+  const [dhG, setDhG] = useState(5)
+  const [dhA, setDhA] = useState(4)
+  const [dhB, setDhB] = useState(3)
+  const [dhMitm, setDhMitm] = useState(false)
+  const dhResult = useMemo(() => {
+    try {
+      if (dhMitm) {
+        return { isMitm: true as const, data: runMitmDH(dhP, dhG, dhA, dhB, 2) }
+      }
+      return { isMitm: false as const, data: runNormalDH(dhP, dhG, dhA, dhB) }
+    } catch {
+      return null
+    }
+  }, [dhP, dhG, dhA, dhB, dhMitm])
+
+  // --- 11. ECC State ---
+  const [eccA, setEccA] = useState(1)
+  const [eccB, setEccB] = useState(6)
+  const [eccP, setEccP] = useState(11)
+  const [eccK, setEccK] = useState(2)
+  const eccCurve: ECCurve = useMemo(() => ({ a: eccA, b: eccB, p: eccP }), [eccA, eccB, eccP])
+  const eccIsNonSingular = useMemo(() => isCurveNonSingular(eccCurve), [eccCurve])
+  const eccPoints = useMemo(() => eccIsNonSingular ? findCurvePoints(eccCurve) : [], [eccCurve, eccIsNonSingular])
+  const [selectedPointIdx, setSelectedPointIdx] = useState(0)
+  const selectedPoint = eccPoints[selectedPointIdx] || eccPoints[0] || null
+  const eccMultResult = useMemo(() => {
+    if (!selectedPoint || !eccIsNonSingular) return null
+    return ecMultiply(eccK, selectedPoint, eccCurve)
+  }, [selectedPoint, eccK, eccCurve, eccIsNonSingular])
+
+  // --- 12. ElGamal State ---
+  const [egP, setEgP] = useState(23)
+  const [egG, setEgG] = useState(5)
+  const [egX, setEgX] = useState(6)
+  const [egMsg, setEgMsg] = useState(9)
+  const [egK, setEgK] = useState(15)
+  const elgamalData = useMemo(() => {
+    try {
+      const keys = generateElGamalKey(egP, egG, egX)
+      const cipher = elgamalEncrypt(BigInt(egMsg), keys.p, keys.g, keys.y, BigInt(egK))
+      const plain = elgamalDecrypt(cipher, keys.p, keys.x)
+      return { keys, cipher, plain, error: null }
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : String(err)
+      return { keys: null, cipher: null, plain: null, error: message }
+    }
+  }, [egP, egG, egX, egMsg, egK])
+
+  // --- 13. Rabin State ---
+  const [rabP, setRabP] = useState(7)
+  const [rabQ, setRabQ] = useState(11)
+  const [rabMsg, setRabMsg] = useState(20)
+  const rabinData = useMemo(() => {
+    try {
+      const keys = generateRabinKeys(rabP, rabQ)
+      if (!keys) return { error: "p and q must be distinct Blum primes (p ≡ q ≡ 3 mod 4)", keys: null, cipher: null, roots: null }
+      const cipher = rabinEncrypt(BigInt(rabMsg), keys.n)
+      const roots = rabinDecrypt(cipher, keys.p, keys.q)
+      return { error: null, keys, cipher, roots }
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : String(err)
+      return { error: message, keys: null, cipher: null, roots: null }
+    }
+  }, [rabP, rabQ, rabMsg])
+
+  // --- 14. TEA State ---
+  const [teaV0, setTeaV0] = useState(0x12345678)
+  const [teaV1, setTeaV1] = useState(0x9ABCDEF0)
+  const teaData = useMemo(() => {
+    const key: TeaKey = [0xA56BABCD, 0x00000000, 0xFFFFFFFF, 0xABCDEF01]
+    const enc = teaEncrypt({ v0: teaV0, v1: teaV1 }, key)
+    const dec = teaDecrypt(enc, key)
+    return { enc, dec }
+  }, [teaV0, teaV1])
+
   const tabs: { id: typeof activeTab; label: string; tag: string }[] = [
     { id: 'caesar', label: 'Caesar', tag: 'Shift' },
     { id: 'affine', label: 'Affine', tag: 'Linear' },
@@ -188,6 +285,11 @@ export default function CryptoPlayground() {
     { id: 'transposition', label: 'Transposition', tag: 'Permute' },
     { id: 'cryptanalysis', label: 'Cryptanalysis', tag: 'Freq / IoC' },
     { id: 'rsa', label: 'RSA', tag: 'Asymmetric' },
+    { id: 'diffie-hellman', label: 'Diffie-Hellman', tag: 'M2 · Key' },
+    { id: 'ecc', label: 'ECC', tag: 'M2 · Curve' },
+    { id: 'elgamal', label: 'ElGamal', tag: 'M2 · DLP' },
+    { id: 'rabin', label: 'Rabin', tag: 'M2 · Roots' },
+    { id: 'tea', label: 'TEA', tag: 'M2 · IoT' },
     { id: 'hash', label: 'SHA-256', tag: 'Digest' }
   ]
 
@@ -882,6 +984,455 @@ export default function CryptoPlayground() {
                   <div className="text-[10px] uppercase tracking-wider text-ok mb-2">Decrypted (C<sup>d</sup> mod n)</div>
                   <div className="text-2xl text-ink break-all font-bold">{rsaDecrypted}</div>
                 </div>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
+      {/* --- DIFFIE-HELLMAN TAB --- */}
+      {activeTab === 'diffie-hellman' && (
+        <Card>
+          <CardHeader>
+            <div className="flex justify-between items-start">
+              <div>
+                <span className="font-mono text-[10px] uppercase tracking-widest text-signal font-bold">M2 · Topic 13</span>
+                <CardTitle className="font-serif text-2xl sm:text-3xl mt-1">Diffie-Hellman Key Exchange</CardTitle>
+              </div>
+              <span className="font-mono text-xs px-2 py-1 bg-paper border border-rule text-ink-soft">DLP Protocol</span>
+            </div>
+            <p className="text-ink-soft text-xs sm:text-sm font-sans mt-2">
+              Public key agreement protocol establishing a shared symmetric secret over untrusted channels: <code className="font-mono font-bold text-ink">K = g^(ab) mod p</code>.
+            </p>
+          </CardHeader>
+          <CardContent className="space-y-6">
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+              <div>
+                <label className="font-mono text-[10px] uppercase tracking-wider font-bold mb-1 block text-ink">Prime (p)</label>
+                <input
+                  type="number"
+                  className="w-full p-2.5 border border-ink bg-paper font-mono text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-signal"
+                  value={dhP}
+                  onChange={e => setDhP(parseInt(e.target.value) || 23)}
+                />
+              </div>
+              <div>
+                <label className="font-mono text-[10px] uppercase tracking-wider font-bold mb-1 block text-ink">Generator (g)</label>
+                <input
+                  type="number"
+                  className="w-full p-2.5 border border-ink bg-paper font-mono text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-signal"
+                  value={dhG}
+                  onChange={e => setDhG(parseInt(e.target.value) || 5)}
+                />
+              </div>
+              <div>
+                <label className="font-mono text-[10px] uppercase tracking-wider font-bold mb-1 block text-ink">Alice Private (a)</label>
+                <input
+                  type="number"
+                  className="w-full p-2.5 border border-ink bg-paper font-mono text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-signal"
+                  value={dhA}
+                  onChange={e => setDhA(parseInt(e.target.value) || 4)}
+                />
+              </div>
+              <div>
+                <label className="font-mono text-[10px] uppercase tracking-wider font-bold mb-1 block text-ink">Bob Private (b)</label>
+                <input
+                  type="number"
+                  className="w-full p-2.5 border border-ink bg-paper font-mono text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-signal"
+                  value={dhB}
+                  onChange={e => setDhB(parseInt(e.target.value) || 3)}
+                />
+              </div>
+            </div>
+
+            <div className="flex items-center gap-2 p-3 bg-paper border border-rule">
+              <input
+                type="checkbox"
+                id="dh-mitm-toggle"
+                checked={dhMitm}
+                onChange={e => setDhMitm(e.target.checked)}
+                className="accent-signal cursor-pointer"
+              />
+              <label htmlFor="dh-mitm-toggle" className="font-mono text-xs text-ink cursor-pointer select-none">
+                Simulate active Mallory Man-in-the-Middle (MitM) interception
+              </label>
+            </div>
+
+            {dhResult && !dhResult.isMitm && 'sharedSecretAlice' in dhResult.data && (
+              <div className="space-y-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 font-mono text-xs">
+                  <div className="p-4 border border-rule bg-card">
+                    <div className="font-bold text-signal uppercase mb-1">Alice Public Value</div>
+                    <div className="text-sm">Y_A = g^a mod p = {dhG}^{dhA} mod {dhP} = <span className="font-bold text-ink">{dhResult.data.alice.publicKey.toString()}</span></div>
+                  </div>
+                  <div className="p-4 border border-rule bg-card">
+                    <div className="font-bold text-signal uppercase mb-1">Bob Public Value</div>
+                    <div className="text-sm">Y_B = g^b mod p = {dhG}^{dhB} mod {dhP} = <span className="font-bold text-ink">{dhResult.data.bob.publicKey.toString()}</span></div>
+                  </div>
+                </div>
+
+                <div className="p-4 border border-ok bg-ok/5 font-mono text-center">
+                  <div className="text-[10px] uppercase tracking-wider text-ok font-bold mb-1">Shared Symmetric Key Established</div>
+                  <div className="text-2xl font-bold text-ink">K = {dhResult.data.sharedSecretAlice?.toString()}</div>
+                  <div className="text-[11px] text-ink-soft mt-1">Alice: (Y_B)^a mod p = {dhResult.data.sharedSecretAlice?.toString()} | Bob: (Y_A)^b mod p = {dhResult.data.sharedSecretBob?.toString()}</div>
+                </div>
+              </div>
+            )}
+
+            {dhResult && dhResult.isMitm && 'mallory' in dhResult.data && (
+              <div className="p-4 border border-bad bg-bad/5 font-mono space-y-3 text-xs">
+                <div className="font-bold text-bad uppercase tracking-wider">Compromised! Mallory Intercepted Communications</div>
+                <p className="text-ink-soft">Because unauthenticated DH lacks digital signatures, Mallory substituted her rogue public key:</p>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <div className="p-2 border border-bad/30 bg-paper">
+                    <div className="text-[10px] text-bad font-bold">Alice &lt;-&gt; Mallory Key</div>
+                    <div className="text-base font-bold text-ink">K_AM = {dhResult.data.mallory.secretWithAlice.toString()}</div>
+                  </div>
+                  <div className="p-2 border border-bad/30 bg-paper">
+                    <div className="text-[10px] text-bad font-bold">Mallory &lt;-&gt; Bob Key</div>
+                    <div className="text-base font-bold text-ink">K_MB = {dhResult.data.mallory.secretWithBob.toString()}</div>
+                  </div>
+                </div>
+              </div>
+            )}
+          </CardContent>
+        </Card>
+      )}
+
+      {/* --- ECC TAB --- */}
+      {activeTab === 'ecc' && (
+        <Card>
+          <CardHeader>
+            <div className="flex justify-between items-start">
+              <div>
+                <span className="font-mono text-[10px] uppercase tracking-widest text-signal font-bold">M2 · Topic 12</span>
+                <CardTitle className="font-serif text-2xl sm:text-3xl mt-1">Elliptic Curve Cryptography</CardTitle>
+              </div>
+              <span className={`font-mono text-xs px-2 py-1 border ${eccIsNonSingular ? 'bg-ok/10 text-ok border-ok' : 'bg-bad/10 text-bad border-bad'}`}>
+                {eccIsNonSingular ? 'Non-Singular' : 'Singular (Invalid)'}
+              </span>
+            </div>
+            <p className="text-ink-soft text-xs sm:text-sm font-sans mt-2">
+              Weierstrass curve over prime field F_p: <code className="font-mono font-bold text-ink">y² ≡ x³ + ax + b (mod p)</code>.
+            </p>
+          </CardHeader>
+          <CardContent className="space-y-6">
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+              <div>
+                <label className="font-mono text-[10px] uppercase tracking-wider font-bold mb-1 block text-ink">Param a</label>
+                <input
+                  type="number"
+                  className="w-full p-2.5 border border-ink bg-paper font-mono text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-signal"
+                  value={eccA}
+                  onChange={e => setEccA(parseInt(e.target.value) || 0)}
+                />
+              </div>
+              <div>
+                <label className="font-mono text-[10px] uppercase tracking-wider font-bold mb-1 block text-ink">Param b</label>
+                <input
+                  type="number"
+                  className="w-full p-2.5 border border-ink bg-paper font-mono text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-signal"
+                  value={eccB}
+                  onChange={e => setEccB(parseInt(e.target.value) || 0)}
+                />
+              </div>
+              <div>
+                <label className="font-mono text-[10px] uppercase tracking-wider font-bold mb-1 block text-ink">Prime (p)</label>
+                <input
+                  type="number"
+                  className="w-full p-2.5 border border-ink bg-paper font-mono text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-signal"
+                  value={eccP}
+                  onChange={e => setEccP(parseInt(e.target.value) || 11)}
+                />
+              </div>
+              <div>
+                <label className="font-mono text-[10px] uppercase tracking-wider font-bold mb-1 block text-ink">Scalar k (k·P)</label>
+                <input
+                  type="number"
+                  min="1"
+                  max="20"
+                  className="w-full p-2.5 border border-ink bg-paper font-mono text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-signal"
+                  value={eccK}
+                  onChange={e => setEccK(parseInt(e.target.value) || 1)}
+                />
+              </div>
+            </div>
+
+            {eccIsNonSingular ? (
+              <div className="space-y-4">
+                <div>
+                  <label className="font-mono text-[10px] uppercase tracking-wider font-bold mb-2 block text-ink">Select Base Point P on Curve ({eccPoints.length} rational points found)</label>
+                  <div className="flex flex-wrap gap-2 max-h-28 overflow-y-auto p-2 border border-rule bg-card">
+                    {eccPoints.map((pt, idx) => (
+                      <button
+                        key={`${pt.x}-${pt.y}`}
+                        onClick={() => setSelectedPointIdx(idx)}
+                        className={`px-2 py-1 font-mono text-xs border ${
+                          selectedPointIdx === idx
+                            ? 'bg-signal text-paper border-signal font-bold'
+                            : 'bg-paper text-ink border-rule hover:border-ink'
+                        }`}
+                      >
+                        ({pt.x}, {pt.y})
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                {selectedPoint && (
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 font-mono text-xs">
+                    <div className="p-4 border border-rule bg-card">
+                      <div className="font-bold text-signal uppercase mb-1">Base Point P</div>
+                      <div className="text-xl font-bold text-ink">P = ({selectedPoint.x}, {selectedPoint.y})</div>
+                      <div className="text-[10px] text-ink-soft mt-1">LHS: {selectedPoint.y}² mod {eccP} = {(selectedPoint.y * selectedPoint.y) % eccP} | RHS: ({selectedPoint.x}³+{eccA}·{selectedPoint.x}+{eccB}) mod {eccP} = {((selectedPoint.x**3 + eccA*selectedPoint.x + eccB) % eccP + eccP) % eccP}</div>
+                    </div>
+                    <div className="p-4 border border-ok bg-ok/5">
+                      <div className="font-bold text-ok uppercase mb-1">Scalar Product: Q = {eccK} · P</div>
+                      <div className="text-xl font-bold text-ink">
+                        {eccMultResult ? `(${eccMultResult.x}, ${eccMultResult.y})` : 'Point at Infinity (O)'}
+                      </div>
+                      <div className="text-[10px] text-ink-soft mt-1">Computed via Double-and-Add algorithm</div>
+                    </div>
+                  </div>
+                )}
+              </div>
+            ) : (
+              <div className="p-4 bg-bad/10 text-bad border border-bad font-mono text-xs">
+                Singular curve! 4a³ + 27b² ≡ 0 (mod {eccP}). Cusps or nodes present; group law undefined.
+              </div>
+            )}
+          </CardContent>
+        </Card>
+      )}
+
+      {/* --- ELGAMAL TAB --- */}
+      {activeTab === 'elgamal' && (
+        <Card>
+          <CardHeader>
+            <div className="flex justify-between items-start">
+              <div>
+                <span className="font-mono text-[10px] uppercase tracking-widest text-signal font-bold">M2 · Topic 11</span>
+                <CardTitle className="font-serif text-2xl sm:text-3xl mt-1">ElGamal Cryptosystem</CardTitle>
+              </div>
+              <span className="font-mono text-xs px-2 py-1 bg-paper border border-rule text-ink-soft">Probabilistic DLP</span>
+            </div>
+            <p className="text-ink-soft text-xs sm:text-sm font-sans mt-2">
+              Randomized asymmetric encryption producing ciphertext pairs <code className="font-mono font-bold text-ink">(c1 = g^k mod p, c2 = M·y^k mod p)</code>.
+            </p>
+          </CardHeader>
+          <CardContent className="space-y-6">
+            <div className="grid grid-cols-2 sm:grid-cols-5 gap-3">
+              <div>
+                <label className="font-mono text-[10px] uppercase tracking-wider font-bold mb-1 block text-ink">Prime (p)</label>
+                <input
+                  type="number"
+                  className="w-full p-2 border border-ink bg-paper font-mono text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-signal"
+                  value={egP}
+                  onChange={e => setEgP(parseInt(e.target.value) || 23)}
+                />
+              </div>
+              <div>
+                <label className="font-mono text-[10px] uppercase tracking-wider font-bold mb-1 block text-ink">Generator (g)</label>
+                <input
+                  type="number"
+                  className="w-full p-2 border border-ink bg-paper font-mono text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-signal"
+                  value={egG}
+                  onChange={e => setEgG(parseInt(e.target.value) || 5)}
+                />
+              </div>
+              <div>
+                <label className="font-mono text-[10px] uppercase tracking-wider font-bold mb-1 block text-ink">Private Key (x)</label>
+                <input
+                  type="number"
+                  className="w-full p-2 border border-ink bg-paper font-mono text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-signal"
+                  value={egX}
+                  onChange={e => setEgX(parseInt(e.target.value) || 6)}
+                />
+              </div>
+              <div>
+                <label className="font-mono text-[10px] uppercase tracking-wider font-bold mb-1 block text-ink">Message (M &lt; p)</label>
+                <input
+                  type="number"
+                  className="w-full p-2 border border-ink bg-paper font-mono text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-signal"
+                  value={egMsg}
+                  onChange={e => setEgMsg(parseInt(e.target.value) || 9)}
+                />
+              </div>
+              <div>
+                <label className="font-mono text-[10px] uppercase tracking-wider font-bold mb-1 block text-ink">Ephemeral (k)</label>
+                <input
+                  type="number"
+                  className="w-full p-2 border border-ink bg-paper font-mono text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-signal"
+                  value={egK}
+                  onChange={e => setEgK(parseInt(e.target.value) || 15)}
+                />
+              </div>
+            </div>
+
+            {elgamalData.error ? (
+              <div className="p-4 bg-bad/10 text-bad border border-bad font-mono text-xs">{elgamalData.error}</div>
+            ) : elgamalData.keys && elgamalData.cipher && (
+              <div className="space-y-4 font-mono text-xs">
+                <div className="p-3 border border-rule bg-card">
+                  <div className="font-bold text-signal uppercase mb-1">Public Key y = g^x mod p</div>
+                  <div className="text-base font-bold text-ink">y = {elgamalData.keys.y.toString()} (Published: p={egP}, g={egG}, y={elgamalData.keys.y.toString()})</div>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div className="p-4 border border-signal bg-signal/5">
+                    <div className="font-bold text-signal uppercase mb-1">Ciphertext Pair (c1, c2)</div>
+                    <div className="text-xl font-bold text-ink">
+                      c1 = {elgamalData.cipher.c1.toString()} | c2 = {elgamalData.cipher.c2.toString()}
+                    </div>
+                    <div className="text-[10px] text-ink-soft mt-1">c1 = g^k mod p | c2 = (M · y^k) mod p</div>
+                  </div>
+                  <div className="p-4 border border-ok bg-ok/5">
+                    <div className="font-bold text-ok uppercase mb-1">Decrypted Plaintext</div>
+                    <div className="text-xl font-bold text-ink">M = {elgamalData.plain?.toString()}</div>
+                    <div className="text-[10px] text-ink-soft mt-1">M = c2 · (c1^x)⁻¹ mod p (Restored!)</div>
+                  </div>
+                </div>
+              </div>
+            )}
+          </CardContent>
+        </Card>
+      )}
+
+      {/* --- RABIN TAB --- */}
+      {activeTab === 'rabin' && (
+        <Card>
+          <CardHeader>
+            <div className="flex justify-between items-start">
+              <div>
+                <span className="font-mono text-[10px] uppercase tracking-widest text-signal font-bold">M2 · Topic 10</span>
+                <CardTitle className="font-serif text-2xl sm:text-3xl mt-1">Rabin Cryptosystem</CardTitle>
+              </div>
+              <span className="font-mono text-xs px-2 py-1 bg-paper border border-rule text-ink-soft">4-Root Ambiguity</span>
+            </div>
+            <p className="text-ink-soft text-xs sm:text-sm font-sans mt-2">
+              Provably secure asymmetric squaring cipher: <code className="font-mono font-bold text-ink">C = M² mod n</code>, decrypted via CRT into four square roots.
+            </p>
+          </CardHeader>
+          <CardContent className="space-y-6">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+              <div>
+                <label className="font-mono text-[10px] uppercase tracking-wider font-bold mb-1 block text-ink">Blum Prime p (p ≡ 3 mod 4)</label>
+                <input
+                  type="number"
+                  className="w-full p-2.5 border border-ink bg-paper font-mono text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-signal"
+                  value={rabP}
+                  onChange={e => setRabP(parseInt(e.target.value) || 7)}
+                />
+              </div>
+              <div>
+                <label className="font-mono text-[10px] uppercase tracking-wider font-bold mb-1 block text-ink">Blum Prime q (q ≡ 3 mod 4)</label>
+                <input
+                  type="number"
+                  className="w-full p-2.5 border border-ink bg-paper font-mono text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-signal"
+                  value={rabQ}
+                  onChange={e => setRabQ(parseInt(e.target.value) || 11)}
+                />
+              </div>
+              <div>
+                <label className="font-mono text-[10px] uppercase tracking-wider font-bold mb-1 block text-ink">Message (M &lt; pq)</label>
+                <input
+                  type="number"
+                  className="w-full p-2.5 border border-ink bg-paper font-mono text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-signal"
+                  value={rabMsg}
+                  onChange={e => setRabMsg(parseInt(e.target.value) || 20)}
+                />
+              </div>
+            </div>
+
+            {rabinData.error ? (
+              <div className="p-4 bg-bad/10 text-bad border border-bad font-mono text-xs">{rabinData.error}</div>
+            ) : rabinData.keys && rabinData.cipher && rabinData.roots && (
+              <div className="space-y-4 font-mono text-xs">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div className="p-4 border border-rule bg-card">
+                    <div className="font-bold text-signal uppercase mb-1">Public Modulus n = p · q</div>
+                    <div className="text-xl font-bold text-ink">n = {rabinData.keys.n.toString()}</div>
+                    <div className="text-[10px] text-ink-soft mt-1">p = {rabP}, q = {rabQ}</div>
+                  </div>
+                  <div className="p-4 border border-signal bg-signal/5">
+                    <div className="font-bold text-signal uppercase mb-1">Encrypted (C = M² mod n)</div>
+                    <div className="text-xl font-bold text-ink">C = {rabinData.cipher.toString()}</div>
+                    <div className="text-[10px] text-ink-soft mt-1">{rabMsg}² mod {rabinData.keys.n.toString()} = {rabinData.cipher.toString()}</div>
+                  </div>
+                </div>
+
+                <div className="p-4 border border-ok bg-ok/5">
+                  <div className="font-bold text-ok uppercase mb-2">Chinese Remainder Theorem 4 Candidate Roots</div>
+                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-center">
+                    {[rabinData.roots.r1, rabinData.roots.r2, rabinData.roots.r3, rabinData.roots.r4].map((r, idx) => {
+                      const isOriginal = r.toString() === rabMsg.toString()
+                      return (
+                        <div key={idx} className={`p-2 border ${isOriginal ? 'bg-ok/20 border-ok font-bold text-ink' : 'bg-paper border-rule text-ink-soft'}`}>
+                          <div className="text-[10px] uppercase">Root r{idx + 1}</div>
+                          <div className="text-lg">{r.toString()}</div>
+                          {isOriginal && <div className="text-[9px] text-ok font-bold uppercase mt-1">Original Match</div>}
+                        </div>
+                      )
+                    })}
+                  </div>
+                </div>
+              </div>
+            )}
+          </CardContent>
+        </Card>
+      )}
+
+      {/* --- TEA TAB --- */}
+      {activeTab === 'tea' && (
+        <Card>
+          <CardHeader>
+            <div className="flex justify-between items-start">
+              <div>
+                <span className="font-mono text-[10px] uppercase tracking-widest text-signal font-bold">M2 · Topic 14</span>
+                <CardTitle className="font-serif text-2xl sm:text-3xl mt-1">Tiny Encryption Algorithm (TEA)</CardTitle>
+              </div>
+              <span className="font-mono text-xs px-2 py-1 bg-paper border border-rule text-ink-soft">Lightweight IoT</span>
+            </div>
+            <p className="text-ink-soft text-xs sm:text-sm font-sans mt-2">
+              Wheeler &amp; Needham 64-bit Feistel cipher: 32 cycles with golden ratio constant <code className="font-mono font-bold text-ink">DELTA = 0x9E3779B9</code>.
+            </p>
+          </CardHeader>
+          <CardContent className="space-y-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div>
+                <label className="font-mono text-[10px] uppercase tracking-wider font-bold mb-1 block text-ink">Left Half v0 (32-bit Integer)</label>
+                <input
+                  type="number"
+                  className="w-full p-2.5 border border-ink bg-paper font-mono text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-signal"
+                  value={teaV0}
+                  onChange={e => setTeaV0(parseInt(e.target.value) || 0)}
+                />
+              </div>
+              <div>
+                <label className="font-mono text-[10px] uppercase tracking-wider font-bold mb-1 block text-ink">Right Half v1 (32-bit Integer)</label>
+                <input
+                  type="number"
+                  className="w-full p-2.5 border border-ink bg-paper font-mono text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-signal"
+                  value={teaV1}
+                  onChange={e => setTeaV1(parseInt(e.target.value) || 0)}
+                />
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 font-mono text-xs">
+              <div className="p-4 border border-signal bg-signal/5">
+                <div className="font-bold text-signal uppercase mb-1">Encrypted 64-bit Block (32 Cycles)</div>
+                <div className="text-base font-bold text-ink">
+                  v0: 0x{teaData.enc.v0.toString(16).toUpperCase().padStart(8, '0')} | v1: 0x{teaData.enc.v1.toString(16).toUpperCase().padStart(8, '0')}
+                </div>
+                <div className="text-[10px] text-ink-soft mt-1">Integrated shifts (v1&lt;&lt;4, v1&gt;&gt;5) and delta accumulation</div>
+              </div>
+              <div className="p-4 border border-ok bg-ok/5">
+                <div className="font-bold text-ok uppercase mb-1">Decrypted Block Recovery</div>
+                <div className="text-base font-bold text-ink">
+                  v0: {teaData.dec.v0} | v1: {teaData.dec.v1}
+                </div>
+                <div className="text-[10px] text-ink-soft mt-1">Exact reversible recovery of original 64-bit plaintext</div>
               </div>
             </div>
           </CardContent>

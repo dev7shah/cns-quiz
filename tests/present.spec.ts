@@ -132,4 +132,69 @@ test.describe('Presenter Mode v2 E2E Tests', () => {
     await revealBtn.click()
     await expect(page.locator('text=Answer Verified:')).toBeVisible()
   })
+
+  test('Loads /present/m2/modes and renders ModeDiagram with zero console errors', async ({ page }) => {
+    const consoleErrors: string[] = []
+    page.on('console', msg => {
+      if (msg.type() === 'error') consoleErrors.push(msg.text())
+    })
+    page.on('pageerror', err => {
+      consoleErrors.push(err.message)
+    })
+
+    await page.goto('/present/m2/modes')
+    await page.waitForLoadState('networkidle')
+
+    // Module 2 header
+    const presentHeader = page.locator('header:has-text("Block Ciphers and Public Key Cryptography")')
+    await expect(presentHeader).toBeVisible()
+
+    // Title of hook plate
+    await expect(page.locator('h1:has-text("The Electronic Codebook Penguin")')).toBeVisible()
+
+    // Navigate to Plate 2 (ModeDiagram interactive figure)
+    const nextBtn = page.locator('button:has-text("Next →")')
+    await nextBtn.click()
+    await expect(page.locator('h1:has-text("Interactive Block Cipher Modes")')).toBeVisible()
+
+    expect(consoleErrors).toEqual([])
+  })
+
+  test('Loads /present/m2/rsa and verifies mathematical plates with zero console errors', async ({ page }) => {
+    const consoleErrors: string[] = []
+    page.on('console', msg => {
+      if (msg.type() === 'error') consoleErrors.push(msg.text())
+    })
+    page.on('pageerror', err => {
+      consoleErrors.push(err.message)
+    })
+
+    await page.goto('/present/m2/rsa')
+    await page.waitForLoadState('networkidle')
+
+    await expect(page.locator('h1:has-text("The Cornerstone of Modern Trust")')).toBeVisible()
+    expect(consoleErrors).toEqual([])
+  })
+
+  test('Loads /present/m2/ecc and renders CurvePlot with zero console errors', async ({ page }) => {
+    const consoleErrors: string[] = []
+    page.on('console', msg => {
+      if (msg.type() === 'error') consoleErrors.push(msg.text())
+    })
+    page.on('pageerror', err => {
+      consoleErrors.push(err.message)
+    })
+
+    await page.goto('/present/m2/ecc')
+    await page.waitForLoadState('networkidle')
+
+    await expect(page.locator('h1:has-text("The Geometric Revolution in Cryptography")')).toBeVisible()
+
+    // Navigate to CurvePlot plate (Plate 3)
+    const plate3Thumb = page.locator('aside button:has-text("Interactive Curve Plot")')
+    await plate3Thumb.click()
+    await expect(page.locator('h1:has-text("Interactive Curve Plot over Finite Field")')).toBeVisible()
+
+    expect(consoleErrors).toEqual([])
+  })
 })
