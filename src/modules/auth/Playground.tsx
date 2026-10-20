@@ -1,8 +1,12 @@
-import { useState, useEffect } from "react"
+import { useState, useEffect, useMemo } from "react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/Card"
+import { Button } from "@/components/ui/Button"
 import { calculatePasswordEntropy, getPasswordStrengthLabel, isVulnerableToDictionary } from "@/lib/auth/password"
 import { generateTOTP } from "@/lib/auth/totp"
 import { sha256 } from "@/lib/crypto/hash"
+import { evaluateBellLaPadula, evaluateBiba, ClearanceLevel } from "@/lib/security/accessControl"
+import { registerWebAuthnCredential, authenticateWebAuthn } from "@/lib/security/userAuth"
+import { evaluateNistPassword, estimateCrackingTime } from "@/lib/security/passwordAttacks"
 
 export default function AuthPlayground() {
   const [password, setPassword] = useState("")
@@ -31,6 +35,37 @@ export default function AuthPlayground() {
     const timer = setInterval(updateTotp, 1000)
     return () => clearInterval(timer)
   }, [totpSecret])
+
+  // --- M4 States ---
+  // Access Control (Bell-LaPadula & Biba)
+  const [acSubjectClearance, setAcSubjectClearance] = useState<ClearanceLevel>("secret")
+  const [acObjectClassification, setAcObjectClassification] = useState<ClearanceLevel>("confidential")
+  const [acOperation, setAcOperation] = useState<"read" | "write">("read")
+  const [acModel, setAcModel] = useState<"bell_lapadula" | "biba">("bell_lapadula")
+
+  const acDecision = useMemo(() => {
+    if (acModel === "bell_lapadula") {
+      return evaluateBellLaPadula("User_Agent", acSubjectClearance, "Resource_File", acObjectClassification, acOperation)
+    }
+    return evaluateBiba("Process_Thread", acSubjectClearance, "System_Object", acObjectClassification, acOperation)
+  }, [acModel, acSubjectClearance, acObjectClassification, acOperation])
+
+  // FIDO2 / WebAuthn Passwordless State
+  const [webAuthnDomain, setWebAuthnDomain] = useState("https://cns-lab.edu")
+  const [webAuthnPhishToggle, setWebAuthnPhishToggle] = useState(false)
+  const webAuthnCred = useMemo(
+    () => registerWebAuthnCredential("student@cns.edu", "https://cns-lab.edu"),
+    []
+  )
+  const webAuthnResult = useMemo(() => {
+    const activeOrigin = webAuthnPhishToggle ? "https://evil-cns-lab-phish.com" : webAuthnDomain
+    return authenticateWebAuthn(webAuthnCred, "random_server_challenge_nonce_42", activeOrigin)
+  }, [webAuthnCred, webAuthnDomain, webAuthnPhishToggle])
+
+  // NIST SP 800-63B Password State
+  const [nistInput, setNistInput] = useState("correct-horse-battery-staple")
+  const nistResult = useMemo(() => evaluateNistPassword(nistInput), [nistInput])
+  const crackingEstimates = useMemo(() => estimateCrackingTime(nistResult.entropyBits), [nistResult.entropyBits])
 
   return (
     <div className="space-y-8 sm:space-y-12">
@@ -124,6 +159,193 @@ export default function AuthPlayground() {
               <div className="text-[10px] uppercase font-mono text-ink-soft mt-3 sm:mt-4 tracking-widest">
                 Changes in {timeLeft}s
               </div>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* --- ACCESS CONTROL CARD: BELL-LAPADULA & BIBA --- */}
+      <Card>
+        <CardHeader>
+          <div className="flex justify-between items-start">
+            <div>
+              <span className="font-mono text-[10px] uppercase tracking-widest text-signal font-bold">M4 · Topic 3</span>
+              <CardTitle className="font-serif text-2xl sm:text-3xl mt-1">Multi-Level Security: Bell-LaPadula & Biba</CardTitle>
+            </div>
+            <span className="font-mono text-xs px-2 py-1 bg-paper border border-rule text-ink-soft">NRU / NWD vs NRD / NWU</span>
+          </div>
+          <p className="text-ink-soft text-xs sm:text-sm font-sans mt-2">
+            Simulate military mandatory access control decisions for confidentiality (Bell-LaPadula) vs data integrity (Biba).
+          </p>
+        </CardHeader>
+        <CardContent className="space-y-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 font-mono text-xs">
+            <div>
+              <label className="font-bold text-ink block mb-1">Security Model</label>
+              <select
+                className="w-full p-2 border border-ink bg-paper"
+                value={acModel}
+                onChange={e => setAcModel(e.target.value as "bell_lapadula" | "biba")}
+              >
+                <option value="bell_lapadula">Bell-LaPadula (Confidentiality)</option>
+                <option value="biba">Biba Model (Integrity)</option>
+              </select>
+            </div>
+            <div>
+              <label className="font-bold text-ink block mb-1">Subject Clearance</label>
+              <select
+                className="w-full p-2 border border-ink bg-paper"
+                value={acSubjectClearance}
+                onChange={e => setAcSubjectClearance(e.target.value as ClearanceLevel)}
+              >
+                <option value="unclassified">Unclassified (0)</option>
+                <option value="confidential">Confidential (1)</option>
+                <option value="secret">Secret (2)</option>
+                <option value="top_secret">Top Secret (3)</option>
+              </select>
+            </div>
+            <div>
+              <label className="font-bold text-ink block mb-1">Object Classification</label>
+              <select
+                className="w-full p-2 border border-ink bg-paper"
+                value={acObjectClassification}
+                onChange={e => setAcObjectClassification(e.target.value as ClearanceLevel)}
+              >
+                <option value="unclassified">Unclassified (0)</option>
+                <option value="confidential">Confidential (1)</option>
+                <option value="secret">Secret (2)</option>
+                <option value="top_secret">Top Secret (3)</option>
+              </select>
+            </div>
+            <div>
+              <label className="font-bold text-ink block mb-1">Operation</label>
+              <div className="flex gap-2">
+                <Button
+                  size="sm"
+                  variant="outline"
+                  onClick={() => setAcOperation("read")}
+                  className={`flex-1 text-xs ${acOperation === "read" ? "bg-ink text-paper" : ""}`}
+                >
+                  READ
+                </Button>
+                <Button
+                  size="sm"
+                  variant="outline"
+                  onClick={() => setAcOperation("write")}
+                  className={`flex-1 text-xs ${acOperation === "write" ? "bg-ink text-paper" : ""}`}
+                >
+                  WRITE
+                </Button>
+              </div>
+            </div>
+          </div>
+
+          {/* Decision Box */}
+          <div className={`p-4 border font-mono text-xs space-y-1.5 ${
+            acDecision.allowed ? "bg-ok/10 border-ok text-ok" : "bg-bad/10 border-bad text-bad"
+          }`}>
+            <div className="font-bold text-sm">
+              {acDecision.allowed ? "ACCESS GRANTED ✓" : "ACCESS DENIED ✕"} ({acDecision.ruleTriggered})
+            </div>
+            <div className="text-ink">{acDecision.explanation}</div>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* --- FIDO2 / WEBAUTHN PASSWORDLESS CARD --- */}
+      <Card>
+        <CardHeader>
+          <div className="flex justify-between items-start">
+            <div>
+              <span className="font-mono text-[10px] uppercase tracking-widest text-signal font-bold">M4 · Topic 4</span>
+              <CardTitle className="font-serif text-2xl sm:text-3xl mt-1">FIDO2 / WebAuthn Origin Binding</CardTitle>
+            </div>
+            <span className="font-mono text-xs px-2 py-1 bg-paper border border-rule text-ink-soft">Phishing-Resistant MFA</span>
+          </div>
+          <p className="text-ink-soft text-xs sm:text-sm font-sans mt-2">
+            Demonstrates why hardware security keys defeat reverse-proxy phishing attacks (Evilginx) by cryptographically binding signatures to browser domain origins.
+          </p>
+        </CardHeader>
+        <CardContent className="space-y-6">
+          <div className="flex flex-wrap items-center justify-between gap-4 font-mono text-xs p-3 border border-rule bg-card">
+            <div>
+              <span className="text-ink-soft block text-[10px] uppercase">Registered Relying Party:</span>
+              <strong>{webAuthnCred.rpOrigin}</strong> (User: {webAuthnCred.userName})
+            </div>
+            <Button
+              size="sm"
+              variant="outline"
+              onClick={() => setWebAuthnPhishToggle(!webAuthnPhishToggle)}
+              className={webAuthnPhishToggle ? "bg-bad text-paper" : ""}
+            >
+              {webAuthnPhishToggle ? "Phishing Site Active [ON]" : "Simulate Phishing Site"}
+            </Button>
+          </div>
+
+          <div className={`p-4 border font-mono text-xs space-y-2 ${
+            webAuthnResult.success ? "bg-ok/10 border-ok text-ok" : "bg-bad/10 border-bad text-bad"
+          }`}>
+            <div className="font-bold text-sm">
+              {webAuthnResult.success ? "WEBAUTHN VERIFIED: AUTHENTICATION GRANTED" : "PHISHING ATTACK THWARTED: REJECTED"}
+            </div>
+            <div className="text-ink">{webAuthnResult.explanation}</div>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* --- NIST SP 800-63B GUIDELINES CARD --- */}
+      <Card>
+        <CardHeader>
+          <div className="flex justify-between items-start">
+            <div>
+              <span className="font-mono text-[10px] uppercase tracking-widest text-signal font-bold">M4 · Topic 5</span>
+              <CardTitle className="font-serif text-2xl sm:text-3xl mt-1">NIST SP 800-63B Password Criteria & Cracking Speeds</CardTitle>
+            </div>
+            <span className="font-mono text-xs px-2 py-1 bg-paper border border-rule text-ink-soft">Entropy & Key Stretching</span>
+          </div>
+          <p className="text-ink-soft text-xs sm:text-sm font-sans mt-2">
+            Length over complexity: Evaluates passwords against NIST standards and compares brute-force resistance across fast hashes (GPU) vs memory-hard Argon2id.
+          </p>
+        </CardHeader>
+        <CardContent className="space-y-6">
+          <div>
+            <label className="font-mono text-[10px] uppercase tracking-wider font-bold mb-2 block text-ink">
+              Test Password / Passphrase ({nistInput.length} characters)
+            </label>
+            <input
+              className="w-full p-2.5 border border-ink bg-paper font-mono text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-signal"
+              value={nistInput}
+              onChange={e => setNistInput(e.target.value)}
+            />
+          </div>
+
+          {/* Compliance & Entropy Status */}
+          <div className={`p-3.5 border font-mono text-xs space-y-1 ${
+            nistResult.isCompliant ? "bg-ok/10 border-ok text-ok" : "bg-bad/10 border-bad text-bad"
+          }`}>
+            <div className="font-bold">{nistResult.verdict}</div>
+            {nistResult.legacyRuleWarnings.length > 0 && (
+              <div className="text-amber-800 text-[11px]">{nistResult.legacyRuleWarnings.join(" ")}</div>
+            )}
+          </div>
+
+          {/* Cracking Speeds Comparison Table */}
+          <div className="p-4 border border-rule bg-card space-y-3 font-mono text-xs">
+            <h4 className="font-bold text-ink uppercase tracking-wider border-b border-rule pb-2">
+              Time to Crack Keyspace (2^{nistResult.entropyBits} combinations) on Dedicated Hardware
+            </h4>
+            <div className="space-y-2">
+              {crackingEstimates.map(est => (
+                <div key={est.algorithm} className="flex justify-between items-center p-2 bg-paper border border-rule">
+                  <div>
+                    <strong>{est.algorithm}</strong>
+                    <span className="text-[10px] text-ink-soft block">{est.hashesPerSecondDisplay} ({est.memoryRequirement})</span>
+                  </div>
+                  <div className="text-right">
+                    <span className="font-bold text-signal">{est.timeDisplay}</span>
+                  </div>
+                </div>
+              ))}
             </div>
           </div>
         </CardContent>

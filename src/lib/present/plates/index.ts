@@ -33,6 +33,12 @@ import { md5ShaPresentation } from "./m3/md5Sha"
 import { digitalSignaturesPresentation } from "./m3/digitalSignatures"
 import { pkiCertificatesPresentation } from "./m3/pkiCertificates"
 
+import { softwareVulnerabilitiesPresentation } from "./m4/softwareVulnerabilities"
+import { malwarePresentation } from "./m4/malware"
+import { accessControlPresentation } from "./m4/accessControl"
+import { authMethodsPresentation } from "./m4/authMethods"
+import { passwordSecurityPresentation } from "./m4/passwordSecurity"
+
 const presentations: Record<string, TopicPresentation> = {
   // Module 1
   'm1/principles': principlesPresentation,
@@ -69,7 +75,14 @@ const presentations: Record<string, TopicPresentation> = {
   'm3/hash-functions': hashPropertiesPresentation,
   'm3/md5-sha': md5ShaPresentation,
   'm3/digital-signatures': digitalSignaturesPresentation,
-  'm3/pki-certificates': pkiCertificatesPresentation
+  'm3/pki-certificates': pkiCertificatesPresentation,
+
+  // Module 4
+  'm4/software-vulnerabilities': softwareVulnerabilitiesPresentation,
+  'm4/malware': malwarePresentation,
+  'm4/access-control': accessControlPresentation,
+  'm4/auth-methods': authMethodsPresentation,
+  'm4/password-security': passwordSecurityPresentation
 }
 
 export function getPresentation(moduleId: string, topicId: string): TopicPresentation | undefined {
@@ -130,5 +143,10 @@ export {
   hashPropertiesPresentation,
   md5ShaPresentation,
   digitalSignaturesPresentation,
-  pkiCertificatesPresentation
+  pkiCertificatesPresentation,
+  softwareVulnerabilitiesPresentation,
+  malwarePresentation,
+  accessControlPresentation,
+  authMethodsPresentation,
+  passwordSecurityPresentation
 }

@@ -183,14 +183,14 @@ export const SYLLABUS: ModuleInfo[] = [
     title: 'Protection of Computing Resources and Security Features',
     hours: 8,
     bloomRange: 'L1-L3',
-    status: 'soon',
+    status: 'ready',
     description: 'Secure programming principles, software vulnerabilities, buffer overflow, malware defenses, user authentication, MFA, passwordless, and password attack mitigation.',
     topics: [
-      { id: 'software-vulnerabilities', title: 'Software Vulnerabilities & Buffer Overflow', hours: 2.0, bloom: 'L3', status: 'soon', description: 'Stack frame manipulation, return address overwrite, shellcode, and canaries.', tags: ['attacks'] },
-      { id: 'malware', title: 'Malware & Malicious Code', hours: 1.5, bloom: 'L2', status: 'soon', description: 'Viruses, worms, trojans, rootkits, and signature vs heuristic detection.', tags: ['attacks'] },
-      { id: 'access-control', title: 'Control Mechanisms & Resource Protection', hours: 1.5, bloom: 'L2', status: 'soon', description: 'DAC, MAC, RBAC, least privilege, and separation of duties.', tags: ['auth'] },
-      { id: 'auth-methods', title: 'User Authentication & Multi-Factor Auth', hours: 1.5, bloom: 'L2', status: 'soon', description: 'Knowledge, possession, inheritance factors, TOTP RFC 6238, and FIDO2/WebAuthn.', tags: ['auth'] },
-      { id: 'password-security', title: 'Password Attacks & Selection Criteria', hours: 1.5, bloom: 'L2', status: 'soon', description: 'Brute force, dictionary attacks, rainbow tables, salting, and key stretching.', tags: ['auth'] }
+      { id: 'software-vulnerabilities', title: 'Software Vulnerabilities & Buffer Overflow', hours: 2.0, bloom: 'L3', status: 'ready', description: 'Stack frame manipulation, return address overwrite, shellcode, and canaries.', tags: ['attacks'] },
+      { id: 'malware', title: 'Malware & Malicious Code', hours: 1.5, bloom: 'L2', status: 'ready', description: 'Viruses, worms, trojans, rootkits, and signature vs heuristic detection.', tags: ['attacks'] },
+      { id: 'access-control', title: 'Control Mechanisms & Resource Protection', hours: 1.5, bloom: 'L2', status: 'ready', description: 'DAC, MAC, RBAC, least privilege, and separation of duties.', tags: ['auth'] },
+      { id: 'auth-methods', title: 'User Authentication & Multi-Factor Auth', hours: 1.5, bloom: 'L2', status: 'ready', description: 'Knowledge, possession, inheritance factors, TOTP RFC 6238, and FIDO2/WebAuthn.', tags: ['auth'] },
+      { id: 'password-security', title: 'Password Attacks & Selection Criteria', hours: 1.5, bloom: 'L2', status: 'ready', description: 'Brute force, dictionary attacks, rainbow tables, salting, and key stretching.', tags: ['auth'] }
     ]
   },
   {

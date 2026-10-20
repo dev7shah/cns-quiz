@@ -263,4 +263,65 @@ test.describe('Presenter Mode v2 E2E Tests', () => {
 
     expect(consoleErrors).toEqual([])
   })
+
+  test('Loads /present/m4/software-vulnerabilities and renders StackDiagram with zero console errors', async ({ page }) => {
+    const consoleErrors: string[] = []
+    page.on('console', msg => {
+      if (msg.type() === 'error') consoleErrors.push(msg.text())
+    })
+    page.on('pageerror', err => {
+      consoleErrors.push(err.message)
+    })
+
+    await page.goto('/present/m4/software-vulnerabilities')
+    await page.waitForLoadState('networkidle')
+
+    await expect(page.locator('h1:has-text("Smashing the Stack for Fun and Profit")')).toBeVisible()
+
+    // Navigate to Plate 2 (Stack Frame Anatomy)
+    const nextBtn = page.locator('button:has-text("Next →")')
+    await nextBtn.click()
+    await expect(page.locator('h1:has-text("The Architecture of a Stack Frame")')).toBeVisible()
+
+    expect(consoleErrors).toEqual([])
+  })
+
+  test('Loads /present/m4/access-control and verifies Bell-LaPadula vs Biba comparison', async ({ page }) => {
+    const consoleErrors: string[] = []
+    page.on('console', msg => {
+      if (msg.type() === 'error') consoleErrors.push(msg.text())
+    })
+    page.on('pageerror', err => {
+      consoleErrors.push(err.message)
+    })
+
+    await page.goto('/present/m4/access-control')
+    await page.waitForLoadState('networkidle')
+
+    await expect(page.locator('h1:has-text("The Confused Deputy Problem")')).toBeVisible()
+
+    // Jump to Plate 3 (Comparison)
+    const compThumb = page.locator('aside button:has-text("compare")')
+    await compThumb.click()
+    await expect(page.locator('h1:has-text("Mandatory Access Control (MAC) Models")')).toBeVisible()
+
+    expect(consoleErrors).toEqual([])
+  })
+
+  test('Loads /present/m4/password-security and renders NIST SP 800-63B guidelines', async ({ page }) => {
+    const consoleErrors: string[] = []
+    page.on('console', msg => {
+      if (msg.type() === 'error') consoleErrors.push(msg.text())
+    })
+    page.on('pageerror', err => {
+      consoleErrors.push(err.message)
+    })
+
+    await page.goto('/present/m4/password-security')
+    await page.waitForLoadState('networkidle')
+
+    await expect(page.locator('h1:has-text("The LinkedIn & Adobe Breaches")')).toBeVisible()
+
+    expect(consoleErrors).toEqual([])
+  })
 })
