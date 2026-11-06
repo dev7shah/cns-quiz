@@ -1,5 +1,7 @@
+import React from "react"
 import { notFound } from "next/navigation"
 import dynamic from "next/dynamic"
+import AuthGate from "@/components/layout/AuthGate"
 
 const SyllabusModuleView = dynamic(() => import("@/modules/syllabus/SyllabusModuleView"), {
   loading: () => <p className="p-8 text-center text-ink-soft font-mono">Loading University Syllabus Module...</p>
@@ -82,51 +84,55 @@ export const instant = false
 export default async function ModulePage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params
   
+  let content: React.ReactElement | null = null
+
   switch (slug) {
     // 6 University Syllabus Modules (CSC602)
     case 'classical':
-      return <SyllabusModuleView moduleId="m1" />
+      content = <SyllabusModuleView moduleId="m1" />; break
     case 'block-public-key':
-      return <SyllabusModuleView moduleId="m2" />
+      content = <SyllabusModuleView moduleId="m2" />; break
     case 'hash-signatures':
-      return <SyllabusModuleView moduleId="m3" />
+      content = <SyllabusModuleView moduleId="m3" />; break
     case 'computing-resources':
-      return <SyllabusModuleView moduleId="m4" />
+      content = <SyllabusModuleView moduleId="m4" />; break
     case 'network-security':
-      return <SyllabusModuleView moduleId="m5" />
+      content = <SyllabusModuleView moduleId="m5" />; break
     case 'security-applications':
-      return <SyllabusModuleView moduleId="m6" />
+      content = <SyllabusModuleView moduleId="m6" />; break
 
     // 6 Web Programming Modules (ITC504)
     case 'wp-fundamentals':
     case 'wp-m1':
-      return <WPModuleView moduleId="wp-m1" />
+      content = <WPModuleView moduleId="wp-m1" />; break
     case 'wp-javascript':
     case 'wp-m2':
-      return <WPModuleView moduleId="wp-m2" />
+      content = <WPModuleView moduleId="wp-m2" />; break
     case 'wp-react':
     case 'wp-m3':
-      return <WPModuleView moduleId="wp-m3" />
+      content = <WPModuleView moduleId="wp-m3" />; break
     case 'wp-nodejs':
     case 'wp-m4':
-      return <WPModuleView moduleId="wp-m4" />
+      content = <WPModuleView moduleId="wp-m4" />; break
     case 'wp-php':
     case 'wp-m5':
-      return <WPModuleView moduleId="wp-m5" />
+      content = <WPModuleView moduleId="wp-m5" />; break
     case 'wp-fullstack':
     case 'wp-m6':
-      return <WPModuleView moduleId="wp-m6" />
+      content = <WPModuleView moduleId="wp-m6" />; break
 
     // Legacy Route Fallbacks
-    case 'crypto': return <CryptoModule />
-    case 'auth': return <AuthModule />
-    case 'firewall': return <FirewallModule />
-    case 'cloud': return <CloudModule />
-    case 'attacks': return <AttacksModule />
-    case 'ids': return <IDSModule />
-    case 'tls': return <TLSModule />
-    case 'ai': return <AIModule />
+    case 'crypto': content = <CryptoModule />; break
+    case 'auth': content = <AuthModule />; break
+    case 'firewall': content = <FirewallModule />; break
+    case 'cloud': content = <CloudModule />; break
+    case 'attacks': content = <AttacksModule />; break
+    case 'ids': content = <IDSModule />; break
+    case 'tls': content = <TLSModule />; break
+    case 'ai': content = <AIModule />; break
     default:
       notFound()
   }
+
+  return <AuthGate>{content}</AuthGate>
 }

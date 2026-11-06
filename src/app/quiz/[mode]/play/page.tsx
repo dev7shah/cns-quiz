@@ -3,6 +3,7 @@ import { QuizModeId } from "@/lib/quiz/v2/types"
 import { allQuestions, getQuestionsByModule } from "@/lib/quiz/v2/questions"
 import { QuizPlayer } from "@/components/quiz/v2/QuizPlayer"
 import WPQuiz from "@/modules/wp/WPQuiz"
+import AuthGate from "@/components/layout/AuthGate"
 
 export function generateStaticParams() {
   return [
@@ -67,9 +68,11 @@ export default async function QuizPlayPage({
   // If Web Programming module or full syllabus quiz
   if (normalized.startsWith('wp-')) {
     return (
-      <div className="min-h-screen bg-paper py-8 px-4">
-        <WPQuiz moduleId={normalized as any} />
-      </div>
+      <AuthGate>
+        <div className="min-h-screen bg-paper py-8 px-4">
+          <WPQuiz moduleId={normalized as any} />
+        </div>
+      </AuthGate>
     )
   }
 
@@ -87,10 +90,12 @@ export default async function QuizPlayPage({
   }
 
   return (
-    <QuizPlayer
-      mode={normalized as QuizModeId}
-      questions={filteredQuestions}
-      initialModule={initialModule}
-    />
+    <AuthGate>
+      <QuizPlayer
+        mode={normalized as QuizModeId}
+        questions={filteredQuestions}
+        initialModule={initialModule}
+      />
+    </AuthGate>
   )
 }

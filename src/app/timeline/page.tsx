@@ -21,6 +21,28 @@ export default function AcademicTimelinePage() {
     )
   }
 
+  if (!isAuthenticated) {
+    return (
+      <div className="min-h-[75vh] flex items-center justify-center p-6 bg-paper">
+        <div className="max-w-sm w-full border border-rule bg-card p-8 text-center space-y-5">
+          <ShieldCheck className="w-10 h-10 text-ink-soft mx-auto" />
+          <div>
+            <p className="font-serif text-xl font-bold text-ink mb-1">Login Required</p>
+            <p className="font-sans text-sm text-ink-soft">
+              The Academic Timeline is only accessible to authenticated TCET students and faculty.
+            </p>
+          </div>
+          <Link
+            href="/login"
+            className="block w-full py-2.5 bg-ink text-paper font-mono text-xs uppercase font-bold tracking-widest hover:bg-signal transition-colors"
+          >
+            Student Login →
+          </Link>
+        </div>
+      </div>
+    )
+  }
+
   const isTeacher = isAuthenticated && role === "teacher"
   const isStudent = isAuthenticated && role === "student"
 

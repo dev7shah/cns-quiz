@@ -171,7 +171,7 @@ const WP_MODULE_QUIZZES: ModuleQuizItem[] = [
 export default function ModuleQuizHub() {
   const router = useRouter()
   const mounted = useMounted()
-  const { student, role } = useAuthStore()
+  const { student, role, isAuthenticated } = useAuthStore()
 
   // The two core formats: 'module-wise' and 'full-syllabus'
   const [quizType, setQuizType] = useState<'module-wise' | 'full-syllabus'>('module-wise')
@@ -179,6 +179,44 @@ export default function ModuleQuizHub() {
 
   const isStudent = mounted && role === "student" && student
   const activeQuizzes = subject === 'CSC602' ? CNS_MODULE_QUIZZES : WP_MODULE_QUIZZES
+
+  if (!mounted) {
+    return (
+      <div className="min-h-[70vh] flex items-center justify-center bg-paper">
+        <span className="font-mono text-sm text-ink-soft animate-pulse">Loading quizzes…</span>
+      </div>
+    )
+  }
+
+  if (!isAuthenticated) {
+    return (
+      <div className="min-h-[75vh] flex items-center justify-center p-6 bg-paper">
+        <div className="max-w-sm w-full border border-rule bg-card p-8 text-center space-y-5">
+          <Award className="w-10 h-10 text-ink-soft mx-auto" />
+          <div>
+            <p className="font-serif text-xl font-bold text-ink mb-1">Login Required</p>
+            <p className="font-sans text-sm text-ink-soft">
+              Quizzes &amp; Assessments are only available to authenticated TCET students and faculty.
+            </p>
+          </div>
+          <div className="flex flex-col gap-2">
+            <Link
+              href="/login"
+              className="block w-full py-2.5 bg-ink text-paper font-mono text-xs uppercase font-bold tracking-widest hover:bg-signal transition-colors"
+            >
+              Student Login →
+            </Link>
+            <Link
+              href="/teacher"
+              className="block w-full py-2 border border-rule bg-paper text-ink font-mono text-xs uppercase tracking-widest hover:bg-card transition-colors"
+            >
+              Faculty Portal
+            </Link>
+          </div>
+        </div>
+      </div>
+    )
+  }
 
   return (
     <div className="min-h-screen bg-paper py-8 px-4 sm:px-6">

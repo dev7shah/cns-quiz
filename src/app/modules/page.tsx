@@ -19,8 +19,11 @@ import {
   Sparkles,
   ShieldAlert,
   Flame,
-  BookOpen
+  BookOpen,
+  ShieldCheck
 } from "lucide-react"
+import { useAuthStore } from "@/lib/authStore"
+import { useMounted } from "@/hooks/useMounted"
 
 interface ModuleCardItem {
   id: string
@@ -184,7 +187,47 @@ const DEEP_DIVE_TOPICS = [
 ]
 
 export default function ModulesDirectoryPage() {
+  const mounted = useMounted()
+  const { isAuthenticated } = useAuthStore()
   const [selectedSubject, setSelectedSubject] = useState<'CSC602' | 'ITC504'>('CSC602')
+
+  if (!mounted) {
+    return (
+      <div className="min-h-[70vh] flex items-center justify-center bg-paper">
+        <span className="font-mono text-sm text-ink-soft animate-pulse">Loading modules…</span>
+      </div>
+    )
+  }
+
+  if (!isAuthenticated) {
+    return (
+      <div className="min-h-[75vh] flex items-center justify-center p-6 bg-paper">
+        <div className="max-w-sm w-full border border-rule bg-card p-8 text-center space-y-5">
+          <ShieldCheck className="w-10 h-10 text-ink-soft mx-auto" />
+          <div>
+            <p className="font-serif text-xl font-bold text-ink mb-1">Login Required</p>
+            <p className="font-sans text-sm text-ink-soft">
+              Modules &amp; Theory are only available to authenticated TCET students and faculty.
+            </p>
+          </div>
+          <div className="flex flex-col gap-2">
+            <Link
+              href="/login"
+              className="block w-full py-2.5 bg-ink text-paper font-mono text-xs uppercase font-bold tracking-widest hover:bg-signal transition-colors"
+            >
+              Student Login →
+            </Link>
+            <Link
+              href="/teacher"
+              className="block w-full py-2 border border-rule bg-paper text-ink font-mono text-xs uppercase tracking-widest hover:bg-card transition-colors"
+            >
+              Faculty Portal
+            </Link>
+          </div>
+        </div>
+      </div>
+    )
+  }
 
   const activeModules = selectedSubject === 'CSC602' ? CNS_MODULES : WP_MODULES
 

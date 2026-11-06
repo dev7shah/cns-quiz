@@ -25,12 +25,7 @@ const teacherNavLinks = [
 ]
 
 const publicNavLinks = [
-  { href: "/", label: "Campus LMS" },
-  { href: "/modules", label: "Modules & Theory" },
-  { href: "/quiz", label: "Quizzes" },
-  { href: "/timeline", label: "Timeline" },
-  { href: "/revision", label: "Revision Hub" },
-  { href: "/login", label: "Student Login" },
+  { href: "/", label: "TCET LMS" },
 ]
 
 const modulesList = [
