@@ -3,6 +3,7 @@ import { getPresentation } from "@/lib/present/plates"
 import { PresenterModeV2 } from "@/components/present/PresenterModeV2"
 import { SYLLABUS } from "@/lib/syllabus"
 import { WP_SYLLABUS } from "@/lib/syllabus/wpSyllabus"
+import { TOA_SYLLABUS } from "@/lib/syllabus/toaSyllabus"
 
 export function generateStaticParams() {
   const params: Array<{ module: string; topic: string }> = []
@@ -17,6 +18,14 @@ export function generateStaticParams() {
 
   // Web Programming (ITC504) Modules
   WP_SYLLABUS.forEach(mod => {
+    mod.topics.forEach(t => {
+      params.push({ module: mod.code.toLowerCase(), topic: t.id })
+      params.push({ module: mod.id.toLowerCase(), topic: t.id })
+    })
+  })
+
+  // Theory of Automata (TOA) Modules
+  TOA_SYLLABUS.forEach(mod => {
     mod.topics.forEach(t => {
       params.push({ module: mod.code.toLowerCase(), topic: t.id })
       params.push({ module: mod.id.toLowerCase(), topic: t.id })

@@ -413,3 +413,13 @@ export const TOA_SYLLABUS: TOAModuleInfo[] = [
     ],
   },
 ]
+
+
+export function getTOAModule(idOrSlug: string): TOAModuleInfo | undefined {
+  return TOA_SYLLABUS.find(m =>
+    m.id === idOrSlug ||
+    m.slug === idOrSlug ||
+    m.code.toLowerCase() === idOrSlug.toLowerCase() ||
+    m.code.toLowerCase().replace('-', '') === idOrSlug.toLowerCase()
+  )
+}

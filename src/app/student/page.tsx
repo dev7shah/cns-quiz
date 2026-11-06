@@ -1054,6 +1054,31 @@ export default function StudentPortalPage() {
                           <div className="pt-2 border-t border-rule">
                             <span className="font-mono text-[10px] text-ink-soft">{mod.bloom}</span>
                           </div>
+
+                          <div className="pt-4 border-t border-rule flex flex-wrap items-center justify-between gap-2 font-mono text-xs uppercase">
+                            <Link
+                              href={`/modules/${mod.id}`}
+                              className="px-3.5 py-2 bg-ink hover:bg-signal text-paper font-bold transition-colors flex items-center gap-1 shadow-xs"
+                            >
+                              <span>Open Theory</span>
+                              <ArrowRight className="h-3 w-3" />
+                            </Link>
+
+                            <Link
+                              href={`/present/${mod.code.toLowerCase()}/${mod.primaryTopic}`}
+                              className="px-2.5 py-2 border border-rule hover:border-ink bg-paper text-ink transition-colors flex items-center gap-1 text-[11px]"
+                            >
+                              <Presentation className="h-3 w-3 text-signal" />
+                              <span>[P] Slides</span>
+                            </Link>
+
+                            <Link
+                              href={`/quiz/${mod.code.toLowerCase()}/play`}
+                              className="px-2.5 py-2 border border-rule hover:border-signal bg-paper text-signal transition-colors text-[11px] font-bold"
+                            >
+                              Quiz →
+                            </Link>
+                          </div>
                         </div>
                       )
                     })}
@@ -1096,6 +1121,17 @@ export default function StudentPortalPage() {
                                 <span>{t}</span>
                               </div>
                             ))}
+                          </div>
+
+                          <div className="pt-4 border-t border-rule flex items-center justify-between font-mono text-xs uppercase">
+                            <Link
+                              href={`/modules/${selectedSubject.toLowerCase()}-${unit.code.toLowerCase()}`}
+                              className="px-3.5 py-2 bg-ink hover:bg-signal text-paper font-bold transition-colors flex items-center gap-1 shadow-xs"
+                            >
+                              <span>Open Theory</span>
+                              <ArrowRight className="h-3 w-3" />
+                            </Link>
+                            <span className="text-[10px] text-ink-soft">45 Hrs Syllabus</span>
                           </div>
                         </div>
                       ))}
