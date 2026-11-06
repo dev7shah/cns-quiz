@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation"
 import { useAuthStore } from "@/lib/authStore"
 import { useQuizRecordsStore } from "@/lib/quizRecordsStore"
 import { useAcademicStore, ACADEMIC_SUBJECTS, SubjectItem, OTHER_SUBJECTS_DETAILS } from "@/lib/academicStore"
+import { TOA_SYLLABUS } from "@/lib/syllabus/toaSyllabus"
 import { useMounted } from "@/hooks/useMounted"
 import { AcademicTimelineView } from "@/components/academic/AcademicTimelineView"
 import { StudentMarksView } from "@/components/academic/StudentMarksView"
@@ -174,6 +175,19 @@ const wpCourseModules = [
     keyTopics: ["3-Tier Separation", "CORS Preflight", "Stateless JWT", "Git Branching", "OWASP Top 10"],
   },
 ]
+
+// Syllabus Modules for TOA (Theory of Automata) - derived from TOA_SYLLABUS
+const toaCourseModules = TOA_SYLLABUS.map((m) => ({
+  id: m.slug,
+  code: m.code,
+  title: m.title,
+  hours: `${m.hours} hrs`,
+  bloom: `Bloom ${m.bloomRange}`,
+  icon: BookOpen,
+  desc: m.description.length > 200 ? m.description.slice(0, 197) + "..." : m.description,
+  primaryTopic: m.topics[0]?.id ?? "",
+  keyTopics: m.topics.slice(0, 5).map((t) => t.title.split(":")[0].trim()),
+}))
 
 export default function StudentPortalPage() {
   const router = useRouter()
@@ -344,7 +358,7 @@ export default function StudentPortalPage() {
               <div>
                 <div className="flex items-center gap-2 mb-1">
                   <span className="px-2 py-0.5 bg-ok text-paper font-mono text-[10px] font-bold uppercase tracking-wider">
-                    Enrolled Courses · 6 Subjects
+                    Enrolled Courses · {ACADEMIC_SUBJECTS.length} Subjects
                   </span>
                   <span className="font-mono text-xs text-ink-soft">
                     Thakur College of Engineering &amp; Technology · Autonomous
@@ -367,7 +381,8 @@ export default function StudentPortalPage() {
                 const subMark = myMarks.find((m) => m.subjectCode === sub.code)
                 const isCNS = sub.code === "CSC602"
                 const isWP = sub.code === "ITC504"
-                const isInteractive = isCNS || isWP
+                const isTOA = sub.code === "TOA"
+                const isInteractive = isCNS || isWP || isTOA
 
                 return (
                   <div
@@ -383,8 +398,8 @@ export default function StudentPortalPage() {
                     <div className="space-y-4">
                       {/* Top Badges */}
                       <div className="flex items-center justify-between">
-                        <span className="px-2 py-0.5 bg-ink text-paper font-mono text-xs font-bold">
-                          {sub.code}
+                        <span className="px-2 py-0.5 bg-paper border border-rule font-mono text-[10px] text-ink-soft font-bold">
+                          {sub.semester}
                         </span>
                         <div className="flex items-center gap-1 font-mono text-[10px]">
                           <span className="px-1.5 py-0.5 bg-paper border border-rule text-ink-soft">
@@ -392,7 +407,7 @@ export default function StudentPortalPage() {
                           </span>
                           {isInteractive && (
                             <span className="px-1.5 py-0.5 bg-signal/10 border border-signal/30 text-signal font-bold uppercase">
-                              Active Curriculum
+                              Active
                             </span>
                           )}
                         </div>
@@ -436,6 +451,19 @@ export default function StudentPortalPage() {
                             </div>
                             <div className="flex items-center gap-1.5 text-ink-soft">
                               <span>■</span> Module Quizzes &amp; 30Q Exam
+                            </div>
+                          </>
+                        )}
+                        {isTOA && (
+                          <>
+                            <div className="flex items-center gap-1.5 text-signal font-semibold">
+                              <span>■</span> 6 Automata Modules (M1–M6) · 45 Hours
+                            </div>
+                            <div className="flex items-center gap-1.5 text-ink-soft">
+                              <span>■</span> State Machine Diagrams & Theory
+                            </div>
+                            <div className="flex items-center gap-1.5 text-ink-soft">
+                              <span>■</span> JFLAP-compatible Module Coverage
                             </div>
                           </>
                         )}
@@ -736,7 +764,7 @@ export default function StudentPortalPage() {
                         : "bg-paper text-ink border-rule hover:border-ink"
                     }`}
                   >
-                    {sub.code}
+                    {sub.name.split(" ")[0]}
                   </button>
                 ))}
               </div>
@@ -748,7 +776,7 @@ export default function StudentPortalPage() {
                 <div>
                   <div className="flex items-center gap-2 mb-1">
                     <span className="px-2.5 py-0.5 bg-signal text-paper font-mono text-[10px] font-bold uppercase tracking-wider">
-                      Course Code: {activeSubjectInfo.code}
+                      {activeSubjectInfo.semester}
                     </span>
                     <span className="font-mono text-xs text-ink-soft">
                       {activeSubjectInfo.department} · {activeSubjectInfo.semester}
@@ -835,10 +863,12 @@ export default function StudentPortalPage() {
                 <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 border-b border-rule pb-3">
                   <h3 className="font-serif text-2xl font-bold text-ink">
                     {selectedSubject === "CSC602"
-                      ? "CNS Syllabus Modules (CSC602 · M1 to M6)"
+                      ? "CNS Syllabus Modules (M1 to M6)"
                       : selectedSubject === "ITC504"
-                      ? "Web Programming Syllabus Modules (ITC504 · WP-M1 to WP-M6)"
-                      : `${activeSubjectInfo.name} Syllabus Units (${activeSubjectInfo.code})`}
+                      ? "Web Programming Syllabus Modules (WP-M1 to WP-M6)"
+                      : selectedSubject === "TOA"
+                      ? "Theory of Automata Syllabus Modules (M1 to M6)"
+                      : `${activeSubjectInfo.name} Syllabus Units`}
                   </h3>
                   <span className="font-mono text-xs text-ink-soft">
                     Access step-by-step interactive theory, classroom slides, and module quizzes
@@ -989,8 +1019,49 @@ export default function StudentPortalPage() {
                   </div>
                 )}
 
-                {/* Other 4 Subjects Syllabus Units */}
-                {selectedSubject !== "CSC602" && selectedSubject !== "ITC504" && OTHER_SUBJECTS_DETAILS[selectedSubject] && (
+                {/* TOA Modules */}
+                {selectedSubject === "TOA" && (
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    {toaCourseModules.map((mod) => {
+                      const Icon = mod.icon
+                      return (
+                        <div
+                          key={mod.id}
+                          className="p-6 border border-rule bg-card hover:border-ink transition-all space-y-4 group"
+                        >
+                          <div className="flex items-start justify-between">
+                            <span className="px-2 py-0.5 bg-paper border border-rule font-mono text-[10px] text-ink-soft font-bold">
+                              {mod.code}
+                            </span>
+                            <span className="font-mono text-[10px] text-ink-soft">{mod.hours}</span>
+                          </div>
+                          <div>
+                            <h4 className="font-serif text-lg font-bold text-ink leading-snug group-hover:text-signal transition-colors">
+                              {mod.title}
+                            </h4>
+                            <p className="font-sans text-xs text-ink-soft leading-relaxed mt-2">
+                              {mod.desc}
+                            </p>
+                          </div>
+                          <div className="pt-2 border-t border-rule space-y-1 font-mono text-[11px] text-ink">
+                            {mod.keyTopics.map((t) => (
+                              <div key={t} className="flex items-center gap-1.5">
+                                <span className="text-signal">■</span>
+                                <span>{t}</span>
+                              </div>
+                            ))}
+                          </div>
+                          <div className="pt-2 border-t border-rule">
+                            <span className="font-mono text-[10px] text-ink-soft">{mod.bloom}</span>
+                          </div>
+                        </div>
+                      )
+                    })}
+                  </div>
+                )}
+
+                {/* Other Subjects Syllabus Units */}
+                {selectedSubject !== "CSC602" && selectedSubject !== "ITC504" && selectedSubject !== "TOA" && OTHER_SUBJECTS_DETAILS[selectedSubject] && (
                   <div className="space-y-6">
                     <div className="p-4 bg-paper border border-rule">
                       <p className="font-sans text-xs text-ink-soft leading-relaxed">
@@ -1041,7 +1112,7 @@ export default function StudentPortalPage() {
               <div className="space-y-6">
                 <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 border-b border-rule pb-3">
                   <h3 className="font-serif text-2xl font-bold text-ink">
-                    Quizzes &amp; Mock Exams · {activeSubjectInfo.name} ({activeSubjectInfo.code})
+                    Quizzes &amp; Mock Exams · {activeSubjectInfo.name}
                   </h3>
                   <span className="font-mono text-xs text-ink-soft">
                     Module-wise practice tests &amp; full syllabus examination
@@ -1156,8 +1227,51 @@ export default function StudentPortalPage() {
                   </div>
                 )}
 
+                {/* TOA Quizzes */}
+                {selectedSubject === "TOA" && (
+                  <div className="space-y-6">
+                    <div className="p-6 bg-card border-2 border-ink shadow-[4px_4px_0_var(--ink)] flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+                      <div className="space-y-1">
+                        <div className="flex items-center gap-2">
+                          <span className="px-2 py-0.5 bg-signal text-paper font-mono text-xs font-bold uppercase">
+                            Full Syllabus Mock
+                          </span>
+                          <span className="font-mono text-xs text-ink-soft">
+                            University Pattern · 45 Questions · 45 Min
+                          </span>
+                        </div>
+                        <h4 className="font-serif text-2xl font-bold text-ink">
+                          Comprehensive Theory of Automata Examination
+                        </h4>
+                        <p className="font-sans text-xs text-ink-soft max-w-xl">
+                          Covers all 6 modules: FA & RE, Pumping Lemma, CFG/CFL, PDA, and Turing Machines.
+                        </p>
+                      </div>
+                      <span className="px-6 py-3.5 bg-rule text-ink font-mono text-xs uppercase font-bold tracking-wider shrink-0 shadow-[2px_2px_0_var(--ink)] cursor-not-allowed opacity-70">
+                        Coming Soon
+                      </span>
+                    </div>
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                      {toaCourseModules.map((mod) => (
+                        <div key={mod.id} className="p-5 border border-rule bg-card hover:border-ink transition-colors flex flex-col justify-between">
+                          <div>
+                            <div className="flex justify-between items-center mb-2 font-mono text-xs">
+                              <span className="px-1.5 py-0.5 bg-paper border border-ink text-signal font-bold">{mod.code}</span>
+                              <span className="text-ink-soft">{mod.bloom}</span>
+                            </div>
+                            <h5 className="font-serif text-base font-bold text-ink mb-1">{mod.title}</h5>
+                          </div>
+                          <span className="w-full py-2 mt-2 bg-rule text-ink font-mono text-xs uppercase font-bold text-center block cursor-not-allowed opacity-70">
+                            Quiz Coming Soon
+                          </span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
                 {/* Other Subjects Quizzes */}
-                {selectedSubject !== "CSC602" && selectedSubject !== "ITC504" && (
+                {selectedSubject !== "CSC602" && selectedSubject !== "ITC504" && selectedSubject !== "TOA" && (
                   <div className="p-8 bg-card border border-rule text-center space-y-3 font-mono">
                     <Award className="h-8 w-8 text-signal mx-auto" />
                     <h4 className="font-serif text-xl font-bold text-ink">Question Bank &amp; Practice Sets</h4>

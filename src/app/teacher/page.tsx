@@ -11,6 +11,7 @@ import {
 } from "@/lib/quizRecordsStore"
 import { SYLLABUS } from "@/lib/syllabus"
 import { WP_SYLLABUS } from "@/lib/syllabus/wpSyllabus"
+import { TOA_SYLLABUS } from "@/lib/syllabus/toaSyllabus"
 import {
   useAcademicStore,
   ACADEMIC_SUBJECTS,
@@ -77,6 +78,25 @@ const getSubjectModules = (subjectCode: string): SubjectModule[] => {
 
   if (subjectCode === "ITC504") {
     return WP_SYLLABUS.map((m) => ({
+      id: m.id,
+      code: m.code,
+      title: m.title,
+      hours: m.hours,
+      bloom: m.bloomRange,
+      description: m.description,
+      topics: m.topics.map((t, idx) => ({
+        id: t.id,
+        topicNum: idx + 1,
+        title: t.title,
+        hours: t.hours,
+        bloom: t.bloom,
+        description: t.description,
+      })),
+    }))
+  }
+
+  if (subjectCode === "TOA") {
+    return TOA_SYLLABUS.map((m) => ({
       id: m.id,
       code: m.code,
       title: m.title,
@@ -360,7 +380,7 @@ export default function TeacherPortalPage() {
             <div>
               <div className="flex items-center gap-2 mb-1">
                 <span className="px-2 py-0.5 bg-ok text-paper font-mono text-[10px] font-bold uppercase tracking-wider">
-                  Course Instruction · 6 Subjects
+                  Course Instruction · {ACADEMIC_SUBJECTS.length} Subjects
                 </span>
                 <span className="font-mono text-xs text-ink-soft">
                   Thakur College of Engineering &amp; Technology · Autonomous
@@ -397,8 +417,8 @@ export default function TeacherPortalPage() {
                   <div className="space-y-4">
                     {/* Top Badges */}
                     <div className="flex items-center justify-between">
-                      <span className="px-2.5 py-1 bg-ink text-paper font-mono text-xs font-bold">
-                        {sub.code}
+                      <span className="px-2.5 py-0.5 bg-paper border border-rule font-mono text-[10px] text-ink-soft font-bold">
+                        {sub.semester}
                       </span>
                       <div className="flex items-center gap-1.5 font-mono text-[10px]">
                         <span className="px-1.5 py-0.5 bg-paper border border-rule text-ink-soft">
@@ -498,7 +518,7 @@ export default function TeacherPortalPage() {
                       : "bg-paper text-ink border-rule hover:border-ink"
                   }`}
                 >
-                  {sub.code}
+                  {sub.name.split(" ")[0]}
                 </button>
               ))}
             </div>

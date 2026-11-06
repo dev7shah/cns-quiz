@@ -101,7 +101,8 @@ describe("Academic Timeline, Portion Progress & Multi-Subject Marks Store", () =
     const store = useAcademicStore.getState()
     const itStudentMarks = store.getStudentMarksByRoll("21BIT015")
 
-    expect(itStudentMarks.length).toBe(6)
+    // Now 7 subjects with TOA added
+    expect(itStudentMarks.length).toBe(7)
     const subjects = itStudentMarks.map(m => m.subjectCode)
     expect(subjects).toContain("CSC602") // CNS
     expect(subjects).toContain("ITC504") // Web Programming
@@ -109,6 +110,7 @@ describe("Academic Timeline, Portion Progress & Multi-Subject Marks Store", () =
     expect(subjects).toContain("CSC404") // OS
     expect(subjects).toContain("ITC602") // CN
     expect(subjects).toContain("ITC603") // SE
+    expect(subjects).toContain("TOA")    // Theory of Automata
 
     itStudentMarks.forEach(record => {
       expect(record.studentName).toBe("Aarav Patel")

@@ -111,6 +111,14 @@ export const ACADEMIC_SUBJECTS: SubjectItem[] = [
     inCharge: "Prof. V. K. Singh",
     department: "Information Technology (INFT)",
   },
+  {
+    code: "TOA",
+    name: "Theory of Automata",
+    semester: "Semester IV",
+    credits: 4,
+    inCharge: "Prof. R. K. Verma",
+    department: "Information Technology (INFT)",
+  },
 ]
 
 export const OTHER_SUBJECTS_DETAILS: Record<string, {
@@ -164,6 +172,18 @@ export const OTHER_SUBJECTS_DETAILS: Record<string, {
       { code: "M4", title: "Software Testing & QA", desc: "Black-box testing (Equivalence Partitioning, BVA), White-box testing (Basis Path, Cyclomatic Complexity), unit & integration.", topics: ["Equivalence Partitioning", "Cyclomatic Complexity", "Basis Path Testing", "Unit vs Integration"] },
       { code: "M5", title: "Project Estimation & Risk", desc: "COCOMO I & II cost estimation, Function Point analysis, risk management matrix, and Gantt charts.", topics: ["COCOMO Estimation", "Function Points", "Risk Matrix", "Critical Path Method"] },
       { code: "M6", title: "DevOps & Quality Standards", desc: "Git workflows, CI/CD automated test pipelines, CMMI maturity levels, and ISO 9001 software quality benchmarks.", topics: ["Git Branching Flow", "CI/CD Pipelines", "CMMI Levels 1-5", "Software Maintenance"] }
+    ]
+  },
+  TOA: {
+    syllabusHours: 45,
+    description: "Formal language theory, automata classes, regular expressions, context-free grammars, pushdown automata, Turing machines, and undecidability.",
+    units: [
+      { code: "M1", title: "Introduction to Automata Theory", desc: "Alphabets, strings, languages, Chomsky hierarchy, DFA/NFA definitions, state transition diagrams, Moore & Mealy machines, JFLAP introduction.", topics: ["Chomsky Hierarchy", "DFA & NFA Definitions", "Moore & Mealy Machines", "JFLAP Basics"] },
+      { code: "M2", title: "Finite Automata & Regular Expressions", desc: "ε-NFA to DFA conversion, DFA minimization, Regular expressions, RE↔FA conversions, decision properties of regular languages.", topics: ["ε-NFA to DFA (Subset Construction)", "DFA Minimization", "RE to NFA (Thompson)", "FA to RE (Arden's Lemma)"] },
+      { code: "M3", title: "Regular Languages & Pumping Lemma", desc: "Proving non-regularity via Pumping Lemma, closure under Boolean operations, reversal, homomorphism, Myhill-Nerode Theorem.", topics: ["Pumping Lemma for RL", "Closure Properties", "Homomorphism", "Myhill-Nerode Theorem"] },
+      { code: "M4", title: "Context-Free Grammars & CFLs", desc: "CFG formal definition, parse trees, ambiguity, CNF, GNF, Pumping Lemma for CFLs, CFL closure properties, Linear Bounded Automata.", topics: ["Parse Trees & Ambiguity", "CNF & GNF Conversion", "Pumping Lemma for CFL", "LBA & CSG"] },
+      { code: "M5", title: "Pushdown Automata & CFL", desc: "PDA formal definition, IDs, DPDA vs NPDA, CFG↔PDA equivalence, PDA design problems, syntax analysis applications.", topics: ["PDA 7-Tuple Definition", "DPDA vs NPDA", "CFG to PDA Conversion", "PDA Design Problems"] },
+      { code: "M6", title: "Turing Machines & Recursively Enumerable Languages", desc: "TM formal definition, TM variants (NDTM, Multitape, UTM), TM as computer, Halting Problem, Quantum automata, AI/ML applications.", topics: ["TM Formal Definition", "TM Variants & UTM", "The Halting Problem", "Quantum Automata"] }
     ]
   }
 }
@@ -288,6 +308,67 @@ export const INITIAL_MODULE_PROGRESS: Record<string, ModulePortionProgress> = {
     unlockedUpTo: 3,
     lastUpdatedDate: '2026-02-12',
     updatedBy: 'Prof. V. K. Singh',
+  },
+  // Theory of Automata (TOA) module progress
+  'toa-m1': {
+    moduleId: 'toa-m1',
+    code: 'M1',
+    title: 'Introduction to Automata Theory',
+    totalTopics: 6,
+    completedUpTo: 2,
+    unlockedUpTo: 6,
+    lastUpdatedDate: '2026-02-18',
+    updatedBy: 'Prof. R. K. Verma',
+  },
+  'toa-m2': {
+    moduleId: 'toa-m2',
+    code: 'M2',
+    title: 'Finite Automata & Regular Expressions',
+    totalTopics: 7,
+    completedUpTo: 1,
+    unlockedUpTo: 7,
+    lastUpdatedDate: '2026-02-18',
+    updatedBy: 'Prof. R. K. Verma',
+  },
+  'toa-m3': {
+    moduleId: 'toa-m3',
+    code: 'M3',
+    title: 'Regular Languages & Pumping Lemma',
+    totalTopics: 4,
+    completedUpTo: 0,
+    unlockedUpTo: 4,
+    lastUpdatedDate: '2026-02-10',
+    updatedBy: 'Prof. R. K. Verma',
+  },
+  'toa-m4': {
+    moduleId: 'toa-m4',
+    code: 'M4',
+    title: 'Context-Free Grammars & Context-Free Languages',
+    totalTopics: 7,
+    completedUpTo: 0,
+    unlockedUpTo: 7,
+    lastUpdatedDate: '2026-02-10',
+    updatedBy: 'Prof. R. K. Verma',
+  },
+  'toa-m5': {
+    moduleId: 'toa-m5',
+    code: 'M5',
+    title: 'Pushdown Automata & Context-Free Language',
+    totalTopics: 5,
+    completedUpTo: 0,
+    unlockedUpTo: 5,
+    lastUpdatedDate: '2026-02-10',
+    updatedBy: 'Prof. R. K. Verma',
+  },
+  'toa-m6': {
+    moduleId: 'toa-m6',
+    code: 'M6',
+    title: 'Turing Machines & Recursively Enumerable Languages',
+    totalTopics: 6,
+    completedUpTo: 0,
+    unlockedUpTo: 6,
+    lastUpdatedDate: '2026-02-10',
+    updatedBy: 'Prof. R. K. Verma',
   },
 }
 
@@ -531,6 +612,17 @@ export const INITIAL_STUDENT_MARKS: StudentSubjectMarks[] = [
     { ise1: 19, fa1: 24, ise2: 18, ise3: 19, fa2: 24, termWork: 24 },
     "Proficient in React component state, asynchronous Fetch flows, and Express REST APIs."
   ),
+  buildStudentMarks(
+    "21BIT015",
+    "Aarav Patel",
+    "Information Technology (INFT)",
+    "Batch IT-B",
+    "TOA",
+    "Theory of Automata",
+    "Prof. R. K. Verma",
+    { ise1: 17, fa1: 22, ise2: 16, ise3: 18, fa2: 22, termWork: 22 },
+    "Good understanding of DFA/NFA conversions and regular expression design."
+  ),
 
   // IT Student: Priya Sharma (21BIT028)
   buildStudentMarks(
@@ -593,6 +685,17 @@ export const INITIAL_STUDENT_MARKS: StudentSubjectMarks[] = [
     "Prof. V. K. Singh",
     { ise1: 20, fa1: 25, ise2: 19, ise3: 20, fa2: 25, termWork: 25 },
     "Distinction grade in modern JavaScript ES6+, Flexbox/Grid design, and full-stack integration."
+  ),
+  buildStudentMarks(
+    "21BIT028",
+    "Priya Sharma",
+    "Information Technology (INFT)",
+    "Batch IT-A",
+    "TOA",
+    "Theory of Automata",
+    "Prof. R. K. Verma",
+    { ise1: 20, fa1: 25, ise2: 19, ise3: 20, fa2: 24, termWork: 25 },
+    "Excellent Pumping Lemma proofs and CFG-to-PDA conversion exercises."
   ),
 
   // CMPN Student: Dev Shah (21BCP042)
@@ -658,6 +761,17 @@ export const INITIAL_STUDENT_MARKS: StudentSubjectMarks[] = [
     { ise1: 20, fa1: 25, ise2: 20, ise3: 20, fa2: 25, termWork: 25 },
     "Outstanding mastery of React Hooks, Next.js App Router, and full-stack API architectures."
   ),
+  buildStudentMarks(
+    "21BCP042",
+    "Dev Shah",
+    "Computer Engineering (CMPN)",
+    "Batch A1",
+    "TOA",
+    "Theory of Automata",
+    "Prof. R. K. Verma",
+    { ise1: 20, fa1: 25, ise2: 20, ise3: 20, fa2: 25, termWork: 25 },
+    "Perfect scores in Turing Machine design and Pumping Lemma proofs."
+  ),
 
   // IT Student: Rohan Mehta (21BIT044)
   buildStudentMarks(
@@ -709,6 +823,27 @@ export const INITIAL_STUDENT_MARKS: StudentSubjectMarks[] = [
     "Software Engineering & Agile Methodologies",
     "Prof. V. K. Singh",
     { ise1: 17, fa1: 22, ise2: 16, ise3: 18, fa2: 22, termWork: 23 }
+  ),
+  buildStudentMarks(
+    "21BIT044",
+    "Rohan Mehta",
+    "Information Technology (INFT)",
+    "Batch IT-B",
+    "ITC504",
+    "Web Programming & Full-Stack Applications",
+    "Prof. V. K. Singh",
+    { ise1: 14, fa1: 19, ise2: 15, ise3: 15, fa2: 20, termWork: 20 }
+  ),
+  buildStudentMarks(
+    "21BIT044",
+    "Rohan Mehta",
+    "Information Technology (INFT)",
+    "Batch IT-B",
+    "TOA",
+    "Theory of Automata",
+    "Prof. R. K. Verma",
+    { ise1: 13, fa1: 18, ise2: 14, ise3: 15, fa2: 19, termWork: 19 },
+    "Needs improvement in NFA-to-DFA conversion. Pumping Lemma applications need revisiting."
   ),
 ]
 

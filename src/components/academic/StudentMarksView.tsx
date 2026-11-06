@@ -415,7 +415,7 @@ export function StudentMarksView({ isFaculty = false, currentStudentRoll, filter
           <label className="block font-mono text-xs uppercase tracking-wider text-ink font-bold">
             1. Select Course Subject:
           </label>
-          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2">
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-7 gap-2">
             {ACADEMIC_SUBJECTS.map((sub) => (
               <button
                 key={sub.code}
@@ -426,8 +426,7 @@ export function StudentMarksView({ isFaculty = false, currentStudentRoll, filter
                     : "border-rule bg-paper text-ink hover:border-ink"
                 }`}
               >
-                <span className="block text-[10px] uppercase font-bold opacity-80">{sub.code}</span>
-                <span className="block font-serif text-xs font-bold leading-tight truncate mt-0.5">{sub.name}</span>
+                <span className="block font-serif text-xs font-bold leading-tight truncate">{sub.name}</span>
                 <span className="block text-[9px] opacity-75 mt-1">{sub.inCharge}</span>
               </button>
             ))}
