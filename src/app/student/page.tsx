@@ -175,28 +175,6 @@ const wpCourseModules = [
   },
 ]
 
-// Topic Laboratories for CNS
-const cnsSimulators = [
-  { href: "/modules/crypto", label: "Classical Cipher Lab", sub: "Caesar, Affine, Playfair, Hill Matrix, Transposition", icon: Key },
-  { href: "/modules/auth", label: "DES & AES Block Cipher Lab", sub: "Feistel Rounds, S-Box, MixColumns, AES Key Expansion", icon: Cpu },
-  { href: "/modules/firewall", label: "Firewall & DMZ Defense Lab", sub: "Packet Filter Rule Matrix, Stateful Inspection, NAT", icon: Network },
-  { href: "/modules/attacks", label: "Computing Attacks Lab", sub: "Buffer Overflow, SQL Injection, XSS, Stack Canaries", icon: Lock },
-  { href: "/modules/ids", label: "IDS & IPS Lab", sub: "Signature, Anomaly Detection, Snort Rule Engine", icon: Terminal },
-  { href: "/modules/tls", label: "SSL / TLS Lab", sub: "Handshake Flights, Cipher Suites, 1-RTT Forward Secrecy", icon: FileKey2 },
-  { href: "/modules/cloud", label: "Cloud Security Lab", sub: "Shared Responsibility, IAM Policies, S3 Storage", icon: Server },
-  { href: "/modules/ai", label: "AI Security Lab", sub: "Adversarial Evasion, Model Poisoning, ML Defense", icon: Sparkles }
-]
-
-// Topic Laboratories for Web Programming
-const wpSimulators = [
-  { href: "/modules/wp-fundamentals", label: "CSS Box Model & Grid Matrix Lab", sub: "Box-sizing, padding/margin math, Flexbox 1D & Grid 2D", icon: Layers },
-  { href: "/modules/wp-javascript", label: "JavaScript Event Loop & Closures Lab", sub: "Call Stack, Microtask queue, timers, and lexical scope", icon: Terminal },
-  { href: "/modules/wp-react", label: "React Virtual DOM Reconciliation Lab", sub: "O(N) Diff heuristic, useState dependency rules, SSR", icon: Cpu },
-  { href: "/modules/wp-nodejs", label: "Node.js Express Middleware Pipeline", sub: "libuv async I/O, request routing, error pipeline", icon: Server },
-  { href: "/modules/wp-php", label: "PHP PDO SQLi Immunity Lab", sub: "Prepared statements parameter binding vs dynamic strings", icon: Database },
-  { href: "/modules/wp-fullstack", label: "Full-Stack JWT & CORS Security Lab", sub: "Stateless Bearer auth, preflight headers, OWASP Top 10", icon: Globe }
-]
-
 // Syllabus info for other 4 subjects
 const OTHER_SUBJECTS_DETAILS: Record<string, {
   syllabusHours: number
@@ -263,7 +241,7 @@ export default function StudentPortalPage() {
   // The core state: selectedSubject is null -> shows "My Enrolled Subjects" grid.
   // When a subject is selected -> shows ALL info for THAT subject only!
   const [selectedSubject, setSelectedSubject] = useState<string | null>(null)
-  const [subjectTab, setSubjectTab] = useState<"modules" | "quizzes" | "marks" | "timeline" | "simulators">("modules")
+  const [subjectTab, setSubjectTab] = useState<"modules" | "quizzes" | "marks" | "timeline">("modules")
 
   if (!mounted) {
     return (
@@ -452,7 +430,7 @@ export default function StudentPortalPage() {
                           </span>
                           {isInteractive && (
                             <span className="px-1.5 py-0.5 bg-signal/10 border border-signal/30 text-signal font-bold uppercase">
-                              Active Labs
+                              Active Curriculum
                             </span>
                           )}
                         </div>
@@ -479,7 +457,7 @@ export default function StudentPortalPage() {
                               <span>■</span> 6 Syllabus Modules (M1–M6) · 45 Hours
                             </div>
                             <div className="flex items-center gap-1.5 text-ink-soft">
-                              <span>■</span> 8 Deep-Dive Security Simulators
+                              <span>■</span> Interactive Theory &amp; Guided Lessons
                             </div>
                             <div className="flex items-center gap-1.5 text-ink-soft">
                               <span>■</span> Module Quizzes &amp; 45Q Mock Exam
@@ -492,7 +470,7 @@ export default function StudentPortalPage() {
                               <span>■</span> 6 Web Modules (WP-M1–WP-M6) · 45 Hours
                             </div>
                             <div className="flex items-center gap-1.5 text-ink-soft">
-                              <span>■</span> HTML5, React, Node, PHP &amp; Security Labs
+                              <span>■</span> Interactive Theory &amp; Code Mechanics
                             </div>
                             <div className="flex items-center gap-1.5 text-ink-soft">
                               <span>■</span> Module Quizzes &amp; 30Q Exam
@@ -671,20 +649,6 @@ export default function StudentPortalPage() {
                   <Calendar className="h-4 w-4" />
                   <span>4. Portion Timeline &amp; Dates</span>
                 </button>
-
-                {(selectedSubject === "CSC602" || selectedSubject === "ITC504") && (
-                  <button
-                    onClick={() => setSubjectTab("simulators")}
-                    className={`px-4 py-2 uppercase font-bold border transition-all cursor-pointer flex items-center gap-2 ${
-                      subjectTab === "simulators"
-                        ? "bg-signal text-paper border-signal shadow-[2px_2px_0_var(--ink)]"
-                        : "bg-paper text-ink border-rule hover:border-ink"
-                    }`}
-                  >
-                    <Sparkles className="h-4 w-4" />
-                    <span>5. Topic Laboratories</span>
-                  </button>
-                )}
               </div>
             </div>
 
@@ -1081,57 +1045,6 @@ export default function StudentPortalPage() {
               </div>
             )}
 
-            {/* ========================================================================= */}
-            {/* SUB-TAB 5: TOPIC LABORATORIES (For Active Lab Subjects)                   */}
-            {/* ========================================================================= */}
-            {subjectTab === "simulators" && (
-              <div className="space-y-6">
-                <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 border-b border-rule pb-3">
-                  <h3 className="font-serif text-2xl font-bold text-ink">
-                    Interactive Laboratories &amp; Simulators · {activeSubjectInfo.code}
-                  </h3>
-                  <span className="font-mono text-xs text-ink-soft">
-                    Hands-on algorithm playgrounds, parameter builders &amp; attack spotters
-                  </span>
-                </div>
-
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                  {(selectedSubject === "CSC602" ? cnsSimulators : wpSimulators).map((lab) => {
-                    const Icon = lab.icon
-                    return (
-                      <Link
-                        key={lab.href}
-                        href={lab.href}
-                        className="p-5 bg-card border border-rule hover:border-ink hover:shadow-[4px_4px_0_var(--signal)] transition-all flex flex-col justify-between group"
-                      >
-                        <div>
-                          <div className="flex items-center justify-between mb-3">
-                            <div className="p-2 border border-rule bg-paper text-signal">
-                              <Icon className="h-5 w-5" />
-                            </div>
-                            <span className="font-mono text-[9px] uppercase px-1.5 py-0.5 border border-rule text-ink-soft font-bold">
-                              Lab
-                            </span>
-                          </div>
-
-                          <h4 className="font-serif text-base font-bold text-ink mb-1 group-hover:text-signal transition-colors">
-                            {lab.label}
-                          </h4>
-                          <p className="font-sans text-xs text-ink-soft leading-relaxed">
-                            {lab.sub}
-                          </p>
-                        </div>
-
-                        <div className="pt-3 border-t border-rule mt-4 flex items-center justify-between font-mono text-xs text-signal font-bold">
-                          <span>Launch Simulator</span>
-                          <ArrowRight className="h-3.5 w-3.5 group-hover:translate-x-0.5 transition-transform" />
-                        </div>
-                      </Link>
-                    )
-                  })}
-                </div>
-              </div>
-            )}
           </div>
         )}
       </div>

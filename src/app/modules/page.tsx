@@ -175,17 +175,6 @@ const WP_MODULES: ModuleCardItem[] = [
   }
 ]
 
-const DEEP_DIVE_TOPICS = [
-  { href: "/modules/crypto", label: "Cryptography Lab", sub: "Caesar, Vigenère, RSA, SHA-256", icon: Key },
-  { href: "/modules/auth", label: "Authentication Lab", sub: "Salt/Hash, MFA, Biometrics, Replay", icon: Lock },
-  { href: "/modules/firewall", label: "Firewall Lab", sub: "Packet Filters, Stateful Conntrack, DMZ", icon: Network },
-  { href: "/modules/attacks", label: "Web Attacks Lab", sub: "XSS, SQL Injection, CSRF, MITM, DDoS", icon: ShieldAlert },
-  { href: "/modules/ids", label: "IDS & IPS Lab", sub: "Signature, Anomaly, Snort Rule Engine", icon: Terminal },
-  { href: "/modules/tls", label: "SSL / TLS Lab", sub: "Handshake Flights, Cipher Suites, 1-RTT", icon: FileKey2 },
-  { href: "/modules/cloud", label: "Cloud Security Lab", sub: "Shared Responsibility, IAM, S3 Buckets", icon: Server },
-  { href: "/modules/ai", label: "AI Security Lab", sub: "Adversarial Evasion, Model Poisoning, ML", icon: Sparkles }
-]
-
 export default function ModulesDirectoryPage() {
   const mounted = useMounted()
   const { isAuthenticated } = useAuthStore()
@@ -372,51 +361,6 @@ export default function ModulesDirectoryPage() {
             })}
           </div>
         </div>
-
-        {/* Deep-Dive Security Simulators (Direct Access to 8 Core Topics) */}
-        {selectedSubject === 'CSC602' && (
-          <div className="pt-6 border-t border-rule space-y-4">
-            <div className="flex items-center justify-between">
-              <div>
-                <h3 className="font-serif text-xl font-bold text-ink">
-                  Direct Topic Laboratories (8 Guided Modules)
-                </h3>
-                <p className="text-xs text-ink-soft font-mono">
-                  Deep-dive simulators with step-by-step guided lessons, complexity analysis, and numerical tools.
-                </p>
-              </div>
-            </div>
-
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-              {DEEP_DIVE_TOPICS.map((topic) => {
-                const Icon = topic.icon
-                return (
-                  <Link
-                    key={topic.href}
-                    href={topic.href}
-                    className="p-4 bg-card border border-rule hover:border-ink hover:shadow-[3px_3px_0_var(--signal)] transition-all flex flex-col justify-between"
-                  >
-                    <div>
-                      <div className="flex items-center justify-between mb-2">
-                        <Icon className="h-4 w-4 text-signal" />
-                        <span className="font-mono text-[9px] uppercase px-1 border border-rule text-ink-soft">Lab</span>
-                      </div>
-                      <h4 className="font-serif text-sm font-bold text-ink mb-1">
-                        {topic.label}
-                      </h4>
-                      <p className="font-sans text-[11px] text-ink-soft line-clamp-2">
-                        {topic.sub}
-                      </p>
-                    </div>
-                    <span className="text-[10px] font-mono uppercase text-signal font-bold mt-3 block">
-                      Launch Lab →
-                    </span>
-                  </Link>
-                )
-              })}
-            </div>
-          </div>
-        )}
       </div>
     </div>
   )
