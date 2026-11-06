@@ -5,7 +5,7 @@ import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { useAuthStore } from "@/lib/authStore"
 import { useQuizRecordsStore } from "@/lib/quizRecordsStore"
-import { useAcademicStore, ACADEMIC_SUBJECTS, SubjectItem } from "@/lib/academicStore"
+import { useAcademicStore, ACADEMIC_SUBJECTS, SubjectItem, OTHER_SUBJECTS_DETAILS } from "@/lib/academicStore"
 import { useMounted } from "@/hooks/useMounted"
 import { AcademicTimelineView } from "@/components/academic/AcademicTimelineView"
 import { StudentMarksView } from "@/components/academic/StudentMarksView"
@@ -174,62 +174,6 @@ const wpCourseModules = [
     keyTopics: ["3-Tier Separation", "CORS Preflight", "Stateless JWT", "Git Branching", "OWASP Top 10"],
   },
 ]
-
-// Syllabus info for other 4 subjects
-const OTHER_SUBJECTS_DETAILS: Record<string, {
-  syllabusHours: number
-  description: string
-  units: { code: string; title: string; desc: string; topics: string[] }[]
-}> = {
-  ITC601: {
-    syllabusHours: 45,
-    description: "Relational database modeling, SQL DDL/DML, functional dependencies, BCNF normalization, ACID transactions, and NoSQL warehousing.",
-    units: [
-      { code: "M1", title: "Introduction & Relational Model", desc: "Entity-Relationship (ER/EER) modeling, relational schema translation, and Relational Algebra operators.", topics: ["ER Diagrams", "Relational Algebra", "Tuple Calculus", "Integrity Constraints"] },
-      { code: "M2", title: "Advanced SQL & Database Design", desc: "Complex nested queries, joins, triggers, assertions, stored procedures, and dynamic SQL.", topics: ["Subqueries & Joins", "Triggers & Views", "Stored Procedures", "Embedded SQL"] },
-      { code: "M3", title: "Relational Design & Normalization", desc: "Functional dependencies, Armstrong's axioms, 1NF, 2NF, 3NF, BCNF, lossless join decomposition.", topics: ["Functional Dependency", "1NF to 3NF", "Boyce-Codd Normal Form", "Lossless Decomposition"] },
-      { code: "M4", title: "Transaction Processing & Concurrency", desc: "ACID properties, serializability, lock-based protocols (2PL), deadlock prevention, and timestamp ordering.", topics: ["ACID Properties", "Two-Phase Locking (2PL)", "Deadlock Detection", "Timestamp Protocols"] },
-      { code: "M5", title: "Crash Recovery Systems", desc: "Log-based recovery, write-ahead logging (WAL), checkpoints, ARIES algorithm, and shadow paging.", topics: ["Write-Ahead Logging", "Checkpoints", "ARIES Algorithm", "Shadow Paging"] },
-      { code: "M6", title: "Data Warehousing & NoSQL", desc: "Star and snowflake dimensional schemas, ETL pipeline, OLAP cubes, MongoDB document storage, and CAP theorem.", topics: ["Star/Snowflake Schema", "OLAP Cubes", "MongoDB Document Store", "CAP Theorem"] }
-    ]
-  },
-  CSC404: {
-    syllabusHours: 45,
-    description: "Operating system principles, kernel architecture, process scheduling, concurrency synchronization, virtual memory paging, and file systems.",
-    units: [
-      { code: "M1", title: "OS Architecture & Process Model", desc: "Monolithic vs microkernels, system calls, PCB structure, process state transitions, and context switching.", topics: ["Kernel Architecture", "Process Control Block (PCB)", "System Calls", "Context Switching"] },
-      { code: "M2", title: "CPU Scheduling Algorithms", desc: "Preemptive vs non-preemptive algorithms: FCFS, SJF, Round Robin, Priority, and Multi-Level Feedback Queues.", topics: ["FCFS & SJF", "Round Robin (RR)", "Priority Scheduling", "Multilevel Queues"] },
-      { code: "M3", title: "Process Synchronization & Deadlocks", desc: "Critical section problem, Peterson's algorithm, Semaphores, Monitors, Banker's algorithm for deadlock avoidance.", topics: ["Critical Section", "Counting Semaphores", "Dining Philosophers", "Banker's Algorithm"] },
-      { code: "M4", title: "Memory Management & Paging", desc: "Contiguous allocation, paging, Page Table Base Register (PTBR), Translation Lookaside Buffer (TLB), and segmentation.", topics: ["Paging Hardware", "TLB Translation", "Segmentation", "Internal/External Frag"] },
-      { code: "M5", title: "Virtual Memory & Page Replacement", desc: "Demand paging, page fault handling, FIFO, LRU, Optimal page replacement algorithms, and thrashing mitigation.", topics: ["Demand Paging", "FIFO vs LRU vs OPT", "Belady's Anomaly", "Thrashing & Working Set"] },
-      { code: "M6", title: "Storage & File Systems", desc: "Disk scheduling (SSTF, SCAN, C-SCAN), inode structure, file allocation methods (contiguous, linked, indexed).", topics: ["Disk Scheduling", "Unix Inode Table", "File Allocation", "RAID Architectures"] }
-    ]
-  },
-  ITC602: {
-    syllabusHours: 45,
-    description: "Computer network protocols, layered architecture, data link flow control, IP subnetting & CIDR, routing algorithms, and transport protocols.",
-    units: [
-      { code: "M1", title: "Network Reference Models & Physical Layer", desc: "OSI 7-layer model, TCP/IP 4-layer model, packet vs circuit switching, guided transmission media, and topologies.", topics: ["OSI 7-Layer", "TCP/IP Suite", "Packet Switching", "Transmission Media"] },
-      { code: "M2", title: "Data Link Layer & MAC Protocols", desc: "Framing, error detection (CRC-32, Checksum), flow control (Stop-and-Wait, Go-Back-N, Selective Repeat), CSMA/CD.", topics: ["CRC-32 Calculation", "Go-Back-N vs SR", "Sliding Window", "Ethernet CSMA/CD"] },
-      { code: "M3", title: "Network Layer & IP Subnetting", desc: "IPv4 addressing, Classless Inter-Domain Routing (CIDR), Variable Length Subnet Masking (VLSM), IPv6 header, ARP/RARP.", topics: ["CIDR Subnet Math", "VLSM Allocation", "IPv4 vs IPv6 Header", "ARP Protocol"] },
-      { code: "M4", title: "Routing Protocols & Algorithms", desc: "Intra-domain vs inter-domain routing: Dijkstra's Link-State (OSPF), Bellman-Ford Distance Vector (RIP), and BGP.", topics: ["Dijkstra Shortest Path", "Bellman-Ford & Count-to-Inf", "OSPF Areas", "BGP Path Vector"] },
-      { code: "M5", title: "Transport Layer: TCP & UDP", desc: "3-way handshake, connection teardown, TCP sliding window, flow control, and congestion control (AIMD, Slow Start).", topics: ["TCP 3-Way Handshake", "TCP vs UDP", "AIMD Congestion", "Fast Retransmit"] },
-      { code: "M6", title: "Application Layer Services", desc: "Domain Name System (DNS) resolution, HTTP/1.1 vs HTTP/2, SMTP/IMAP email transfer, FTP, and DHCP dynamic allocation.", topics: ["DNS Hierarchy", "HTTP/2 Multiplexing", "SMTP & MIME", "DHCP DORA Flow"] }
-    ]
-  },
-  ITC603: {
-    syllabusHours: 40,
-    description: "Software engineering methodologies, Agile Scrum, requirements modeling, design patterns, testing techniques, and CI/CD pipelines.",
-    units: [
-      { code: "M1", title: "Software Process Models", desc: "Waterfall, Incremental, Spiral, Agile Scrum framework (Sprints, Standups, Retrospectives), and Kanban boards.", topics: ["Waterfall vs Agile", "Scrum Framework", "User Stories", "Kanban Workflows"] },
-      { code: "M2", title: "Requirements Engineering", desc: "Functional vs non-functional requirements, SRS document IEEE standard, use case modeling, and feasibility analysis.", topics: ["IEEE SRS Standard", "Use Case Diagrams", "Feasibility Study", "Requirement Traceability"] },
-      { code: "M3", title: "Software Architecture & Design", desc: "Coupling and cohesion metrics, architectural styles (MVC, Microservices, Event-Driven), and GoF design patterns.", topics: ["Coupling & Cohesion", "MVC Architecture", "Microservices", "Design Patterns (GoF)"] },
-      { code: "M4", title: "Software Testing & QA", desc: "Black-box testing (Equivalence Partitioning, BVA), White-box testing (Basis Path, Cyclomatic Complexity), unit & integration.", topics: ["Equivalence Partitioning", "Cyclomatic Complexity", "Basis Path Testing", "Unit vs Integration"] },
-      { code: "M5", title: "Project Estimation & Risk", desc: "COCOMO I & II cost estimation, Function Point analysis, risk management matrix, and Gantt charts.", topics: ["COCOMO Estimation", "Function Points", "Risk Matrix", "Critical Path Method"] },
-      { code: "M6", title: "DevOps & Quality Standards", desc: "Git workflows, CI/CD automated test pipelines, CMMI maturity levels, and ISO 9001 software quality benchmarks.", topics: ["Git Branching Flow", "CI/CD Pipelines", "CMMI Levels 1-5", "Software Maintenance"] }
-    ]
-  }
-}
 
 export default function StudentPortalPage() {
   const router = useRouter()

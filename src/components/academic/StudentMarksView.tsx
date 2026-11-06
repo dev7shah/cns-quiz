@@ -19,10 +19,16 @@ export function StudentMarksView({ isFaculty = false, currentStudentRoll, filter
   } = useAcademicStore()
 
   // Faculty view state
-  const [selectedSubject, setSelectedSubject] = useState<string>("CSC602")
+  const [selectedSubject, setSelectedSubject] = useState<string>(filterSubjectCode || "CSC602")
   const [selectedDeptFilter, setSelectedDeptFilter] = useState<string>("ALL")
   const [searchQuery, setSearchQuery] = useState("")
   const [toastMessage, setToastMessage] = useState("")
+
+  React.useEffect(() => {
+    if (filterSubjectCode) {
+      setSelectedSubject(filterSubjectCode)
+    }
+  }, [filterSubjectCode])
 
   // Add new student modal state
   const [isAddingStudent, setIsAddingStudent] = useState(false)

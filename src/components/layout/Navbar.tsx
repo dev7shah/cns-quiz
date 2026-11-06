@@ -30,8 +30,7 @@ export function Navbar() {
   // Navigation links are strictly subject-first; all modules/quizzes live inside the subject workspace
   const navLinks = isTeacher
     ? [
-        { href: "/student", label: "My Subjects", icon: BookOpen },
-        { href: "/teacher", label: "Faculty Portal", icon: GraduationCap },
+        { href: "/teacher", label: "My Subjects", icon: BookOpen },
       ]
     : isStudent
     ? [
