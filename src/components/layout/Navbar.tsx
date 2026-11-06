@@ -5,39 +5,7 @@ import Link from "next/link"
 import { usePathname, useRouter } from "next/navigation"
 import { useAuthStore } from "@/lib/authStore"
 import { useMounted } from "@/hooks/useMounted"
-
-const studentNavLinks = [
-  { href: "/", label: "Campus LMS" },
-  { href: "/student", label: "My Subjects" },
-  { href: "/modules", label: "Modules & Theory" },
-  { href: "/quiz", label: "Quizzes" },
-  { href: "/timeline", label: "Academic Timeline" },
-  { href: "/revision", label: "Revision Hub" },
-]
-
-const teacherNavLinks = [
-  { href: "/", label: "Campus LMS" },
-  { href: "/modules", label: "Modules & Theory" },
-  { href: "/quiz", label: "Quizzes" },
-  { href: "/teacher", label: "Faculty Gradebook" },
-  { href: "/timeline", label: "Portion Timeline" },
-  { href: "/revision", label: "Revision Hub" },
-]
-
-const publicNavLinks = [
-  { href: "/", label: "TCET LMS" },
-]
-
-const modulesList = [
-  { href: "/modules/crypto", label: "Cryptography (M1)" },
-  { href: "/modules/tls", label: "SSL / TLS (M2)" },
-  { href: "/modules/firewall", label: "Firewalls (M4)" },
-  { href: "/modules/auth", label: "Authentication (M3)" },
-  { href: "/modules/attacks", label: "Attacks (M4)" },
-  { href: "/modules/ids", label: "IDS / IPS (M5)" },
-  { href: "/modules/cloud", label: "Cloud Security (M6)" },
-  { href: "/modules/ai", label: "AI Security (M6)" },
-]
+import { BookOpen, GraduationCap, LogIn, LogOut } from "lucide-react"
 
 export function Navbar() {
   const [isOpen, setIsOpen] = useState(false)
@@ -56,17 +24,30 @@ export function Navbar() {
   const isStudent = isLoggedIn && role === "student"
   const isTeacher = isLoggedIn && role === "teacher"
 
-  const activeNavLinks = isTeacher
-    ? teacherNavLinks
+  // Brand destination
+  const brandHref = isTeacher ? "/teacher" : isStudent ? "/student" : "/"
+
+  // Navigation links are strictly subject-first; all modules/quizzes live inside the subject workspace
+  const navLinks = isTeacher
+    ? [
+        { href: "/student", label: "My Subjects", icon: BookOpen },
+        { href: "/teacher", label: "Faculty Portal", icon: GraduationCap },
+      ]
     : isStudent
-    ? studentNavLinks
-    : publicNavLinks
+    ? [
+        { href: "/student", label: "My Subjects", icon: BookOpen },
+      ]
+    : []
 
   return (
     <header className="sticky top-0 z-50 w-full border-b border-rule bg-paper">
       <div className="container mx-auto flex h-14 items-center justify-between px-4 max-w-[1180px]">
         {/* Brand */}
-        <Link href="/" className="flex items-center space-x-3 group" onClick={() => setIsOpen(false)}>
+        <Link
+          href={brandHref}
+          className="flex items-center space-x-3 group"
+          onClick={() => setIsOpen(false)}
+        >
           <div className="w-8 h-8 rounded-xs bg-ink text-paper flex items-center justify-center font-serif font-bold text-sm border border-ink group-hover:bg-signal transition-colors shrink-0">
             T
           </div>
@@ -80,69 +61,86 @@ export function Navbar() {
           </div>
         </Link>
 
-        {/* Desktop Navigation Links */}
+        {/* Desktop Navigation Links (Subjects-Only) */}
         <nav className="hidden md:flex items-center space-x-6 text-sm font-sans font-medium">
-          {activeNavLinks.map((link) => {
+          {navLinks.map((link) => {
+            const Icon = link.icon
             const isActive =
               pathname === link.href ||
-              (link.href !== "/" && !link.href.startsWith("/#") && pathname.startsWith(link.href))
+              (link.href !== "/" && pathname.startsWith(link.href))
             return (
               <Link
                 key={link.href}
                 href={link.href}
-                className={`transition-colors hover:text-signal ${
+                className={`flex items-center gap-1.5 transition-colors hover:text-signal ${
                   isActive ? "text-signal font-bold" : "text-ink"
                 }`}
               >
-                {link.label}
+                <Icon className="h-4 w-4" />
+                <span>{link.label}</span>
               </Link>
             )
           })}
         </nav>
 
-        {/* Desktop Right Actions / Auth Badge */}
+        {/* Desktop Right Actions / User Profile */}
         <div className="hidden md:flex items-center space-x-3 font-mono text-xs">
           {isTeacher ? (
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-3">
               <Link
                 href="/teacher"
-                className="px-2.5 py-1 bg-ink text-paper hover:bg-signal font-bold uppercase transition-colors rounded-xs flex items-center gap-1.5"
+                className="flex items-center gap-2 px-3 py-1 bg-ink text-paper hover:bg-signal transition-colors rounded-xs"
+                title="Faculty Gradebook & Controls"
               >
-                <span>👩‍🏫</span> Faculty ({teacher?.name.split(" ")[1] || "Examiner"})
+                <span>👩‍🏫</span>
+                <div className="flex flex-col text-left leading-tight">
+                  <span className="font-sans font-bold text-xs">{teacher?.name}</span>
+                  <span className="font-mono text-[9px] text-paper/70 uppercase">Faculty In-Charge</span>
+                </div>
               </Link>
               <button
                 type="button"
                 onClick={handleLogout}
-                className="text-ink-soft hover:text-ink text-[11px] underline"
+                className="flex items-center gap-1 text-ink-soft hover:text-bad text-[11px] font-mono uppercase tracking-wider transition-colors cursor-pointer"
                 title="Sign out"
               >
-                Exit
+                <LogOut className="h-3 w-3" />
+                <span>Exit</span>
               </button>
             </div>
           ) : isStudent ? (
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-3">
               <Link
                 href="/student"
-                className="px-2.5 py-1 bg-signal/15 border border-signal/40 text-signal font-bold uppercase hover:bg-signal hover:text-paper transition-colors rounded-xs flex items-center gap-1.5"
+                className="flex items-center gap-2 px-3 py-1 bg-card border border-rule hover:border-signal text-ink transition-colors rounded-xs group"
+                title="Student Profile & My Subjects"
               >
-                <span>👨‍🎓</span> {student?.rollNo || "Profile"}
+                <span className="w-5 h-5 rounded-full bg-signal/15 text-signal font-bold text-xs flex items-center justify-center group-hover:bg-signal group-hover:text-paper transition-colors">
+                  🎓
+                </span>
+                <div className="flex flex-col text-left leading-tight">
+                  <span className="font-sans font-bold text-xs text-ink">{student?.name}</span>
+                  <span className="font-mono text-[10px] text-ink-soft">{student?.rollNo} · {student?.department || "INFT"}</span>
+                </div>
               </Link>
               <button
                 type="button"
                 onClick={handleLogout}
-                className="text-ink-soft hover:text-ink text-[11px] underline"
+                className="flex items-center gap-1 text-ink-soft hover:text-bad text-[11px] font-mono uppercase tracking-wider transition-colors cursor-pointer"
                 title="Sign out"
               >
-                Exit
+                <LogOut className="h-3 w-3" />
+                <span>Exit</span>
               </button>
             </div>
           ) : (
             <div className="flex items-center gap-3">
               <Link
                 href="/login"
-                className="px-3.5 py-1.5 bg-signal text-paper font-semibold uppercase tracking-wider transition-opacity hover:opacity-90"
+                className="flex items-center gap-1.5 px-3.5 py-1.5 bg-signal text-paper font-semibold uppercase tracking-wider text-xs transition-opacity hover:opacity-90"
               >
-                Student Login
+                <LogIn className="h-3.5 w-3.5" />
+                <span>Student Login</span>
               </Link>
               <Link
                 href="/teacher"
@@ -181,20 +179,22 @@ export function Navbar() {
       {isOpen && (
         <div className="md:hidden border-b border-rule bg-paper/98 backdrop-blur-sm px-4 pt-2 pb-6 space-y-4 animate-in fade-in slide-in-from-top-2 duration-200">
           <nav className="flex flex-col space-y-1 font-sans font-medium">
-            {activeNavLinks.map((link) => {
+            {navLinks.map((link) => {
+              const Icon = link.icon
               const isActive =
                 pathname === link.href ||
-                (link.href !== "/" && !link.href.startsWith("/#") && pathname.startsWith(link.href))
+                (link.href !== "/" && pathname.startsWith(link.href))
               return (
                 <Link
                   key={link.href}
                   href={link.href}
                   onClick={() => setIsOpen(false)}
-                  className={`px-3 py-2.5 rounded text-base transition-colors ${
+                  className={`flex items-center gap-2 px-3 py-2.5 rounded text-base transition-colors ${
                     isActive ? "bg-signal text-paper font-bold" : "text-ink hover:bg-card hover:text-signal"
                   }`}
                 >
-                  {link.label}
+                  <Icon className="h-4 w-4" />
+                  <span>{link.label}</span>
                 </Link>
               )
             })}
@@ -224,42 +224,23 @@ export function Navbar() {
             <div className="pt-2 border-t border-rule font-mono text-xs">
               <div className="flex items-center justify-between px-3 py-2 bg-card border border-rule">
                 <div>
-                  <span className="text-[10px] uppercase text-ink-soft block">
-                    {isTeacher ? "Faculty Account" : "Student Account"}
+                  <span className="text-[10px] uppercase text-ink-soft block font-bold">
+                    {isTeacher ? "Faculty Account" : "Student Profile"}
                   </span>
                   <span className="font-bold text-ink">
                     {isTeacher ? teacher?.name : `${student?.name} (${student?.rollNo})`}
+                  </span>
+                  <span className="text-[10px] text-ink-soft block font-sans">
+                    {isTeacher ? "Faculty In-Charge" : student?.department || "INFT / CMPN"}
                   </span>
                 </div>
                 <button
                   type="button"
                   onClick={handleLogout}
-                  className="px-2.5 py-1 bg-paper border border-rule text-bad uppercase font-bold"
+                  className="px-2.5 py-1 bg-paper border border-rule text-bad uppercase font-bold text-[11px]"
                 >
                   Exit
                 </button>
-              </div>
-            </div>
-          )}
-
-          {isLoggedIn && (
-            <div className="pt-3 border-t border-rule">
-              <div className="px-3 text-[10px] font-mono uppercase tracking-widest text-ink-soft mb-2">
-                Active Course Modules (CNS)
-              </div>
-              <div className="grid grid-cols-2 gap-1 text-xs font-mono">
-                {modulesList.map((mod) => (
-                  <Link
-                    key={mod.href}
-                    href={mod.href}
-                    onClick={() => setIsOpen(false)}
-                    className={`p-2 rounded hover:bg-card hover:text-signal truncate transition-colors ${
-                      pathname === mod.href ? "text-signal font-bold bg-signal/5" : "text-ink"
-                    }`}
-                  >
-                    {mod.label}
-                  </Link>
-                ))}
               </div>
             </div>
           )}
