@@ -321,6 +321,20 @@ export const INITIAL_MILESTONES: AcademicMilestone[] = [
     guidelines: "Certified lab manual submission stamped by faculty course in-charge and HOD.",
     status: "upcoming",
   },
+  {
+    id: "m-ese",
+    title: "End Semester Examination (ESE)",
+    code: "ESE",
+    type: "exam",
+    position: "University Final Exam",
+    date: "2026-05-08",
+    time: "10:30 AM – 01:30 PM",
+    venue: "Autonomous Exam Wing · Halls 401–406",
+    maxMarks: 60,
+    syllabusCoverage: "Complete University Syllabus (Modules 1 to 6 across all courses)",
+    guidelines: "Official autonomous end-semester theory examination. Covers Bloom Levels L1 to L4. Hall ticket and TCET student ID mandatory.",
+    status: "upcoming",
+  },
 ]
 
 function computeGradeAndStatus(total: number, max: number): {
