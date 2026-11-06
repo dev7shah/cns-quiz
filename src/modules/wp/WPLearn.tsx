@@ -6,6 +6,8 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/Card"
 import { WPModuleId, getWPModule } from "@/lib/syllabus/wpSyllabus"
 import { Presentation, ArrowRight, Lightbulb, ShieldCheck, AlertCircle, BookMarked, Code2, CheckCircle2, Layers, Cpu, Database, Server, Globe } from "lucide-react"
 import { useAcademicStore } from "@/lib/academicStore"
+import { useAuthStore } from "@/lib/authStore"
+import { useMounted } from "@/hooks/useMounted"
 
 interface DeepDiveContent {
   analogy: string
@@ -225,7 +227,10 @@ const WP_DEEP_DIVES: Record<WPModuleId, DeepDiveContent> = {
 export default function WPLearn({ moduleId }: { moduleId: WPModuleId }) {
   const mod = getWPModule(moduleId)
   const deepDive = WP_DEEP_DIVES[moduleId] || WP_DEEP_DIVES['wp-m1']
-  const { moduleProgress } = useAcademicStore()
+  const mounted = useMounted()
+  const { role, isAuthenticated } = useAuthStore()
+  const isTeacher = mounted && isAuthenticated && role === "teacher"
+  const { moduleProgress, isTopicCompleted, toggleTopicCovered } = useAcademicStore()
   const progress = moduleProgress[moduleId as any]
 
   const [activeTopicIndex, setActiveTopicIndex] = useState(0)
@@ -348,10 +353,15 @@ export default function WPLearn({ moduleId }: { moduleId: WPModuleId }) {
       {/* 3. Detailed Syllabus Topic Breakdown with Clickable Deep Dive */}
       <Card className="border border-ink shadow-[4px_4px_0_var(--rule)] bg-card">
         <CardHeader className="border-b border-rule pb-3">
-          <div className="flex items-center justify-between">
-            <CardTitle className="font-serif text-xl sm:text-2xl text-ink font-bold">
-              Accredited Syllabus Subtopics ({mod.topics.length} Units)
-            </CardTitle>
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+            <div>
+              <CardTitle className="font-serif text-xl sm:text-2xl text-ink font-bold">
+                Accredited Syllabus Subtopics ({mod.topics.length} Units)
+              </CardTitle>
+              <p className="text-xs text-ink-soft font-mono mt-0.5">
+                Faculty covered up to Topic {progress?.completedUpTo ?? 0} of {mod.topics.length} · All topics open for self-study
+              </p>
+            </div>
             <span className="font-mono text-[11px] text-ink-soft uppercase">
               Click topic to preview
             </span>
@@ -361,6 +371,7 @@ export default function WPLearn({ moduleId }: { moduleId: WPModuleId }) {
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2">
             {mod.topics.map((t, idx) => {
               const isSelected = idx === activeTopicIndex
+              const isCovered = isTopicCompleted(moduleId as any, idx + 1)
               return (
                 <button
                   key={t.id}
@@ -368,6 +379,8 @@ export default function WPLearn({ moduleId }: { moduleId: WPModuleId }) {
                   className={`p-3 border text-left transition-all cursor-pointer font-sans ${
                     isSelected
                       ? "border-signal bg-signal/10 shadow-[2px_2px_0_var(--signal)]"
+                      : isCovered
+                      ? "border-ok/40 bg-card hover:border-ok"
                       : "border-rule bg-paper hover:border-ink"
                   }`}
                 >
@@ -375,9 +388,16 @@ export default function WPLearn({ moduleId }: { moduleId: WPModuleId }) {
                     <span className="font-mono text-[10px] text-ink-soft font-bold">
                       Topic {idx + 1}
                     </span>
-                    <span className="font-mono text-[10px] px-1.5 py-0.2 border border-rule bg-card">
-                      {t.hours}h · {t.bloom}
-                    </span>
+                    {isCovered ? (
+                      <span className="font-mono text-[9px] px-1.5 py-0.5 bg-ok/10 text-ok border border-ok/30 font-bold flex items-center gap-1">
+                        <CheckCircle2 className="h-2.5 w-2.5" />
+                        Covered
+                      </span>
+                    ) : (
+                      <span className="font-mono text-[9px] px-1.5 py-0.5 bg-card text-ink-soft border border-rule">
+                        Pending
+                      </span>
+                    )}
                   </div>
                   <h4 className="text-xs sm:text-sm font-bold text-ink line-clamp-1">
                     {t.title}
@@ -397,12 +417,33 @@ export default function WPLearn({ moduleId }: { moduleId: WPModuleId }) {
               <p className="text-xs sm:text-sm text-ink leading-relaxed font-sans">
                 {activeTopic.description}
               </p>
-              <div className="flex flex-wrap gap-1.5 pt-2">
-                {activeTopic.tags.map(tag => (
-                  <span key={tag} className="px-2 py-0.5 font-mono text-[10px] bg-card border border-rule text-ink-soft">
-                    #{tag}
-                  </span>
-                ))}
+              <div className="flex flex-wrap items-center justify-between gap-2 pt-2 border-t border-rule mt-3">
+                <div className="flex flex-wrap gap-1.5">
+                  {activeTopic.tags.map(tag => (
+                    <span key={tag} className="px-2 py-0.5 font-mono text-[10px] bg-card border border-rule text-ink-soft">
+                      #{tag}
+                    </span>
+                  ))}
+                </div>
+
+                {isTeacher && (
+                  <button
+                    type="button"
+                    onClick={() => toggleTopicCovered(moduleId as any, activeTopicIndex + 1)}
+                    className={`px-3 py-1 font-mono text-xs uppercase font-bold border transition-colors flex items-center gap-1.5 ${
+                      isTopicCompleted(moduleId as any, activeTopicIndex + 1)
+                        ? "bg-ok text-paper border-ok hover:bg-bad hover:border-bad"
+                        : "bg-signal text-paper border-signal hover:opacity-90"
+                    }`}
+                  >
+                    <CheckCircle2 className="h-3.5 w-3.5" />
+                    <span>
+                      {isTopicCompleted(moduleId as any, activeTopicIndex + 1)
+                        ? "Covered in Class ✓"
+                        : "Mark as Done"}
+                    </span>
+                  </button>
+                )}
               </div>
             </div>
           )}

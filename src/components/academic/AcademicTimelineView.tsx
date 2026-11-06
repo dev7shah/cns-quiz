@@ -2,6 +2,8 @@
 
 import React, { useState } from "react"
 import { useAcademicStore, AcademicMilestone } from "@/lib/academicStore"
+import { SYLLABUS } from "@/lib/syllabus"
+import { WP_SYLLABUS } from "@/lib/syllabus/wpSyllabus"
 import { Calendar, CheckCircle2, Clock, MapPin, BookOpen, Edit3, Save, X } from "lucide-react"
 
 interface AcademicTimelineViewProps {
@@ -9,7 +11,7 @@ interface AcademicTimelineViewProps {
 }
 
 export function AcademicTimelineView({ isEditable = false }: AcademicTimelineViewProps) {
-  const { moduleProgress, milestones, setPortionProgress, updateMilestone } = useAcademicStore()
+  const { moduleProgress, milestones, setPortionProgress, updateMilestone, toggleTopicCovered, isTopicCompleted } = useAcademicStore()
 
   // State for milestone editing modal / inline form
   const [editingMilestoneId, setEditingMilestoneId] = useState<string | null>(null)
@@ -49,22 +51,12 @@ export function AcademicTimelineView({ isEditable = false }: AcademicTimelineVie
   }
 
   const handleUpdatePortion = (modId: string, completedVal: number) => {
-    // Automatically apply TCET rule: if teacher completed till Part 5, Part 8 is unlocked (completed + 3)
     const current = moduleProgress[modId]
     if (!current) return
     const safeCompleted = Math.max(0, Math.min(current.totalTopics, completedVal))
-    const unlockedVal = Math.min(current.totalTopics, safeCompleted + 3)
-
-    setPortionProgress(modId, safeCompleted, unlockedVal)
-    setSavedNotice(`Updated ${current.code} portion: Covered up to Topic ${safeCompleted} · Notes unlocked up to Topic ${unlockedVal}`)
-    setTimeout(() => setSavedNotice(""), 3500)
-  }
-
-  const handleCustomUnlock = (modId: string, unlockedVal: number) => {
-    const current = moduleProgress[modId]
-    if (!current) return
-    setPortionProgress(modId, current.completedUpTo, unlockedVal)
-    setSavedNotice(`Custom unlock for ${current.code}: Notes unlocked up to Topic ${unlockedVal}`)
+    // Keep unlockedUpTo in sync (always = totalTopics since everything is open)
+    setPortionProgress(modId, safeCompleted, current.totalTopics)
+    setSavedNotice(`Updated ${current.code}: Covered up to Topic ${safeCompleted} of ${current.totalTopics}`)
     setTimeout(() => setSavedNotice(""), 3500)
   }
 
@@ -72,7 +64,6 @@ export function AcademicTimelineView({ isEditable = false }: AcademicTimelineVie
   const modulesList = Object.values(moduleProgress)
   const totalTopicsAll = modulesList.reduce((acc, m) => acc + m.totalTopics, 0)
   const completedTopicsAll = modulesList.reduce((acc, m) => acc + m.completedUpTo, 0)
-  const unlockedTopicsAll = modulesList.reduce((acc, m) => acc + m.unlockedUpTo, 0)
   const portionPercentage = Math.round((completedTopicsAll / totalTopicsAll) * 100)
 
   return (
@@ -106,7 +97,7 @@ export function AcademicTimelineView({ isEditable = false }: AcademicTimelineVie
               Portion Completion &amp; Assessment Timeline
             </h2>
             <p className="text-xs sm:text-sm text-ink-soft max-w-2xl mt-1">
-              Live tracking of covered syllabus topics, progressive note unlock states, and official evaluation dates for ISE 1, FA 1, ISE 3, ISE 2, FA 2, and Term Work Submission.
+              Live tracking of covered syllabus topics and official evaluation dates for ISE 1, FA 1, ISE 3, ISE 2, FA 2, and Term Work Submission. All module content is open for self-study.
             </p>
           </div>
 
@@ -118,7 +109,7 @@ export function AcademicTimelineView({ isEditable = false }: AcademicTimelineVie
               {portionPercentage}%
             </div>
             <span className="text-[11px] text-ink-soft block">
-              {completedTopicsAll} of {totalTopicsAll} topics covered ({unlockedTopicsAll} unlocked)
+              {completedTopicsAll} of {totalTopicsAll} topics covered by faculty
             </span>
           </div>
         </div>
@@ -128,17 +119,16 @@ export function AcademicTimelineView({ isEditable = false }: AcademicTimelineVie
           <div className="flex items-center justify-between">
             <h3 className="font-serif text-base font-bold text-ink flex items-center gap-2">
               <BookOpen className="h-4 w-4 text-signal" />
-              <span>Module Portion Coverage &amp; Note Unlock Status</span>
+              <span>Module Portion Coverage by Faculty</span>
             </h3>
             <span className="font-mono text-xs text-ink-soft hidden sm:inline">
-              Rule: Teacher completed Part 5 &rarr; Unlocks up to Part 8 for pre-reading
+              All topics are open for student self-study · Track what faculty has covered in class
             </span>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {modulesList.map((mod) => {
               const compPercent = Math.round((mod.completedUpTo / mod.totalTopics) * 100)
-              const unlockPercent = Math.round((mod.unlockedUpTo / mod.totalTopics) * 100)
 
               return (
                 <div
@@ -164,18 +154,13 @@ export function AcademicTimelineView({ isEditable = false }: AcademicTimelineVie
                     </span>
                   </div>
 
-                  {/* Dual Bar: Completed (green) + Unlocked (signal) + Locked (grey) */}
+                  {/* Single Bar: Covered (green) + Remaining (grey) */}
                   <div className="space-y-1">
-                    <div className="h-2.5 w-full bg-rule/30 rounded-xs overflow-hidden flex">
+                    <div className="h-2.5 w-full bg-rule/30 rounded-xs overflow-hidden">
                       <div
-                        className="bg-ok transition-all"
+                        className="bg-ok h-full transition-all"
                         style={{ width: `${compPercent}%` }}
-                        title={`Completed: ${mod.completedUpTo}/${mod.totalTopics}`}
-                      />
-                      <div
-                        className="bg-signal/70 transition-all"
-                        style={{ width: `${Math.max(0, unlockPercent - compPercent)}%` }}
-                        title={`Unlocked Ahead: ${mod.unlockedUpTo}/${mod.totalTopics}`}
+                        title={`Covered: ${mod.completedUpTo}/${mod.totalTopics}`}
                       />
                     </div>
 
@@ -183,8 +168,8 @@ export function AcademicTimelineView({ isEditable = false }: AcademicTimelineVie
                       <span className="text-ok font-bold">
                         ✓ Covered: Part {mod.completedUpTo} of {mod.totalTopics}
                       </span>
-                      <span className="text-signal font-bold">
-                        🔓 Unlocked: Part {mod.unlockedUpTo}
+                      <span className="text-ink-soft">
+                        {compPercent}%
                       </span>
                     </div>
                   </div>
@@ -208,7 +193,7 @@ export function AcademicTimelineView({ isEditable = false }: AcademicTimelineVie
                   Faculty Controls
                 </span>
                 <span className="font-serif text-sm font-bold text-ink">
-                  Update Covered Portion &amp; Unlock Limit
+                  Mark Topics as Covered in Class
                 </span>
               </div>
               <span className="font-mono text-xs text-ink-soft">
@@ -235,10 +220,10 @@ export function AcademicTimelineView({ isEditable = false }: AcademicTimelineVie
                   ))}
                 </div>
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-1">
                   <div className="p-3 bg-card border border-rule space-y-2">
                     <label className="block font-mono text-xs font-bold text-ink uppercase">
-                      1. Set Lecture Completed Up To:
+                      Quick Batch Update (Sequential):
                     </label>
                     <div className="flex items-center gap-3">
                       <select
@@ -248,7 +233,7 @@ export function AcademicTimelineView({ isEditable = false }: AcademicTimelineVie
                       >
                         {Array.from({ length: moduleProgress[selectedModuleId].totalTopics + 1 }, (_, i) => (
                           <option key={i} value={i}>
-                            {i === 0 ? "Not Started (Topic 0)" : `Topic ${i} Covered`}
+                            {i === 0 ? "Not Started" : `Topics 1 to ${i} — Covered`}
                           </option>
                         ))}
                       </select>
@@ -257,35 +242,89 @@ export function AcademicTimelineView({ isEditable = false }: AcademicTimelineVie
                       </span>
                     </div>
                     <p className="text-[11px] text-ink-soft font-mono">
-                      *Automatically unlocks up to Part {Math.min(moduleProgress[selectedModuleId].totalTopics, moduleProgress[selectedModuleId].completedUpTo + 3)} for students.
+                      Sets topics 1 through {moduleProgress[selectedModuleId].completedUpTo} as covered in class.
                     </p>
                   </div>
 
-                  <div className="p-3 bg-card border border-rule space-y-2">
-                    <label className="block font-mono text-xs font-bold text-ink uppercase">
-                      2. Custom Unlocked Limit (Pre-reading):
-                    </label>
-                    <div className="flex items-center gap-3">
-                      <select
-                        value={moduleProgress[selectedModuleId].unlockedUpTo}
-                        onChange={(e) => handleCustomUnlock(selectedModuleId, Number(e.target.value))}
-                        className="px-3 py-2 bg-paper border border-ink font-mono text-sm text-ink rounded-xs flex-1"
-                      >
-                        {Array.from({ length: moduleProgress[selectedModuleId].totalTopics + 1 }, (_, i) => (
-                          <option key={i} value={i}>
-                            {i === 0 ? "All Locked" : `Unlocked up to Topic ${i}`}
-                          </option>
-                        ))}
-                      </select>
-                      <span className="font-mono text-xs text-signal font-bold">
-                        Part {moduleProgress[selectedModuleId].unlockedUpTo}
-                      </span>
-                    </div>
-                    <p className="text-[11px] text-ink-soft font-mono">
-                      Students can access and study notes up to this topic.
+                  <div className="p-3 bg-card border border-rule space-y-1">
+                    <span className="block font-mono text-xs font-bold text-ink uppercase">
+                      Open Learning Policy:
+                    </span>
+                    <p className="text-xs text-ink-soft font-sans">
+                      All syllabus subtopics are unlocked for student pre-reading and self-study. Mark topics covered below as lectures progress.
                     </p>
                   </div>
                 </div>
+
+                {/* Interactive Topic-Wise Toggle Checklist */}
+                {(() => {
+                  const getModuleTopics = (modId: string): string[] => {
+                    if (modId.startsWith("wp-")) {
+                      const wpMod = WP_SYLLABUS.find((m) => m.id === modId)
+                      return wpMod?.topics.map((t) => t.title) || []
+                    }
+                    const cnsMod = SYLLABUS.find((m) => m.id === modId)
+                    return cnsMod?.topics.map((t) => t.title) || []
+                  }
+                  const moduleTopics = getModuleTopics(selectedModuleId)
+
+                  if (moduleTopics.length === 0) return null
+
+                  return (
+                    <div className="border border-rule bg-card p-4 space-y-3">
+                      <div className="flex items-center justify-between border-b border-rule pb-2">
+                        <span className="font-mono text-xs font-bold uppercase text-ink">
+                          Topic-Wise Coverage Checklist ({moduleTopics.length} Topics)
+                        </span>
+                        <span className="font-mono text-[10px] text-ink-soft">
+                          Click to toggle covered / not covered
+                        </span>
+                      </div>
+
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                        {moduleTopics.map((topicTitle, idx) => {
+                          const topicNum = idx + 1
+                          const isCovered = isTopicCompleted(selectedModuleId, topicNum)
+                          return (
+                            <div
+                              key={topicNum}
+                              className={`p-2.5 border flex items-center justify-between gap-3 text-xs transition-colors ${
+                                isCovered
+                                  ? "bg-ok/5 border-ok/40"
+                                  : "bg-paper border-rule"
+                              }`}
+                            >
+                              <div className="min-w-0 flex-1">
+                                <span className="font-mono text-[10px] font-bold text-ink-soft block">
+                                  Part {topicNum}
+                                </span>
+                                <span className="font-sans font-medium text-ink truncate block">
+                                  {topicTitle}
+                                </span>
+                              </div>
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  toggleTopicCovered(selectedModuleId, topicNum)
+                                  setSavedNotice(`Toggled Topic ${topicNum} ${isCovered ? "to Not Covered" : "to Covered"}`)
+                                  setTimeout(() => setSavedNotice(""), 3000)
+                                }}
+                                className={`px-2.5 py-1 font-mono text-[10px] uppercase font-bold border transition-colors shrink-0 flex items-center gap-1 ${
+                                  isCovered
+                                    ? "bg-ok text-paper border-ok hover:bg-bad hover:border-bad"
+                                    : "bg-card text-ink border-rule hover:border-ok hover:text-ok"
+                                }`}
+                              >
+                                <CheckCircle2 className="h-3 w-3" />
+                                <span>{isCovered ? "Covered" : "Mark Done"}</span>
+                              </button>
+                            </div>
+                          )
+                        })}
+                      </div>
+                    </div>
+                  )
+                })()}
               </div>
             )}
           </div>

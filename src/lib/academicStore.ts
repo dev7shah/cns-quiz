@@ -7,7 +7,8 @@ export interface ModulePortionProgress {
   title: string
   totalTopics: number
   completedUpTo: number // 1-based topic index completed in class (e.g. 5)
-  unlockedUpTo: number  // 1-based topic index unlocked for students (e.g. 8)
+  unlockedUpTo: number  // all topics open (equal to totalTopics)
+  coveredTopics?: number[] // 1-based topic indices marked as done by faculty
   lastUpdatedDate: string
   updatedBy: string
 }
@@ -118,8 +119,8 @@ export const INITIAL_MODULE_PROGRESS: Record<string, ModulePortionProgress> = {
     code: "M1",
     title: "Introduction & Classical Cryptography",
     totalTopics: 11,
-    completedUpTo: 5, // Completed till Part 5 (Playfair)
-    unlockedUpTo: 8,  // Unlocked till Part 8 (Hill)
+    completedUpTo: 5, // Faculty covered up to Part 5 (Playfair)
+    unlockedUpTo: 11, // All topics open for self-study
     lastUpdatedDate: "2026-02-18",
     updatedBy: "Prof. S. R. Raman",
   },
@@ -129,7 +130,7 @@ export const INITIAL_MODULE_PROGRESS: Record<string, ModulePortionProgress> = {
     title: "Block Ciphers & Public Key Cryptography",
     totalTopics: 12,
     completedUpTo: 3,
-    unlockedUpTo: 6,
+    unlockedUpTo: 12,
     lastUpdatedDate: "2026-02-18",
     updatedBy: "Prof. S. R. Raman",
   },
@@ -139,7 +140,7 @@ export const INITIAL_MODULE_PROGRESS: Record<string, ModulePortionProgress> = {
     title: "Cryptographic Hashes & Digital Signatures",
     totalTopics: 9,
     completedUpTo: 2,
-    unlockedUpTo: 5,
+    unlockedUpTo: 9,
     lastUpdatedDate: "2026-02-17",
     updatedBy: "Prof. S. R. Raman",
   },
@@ -149,7 +150,7 @@ export const INITIAL_MODULE_PROGRESS: Record<string, ModulePortionProgress> = {
     title: "Protection of Computing Resources & System Security",
     totalTopics: 8,
     completedUpTo: 0,
-    unlockedUpTo: 3,
+    unlockedUpTo: 8,
     lastUpdatedDate: "2026-02-10",
     updatedBy: "Prof. S. R. Raman",
   },
@@ -159,7 +160,7 @@ export const INITIAL_MODULE_PROGRESS: Record<string, ModulePortionProgress> = {
     title: "Network Security & Defense",
     totalTopics: 9,
     completedUpTo: 0,
-    unlockedUpTo: 2,
+    unlockedUpTo: 9,
     lastUpdatedDate: "2026-02-10",
     updatedBy: "Prof. S. R. Raman",
   },
@@ -169,7 +170,7 @@ export const INITIAL_MODULE_PROGRESS: Record<string, ModulePortionProgress> = {
     title: "Network Security Applications & Emerging Threats",
     totalTopics: 8,
     completedUpTo: 0,
-    unlockedUpTo: 2,
+    unlockedUpTo: 8,
     lastUpdatedDate: "2026-02-10",
     updatedBy: "Prof. S. R. Raman",
   },
@@ -219,7 +220,7 @@ export const INITIAL_MODULE_PROGRESS: Record<string, ModulePortionProgress> = {
     title: 'Server-Side Programming: PHP and MySQL',
     totalTopics: 4,
     completedUpTo: 0,
-    unlockedUpTo: 2,
+    unlockedUpTo: 4,
     lastUpdatedDate: '2026-02-12',
     updatedBy: 'Prof. V. K. Singh',
   },
@@ -229,7 +230,7 @@ export const INITIAL_MODULE_PROGRESS: Record<string, ModulePortionProgress> = {
     title: 'Full-Stack Architecture, Deployment & Web Security',
     totalTopics: 3,
     completedUpTo: 0,
-    unlockedUpTo: 2,
+    unlockedUpTo: 3,
     lastUpdatedDate: '2026-02-12',
     updatedBy: 'Prof. V. K. Singh',
   },
@@ -654,6 +655,7 @@ export interface AcademicStoreState {
     unlockedUpTo?: number,
     updatedBy?: string
   ) => void
+  toggleTopicCovered: (moduleId: string, topicIndex1Based: number, updatedBy?: string) => void
 
   isTopicCompleted: (moduleId: string, topicIndex1Based: number) => boolean
   isTopicUnlocked: (moduleId: string, topicIndex1Based: number) => boolean
@@ -699,17 +701,15 @@ export const useAcademicStore = create<AcademicStoreState>()(
       milestones: INITIAL_MILESTONES,
       studentMarks: INITIAL_STUDENT_MARKS,
 
-      setPortionProgress: (moduleId, completedUpTo, customUnlockedUpTo, updatedBy = "Faculty In-Charge") => {
+      setPortionProgress: (moduleId, completedUpTo, _customUnlockedUpTo, updatedBy = "Faculty In-Charge") => {
         set((state) => {
           const current = state.moduleProgress[moduleId]
           if (!current) return state
 
           const safeCompleted = Math.max(0, Math.min(current.totalTopics, completedUpTo))
-          // Rule: If teacher completed till Part 5, Part 8 is unlocked (completedUpTo + 3)
-          const safeUnlocked =
-            customUnlockedUpTo !== undefined
-              ? Math.max(safeCompleted, Math.min(current.totalTopics, customUnlockedUpTo))
-              : Math.min(current.totalTopics, safeCompleted + 3)
+          // Entire module is open for learning once course is active; faculty marks what has been covered
+          const safeUnlocked = current.totalTopics
+          const coveredTopics = Array.from({ length: safeCompleted }, (_, i) => i + 1)
 
           return {
             moduleProgress: {
@@ -718,6 +718,39 @@ export const useAcademicStore = create<AcademicStoreState>()(
                 ...current,
                 completedUpTo: safeCompleted,
                 unlockedUpTo: safeUnlocked,
+                coveredTopics,
+                lastUpdatedDate: new Date().toISOString().split("T")[0],
+                updatedBy,
+              },
+            },
+          }
+        })
+      },
+
+      toggleTopicCovered: (moduleId, topicIndex1Based, updatedBy = "Faculty In-Charge") => {
+        set((state) => {
+          const current = state.moduleProgress[moduleId]
+          if (!current) return state
+
+          const currentCovered = current.coveredTopics
+            ? [...current.coveredTopics]
+            : Array.from({ length: current.completedUpTo }, (_, i) => i + 1)
+
+          const exists = currentCovered.includes(topicIndex1Based)
+          const newCovered = exists
+            ? currentCovered.filter((id) => id !== topicIndex1Based)
+            : [...currentCovered, topicIndex1Based].sort((a, b) => a - b)
+
+          const newCompletedUpTo = newCovered.length > 0 ? Math.max(...newCovered) : 0
+
+          return {
+            moduleProgress: {
+              ...state.moduleProgress,
+              [moduleId]: {
+                ...current,
+                coveredTopics: newCovered,
+                completedUpTo: newCompletedUpTo,
+                unlockedUpTo: current.totalTopics,
                 lastUpdatedDate: new Date().toISOString().split("T")[0],
                 updatedBy,
               },
@@ -729,13 +762,15 @@ export const useAcademicStore = create<AcademicStoreState>()(
       isTopicCompleted: (moduleId, topicIndex1Based) => {
         const prog = get().moduleProgress[moduleId]
         if (!prog) return true
+        if (prog.coveredTopics && Array.isArray(prog.coveredTopics)) {
+          return prog.coveredTopics.includes(topicIndex1Based)
+        }
         return topicIndex1Based <= prog.completedUpTo
       },
 
-      isTopicUnlocked: (moduleId, topicIndex1Based) => {
-        const prog = get().moduleProgress[moduleId]
-        if (!prog) return true
-        return topicIndex1Based <= prog.unlockedUpTo
+      isTopicUnlocked: (_moduleId, _topicIndex1Based) => {
+        // Entire module is open for self-study and student learning
+        return true
       },
 
       updateMilestone: (id, updates) => {

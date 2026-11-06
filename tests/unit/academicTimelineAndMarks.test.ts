@@ -9,41 +9,49 @@ describe("Academic Timeline, Portion Progress & Multi-Subject Marks Store", () =
     })
   })
 
-  it("verifies initial portion progress implements user rule (M1 completed up to Part 5, unlocked up to Part 8)", () => {
+  it("verifies initial portion progress: module is open for learning, faculty portion tracked", () => {
     const store = useAcademicStore.getState()
     const m1 = store.moduleProgress.m1
 
     expect(m1).toBeDefined()
     expect(m1.completedUpTo).toBe(5)
-    expect(m1.unlockedUpTo).toBe(8)
+    expect(m1.unlockedUpTo).toBe(11) // whole module is open
     expect(m1.totalTopics).toBe(11)
 
-    // Topic 1 to 5 should be completed
+    // Topic 1 to 5 should be completed / covered in class
     expect(store.isTopicCompleted("m1", 1)).toBe(true)
     expect(store.isTopicCompleted("m1", 5)).toBe(true)
     expect(store.isTopicCompleted("m1", 6)).toBe(false)
 
-    // Topic 1 to 8 should be unlocked
+    // All topics in the module are open for self-study
     expect(store.isTopicUnlocked("m1", 1)).toBe(true)
     expect(store.isTopicUnlocked("m1", 8)).toBe(true)
-    expect(store.isTopicUnlocked("m1", 9)).toBe(false)
-    expect(store.isTopicUnlocked("m1", 11)).toBe(false)
+    expect(store.isTopicUnlocked("m1", 9)).toBe(true)
+    expect(store.isTopicUnlocked("m1", 11)).toBe(true)
   })
 
-  it("automatically unlocks up to (completed + 3) when teacher advances portion", () => {
+  it("allows teacher to advance portion and mark topics done or not done while module remains fully open", () => {
     const store = useAcademicStore.getState()
 
     // Teacher advances M2 to Topic 4
     store.setPortionProgress("m2", 4)
     const updatedM2 = useAcademicStore.getState().moduleProgress.m2
     expect(updatedM2.completedUpTo).toBe(4)
-    expect(updatedM2.unlockedUpTo).toBe(7) // 4 + 3
+    expect(updatedM2.unlockedUpTo).toBe(12) // entire module open
 
-    // Topics 1-4 completed, 1-7 unlocked
+    // Topics 1-4 completed, 5 not covered yet
     expect(store.isTopicCompleted("m2", 4)).toBe(true)
     expect(store.isTopicCompleted("m2", 5)).toBe(false)
+
+    // All topics unlocked for learning
     expect(store.isTopicUnlocked("m2", 7)).toBe(true)
-    expect(store.isTopicUnlocked("m2", 8)).toBe(false)
+    expect(store.isTopicUnlocked("m2", 12)).toBe(true)
+
+    // Teacher can toggle individual topic covered / not covered
+    store.toggleTopicCovered("m2", 5)
+    expect(store.isTopicCompleted("m2", 5)).toBe(true)
+    store.toggleTopicCovered("m2", 5)
+    expect(store.isTopicCompleted("m2", 5)).toBe(false)
   })
 
   it("verifies all required milestones exist in correct syllabus order", () => {

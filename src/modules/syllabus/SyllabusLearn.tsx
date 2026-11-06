@@ -6,6 +6,8 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/Card"
 import { ModuleId, getModule } from "@/lib/syllabus"
 import { Presentation, ArrowRight, Lightbulb, ShieldCheck, AlertCircle, BookMarked, Lock, CheckCircle2, Clock, BookOpen, Layers } from "lucide-react"
 import { useAcademicStore } from "@/lib/academicStore"
+import { useAuthStore } from "@/lib/authStore"
+import { useMounted } from "@/hooks/useMounted"
 import { GuidedLesson, LessonStepType } from "@/components/layout/GuidedLesson"
 import { cryptoLessonSteps, cryptoLessonDiagrams } from "@/modules/crypto/Learn"
 import { authLessonSteps, authLessonDiagrams } from "@/modules/auth/Learn"
@@ -74,7 +76,10 @@ export default function SyllabusLearn({ moduleId }: { moduleId: ModuleId }) {
   const mod = getModule(moduleId)
   const deepDive = MODULE_DEEP_DIVES[moduleId] || MODULE_DEEP_DIVES.m1
   const lesson = MODULE_GUIDED_LESSONS[moduleId]
-  const { isTopicCompleted, isTopicUnlocked, moduleProgress } = useAcademicStore()
+  const mounted = useMounted()
+  const { role, isAuthenticated } = useAuthStore()
+  const isTeacher = mounted && isAuthenticated && role === "teacher"
+  const { isTopicCompleted, toggleTopicCovered, moduleProgress } = useAcademicStore()
   const progress = moduleProgress[moduleId]
 
   if (!mod) return null
@@ -192,7 +197,7 @@ export default function SyllabusLearn({ moduleId }: { moduleId: ModuleId }) {
               Official Syllabus Topics ({mod.topics.length})
             </h3>
             <p className="text-xs text-ink-soft font-mono">
-              Portion Progress: Faculty covered up to Topic {progress?.completedUpTo ?? 0} · Notes unlocked up to Topic {progress?.unlockedUpTo ?? 0}
+              Faculty covered up to Topic {progress?.completedUpTo ?? 0} of {mod.topics.length} · All topics open for self-study
             </p>
           </div>
           <span className="font-mono text-xs text-ink-soft">Bloom Levels L1 to L4</span>
@@ -202,15 +207,12 @@ export default function SyllabusLearn({ moduleId }: { moduleId: ModuleId }) {
           {mod.topics.map((t, idx) => {
             const topicNum = idx + 1
             const isCompleted = isTopicCompleted(moduleId, topicNum)
-            const isUnlocked = isTopicUnlocked(moduleId, topicNum)
 
             return (
               <div
                 key={t.id}
                 className={`p-4 border transition-all flex flex-col sm:flex-row sm:items-center justify-between gap-4 ${
-                  !isUnlocked
-                    ? "bg-paper/70 border-rule opacity-80"
-                    : isCompleted
+                  isCompleted
                     ? "bg-card border-ok/40 hover:border-ok shadow-xs"
                     : "bg-card border-rule hover:border-ink shadow-xs"
                 }`}
@@ -221,21 +223,16 @@ export default function SyllabusLearn({ moduleId }: { moduleId: ModuleId }) {
                     <span className="px-1.5 py-0.5 border border-rule bg-paper text-ink-soft">{t.hours} hrs</span>
                     <span className="px-1.5 py-0.5 border border-signal/30 bg-signal/10 text-signal font-bold">{t.bloom}</span>
 
-                    {/* Progressive Unlock Badges */}
+                    {/* Covered / Not Yet badge */}
                     {isCompleted ? (
                       <span className="px-1.5 py-0.5 bg-ok/10 border border-ok/30 text-ok font-bold flex items-center gap-1">
                         <CheckCircle2 className="h-3 w-3" />
                         <span>Covered in Class</span>
                       </span>
-                    ) : isUnlocked ? (
-                      <span className="px-1.5 py-0.5 bg-signal/10 border border-signal/30 text-signal font-bold flex items-center gap-1">
-                        <Clock className="h-3 w-3" />
-                        <span>Unlocked (Pre-Reading)</span>
-                      </span>
                     ) : (
                       <span className="px-1.5 py-0.5 bg-card border border-rule text-ink-soft font-bold flex items-center gap-1">
-                        <Lock className="h-3 w-3" />
-                        <span>Locked by Faculty</span>
+                        <Clock className="h-3 w-3" />
+                        <span>Not Yet Covered</span>
                       </span>
                     )}
 
@@ -249,14 +246,9 @@ export default function SyllabusLearn({ moduleId }: { moduleId: ModuleId }) {
                   <p className="text-xs text-ink-soft font-sans leading-relaxed">
                     {t.description}
                   </p>
-                  {!isUnlocked && (
-                    <p className="font-mono text-[11px] text-ink-soft italic pt-0.5">
-                      🔒 Unlocks as teacher completes portion up to Part {Math.max(1, topicNum - 3)}.
-                    </p>
-                  )}
                 </div>
 
-                <div className="shrink-0 flex sm:flex-col items-center sm:items-end gap-2">
+                <div className="shrink-0 flex flex-wrap sm:flex-col items-center sm:items-end gap-2">
                   <Link
                     href={`/present/${mod.code.toLowerCase()}/${t.id}`}
                     className="px-3 py-1.5 border border-rule hover:border-signal bg-paper hover:bg-signal hover:text-paper text-ink transition-colors font-mono text-xs uppercase tracking-wider flex items-center gap-1.5 font-bold"
@@ -265,6 +257,22 @@ export default function SyllabusLearn({ moduleId }: { moduleId: ModuleId }) {
                     <span>Slides [P]</span>
                     <ArrowRight className="h-3 w-3" />
                   </Link>
+
+                  {isTeacher && (
+                    <button
+                      type="button"
+                      onClick={() => toggleTopicCovered(moduleId, topicNum)}
+                      className={`px-3 py-1.5 border font-mono text-xs uppercase tracking-wider flex items-center gap-1.5 font-bold transition-colors ${
+                        isCompleted
+                          ? "border-ok bg-ok/10 text-ok hover:bg-bad/10 hover:border-bad hover:text-bad"
+                          : "border-signal bg-signal/10 text-signal hover:bg-signal hover:text-paper"
+                      }`}
+                      title={isCompleted ? "Faculty: Click to mark as not covered" : "Faculty: Click to mark as covered in class"}
+                    >
+                      <CheckCircle2 className="h-3.5 w-3.5" />
+                      <span>{isCompleted ? "Covered ✓" : "Mark Done"}</span>
+                    </button>
+                  )}
                 </div>
               </div>
             )
